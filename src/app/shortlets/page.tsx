@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { Star, MapPin, Search, SlidersHorizontal } from "lucide-react";
+import { Star, MapPin, Search } from "lucide-react";
 import { shortlets } from "@/data/shortlets";
 
 const cities = ["All", "Lagos", "Abuja"];
@@ -101,8 +101,8 @@ export default function ShortletsPage() {
                     src={item.images[0]}
                     alt={item.title}
                     fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    unoptimized
                   />
                   {item.host.superhost && (
                     <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-amber-400 text-xs font-semibold px-3 py-1 rounded-full">

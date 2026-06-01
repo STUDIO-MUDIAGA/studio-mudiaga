@@ -1,7 +1,6 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Star, MapPin, ArrowRight } from "lucide-react";
@@ -23,8 +22,8 @@ function ShortletCard({ item, index }: { item: (typeof shortlets)[0]; index: num
             src={item.images[0]}
             alt={item.title}
             fill
+            sizes="(max-width: 768px) 100vw, 33vw"
             className="object-cover transition-transform duration-700 group-hover:scale-105"
-            unoptimized
           />
           {item.host.superhost && (
             <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-amber-400 text-xs font-semibold px-3 py-1 rounded-full">
@@ -70,46 +69,32 @@ function ShortletCard({ item, index }: { item: (typeof shortlets)[0]; index: num
 }
 
 export default function FeaturedShortlets() {
-  const ref = useRef<HTMLDivElement>(null);
-
   return (
-    <section ref={ref} className="py-24 px-6">
+    <section className="py-24 px-6">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-end justify-between mb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="flex items-end justify-between mb-12"
+        >
           <div>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-2"
-            >
+            <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-2">
               Shortlets
-            </motion.p>
-            <motion.h2
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-white text-3xl md:text-4xl font-bold"
-            >
+            </p>
+            <h2 className="text-white text-3xl md:text-4xl font-bold">
               Handpicked spaces
-            </motion.h2>
+            </h2>
           </div>
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
+          <Link
+            href="/shortlets"
+            className="hidden md:flex items-center gap-2 text-white/50 hover:text-white text-sm transition-colors group"
           >
-            <Link
-              href="/shortlets"
-              className="hidden md:flex items-center gap-2 text-white/50 hover:text-white text-sm transition-colors group"
-            >
-              See all
-              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </motion.div>
-        </div>
+            See all
+            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </motion.div>
 
         <div className="grid md:grid-cols-3 gap-6">
           {featured.map((item, i) => (

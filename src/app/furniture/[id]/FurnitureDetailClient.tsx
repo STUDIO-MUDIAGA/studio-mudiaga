@@ -33,7 +33,7 @@ export default function FurnitureDetailClient({ item }: { item: FurnitureItem })
                 alt={item.name}
                 fill
                 className="object-cover"
-                unoptimized
+               
               />
             </div>
             {item.images.length > 1 && (
@@ -47,7 +47,7 @@ export default function FurnitureDetailClient({ item }: { item: FurnitureItem })
                       activeImage === i ? "border-amber-400" : "border-white/10"
                     )}
                   >
-                    <Image src={img} alt="" fill className="object-cover" unoptimized />
+                    <Image src={img} alt="" fill className="object-cover" />
                   </button>
                 ))}
               </div>

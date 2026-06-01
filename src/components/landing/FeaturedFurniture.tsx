@@ -22,8 +22,8 @@ function FurnitureCard({ item, index }: { item: (typeof furnitureItems)[0]; inde
             src={item.images[0]}
             alt={item.name}
             fill
+            sizes="(max-width: 768px) 50vw, 25vw"
             className="object-cover transition-transform duration-700 group-hover:scale-105"
-            unoptimized
           />
           {!item.inStock && (
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
@@ -63,32 +63,22 @@ export default function FeaturedFurniture() {
   return (
     <section className="py-24 px-6 bg-white/2">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-end justify-between mb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="flex items-end justify-between mb-12"
+        >
           <div>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-2"
-            >
+            <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-2">
               Furniture
-            </motion.p>
-            <motion.h2
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-white text-3xl md:text-4xl font-bold"
-            >
+            </p>
+            <h2 className="text-white text-3xl md:text-4xl font-bold">
               Crafted to last
-            </motion.h2>
+            </h2>
           </div>
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-          >
+          <div>
             <Link
               href="/furniture"
               className="hidden md:flex items-center gap-2 text-white/50 hover:text-white text-sm transition-colors group"
@@ -96,8 +86,8 @@ export default function FeaturedFurniture() {
               View collection
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
           {featured.map((item, i) => (

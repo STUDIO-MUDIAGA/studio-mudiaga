@@ -29,7 +29,7 @@ export default function ShortletDetailClient({ shortlet }: { shortlet: Shortlet 
               alt={shortlet.title}
               fill
               className="object-cover"
-              unoptimized
+             
             />
           </div>
           <div className="col-span-2 grid grid-rows-2 gap-2">
@@ -39,7 +39,7 @@ export default function ShortletDetailClient({ shortlet }: { shortlet: Shortlet 
                 className="relative cursor-pointer"
                 onClick={() => setActiveImage(i + 1)}
               >
-                <Image src={img} alt="" fill className="object-cover" unoptimized />
+                <Image src={img} alt="" fill className="object-cover" />
               </div>
             ))}
           </div>
@@ -172,7 +172,7 @@ export default function ShortletDetailClient({ shortlet }: { shortlet: Shortlet 
                     alt={shortlet.host.name}
                     fill
                     className="object-cover"
-                    unoptimized
+                   
                   />
                 </div>
                 <div>

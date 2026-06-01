@@ -101,8 +101,8 @@ export default function FurniturePage() {
                     src={item.images[0]}
                     alt={item.name}
                     fill
+                    sizes="(max-width: 768px) 50vw, 25vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    unoptimized
                   />
                   {!item.inStock && (
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
