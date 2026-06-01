@@ -120,14 +120,14 @@ export default function Hero() {
         >
           <Link
             href="/shortlets"
-            className="group flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-black font-semibold px-8 py-4 rounded-full text-sm transition-all duration-300 hover:scale-105"
+            className="group inline-flex items-center gap-2.5 bg-amber-400 hover:bg-amber-300 active:scale-[0.97] text-black font-semibold px-8 py-3.5 rounded-full text-sm transition-all duration-200 shadow-[0_0_24px_2px_#fbbf2440] hover:shadow-[0_0_32px_6px_#fbbf2455]"
           >
             Book a Shortlet
-            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform duration-200" />
           </Link>
           <Link
             href="/furniture"
-            className="group flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium px-8 py-4 rounded-full text-sm transition-all duration-300"
+            className="group inline-flex items-center gap-2.5 bg-white/6 hover:bg-white/10 active:scale-[0.97] border border-white/12 hover:border-white/22 text-white font-medium px-8 py-3.5 rounded-full text-sm transition-all duration-200 backdrop-blur-sm"
           >
             Shop Furniture
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />

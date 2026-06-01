@@ -156,7 +156,7 @@ export default function ShortletDetailClient({ shortlet }: { shortlet: Shortlet 
 
               <button
                 disabled={!shortlet.available}
-                className="w-full bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-amber-300 text-black font-semibold py-4 rounded-full text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full inline-flex items-center justify-center bg-amber-400 hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-amber-400 text-black font-bold py-3.5 rounded-full text-sm transition-all duration-200 active:scale-[0.97] shadow-[0_0_20px_2px_#fbbf2440] hover:shadow-[0_0_28px_5px_#fbbf2455]"
               >
                 {shortlet.available ? "Reserve" : "Unavailable"}
               </button>

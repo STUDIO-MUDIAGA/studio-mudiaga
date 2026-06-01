@@ -74,10 +74,10 @@ export default function FurniturePage() {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`px-4 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 active:scale-[0.97] ${
                   selectedCategory === cat
-                    ? "bg-amber-400 text-black"
-                    : "bg-white/5 border border-white/10 text-white/60 hover:text-white"
+                    ? "bg-amber-400 text-black shadow-[0_0_14px_1px_#fbbf2435]"
+                    : "bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10 hover:border-white/20"
                 }`}
               >
                 {cat}

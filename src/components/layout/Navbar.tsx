@@ -56,7 +56,7 @@ export default function Navbar() {
           ))}
           <Link
             href="/shortlets"
-            className="bg-amber-400 text-black text-sm font-semibold px-5 py-2 rounded-full hover:bg-amber-300 transition-colors"
+            className="inline-flex items-center bg-amber-400 hover:bg-amber-300 active:scale-[0.97] text-black text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200 shadow-[0_0_16px_1px_#fbbf2430] hover:shadow-[0_0_20px_3px_#fbbf2445]"
           >
             Book Now
           </Link>
