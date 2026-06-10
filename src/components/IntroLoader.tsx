@@ -2,99 +2,116 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 const EASE = [0.76, 0, 0.24, 1] as [number, number, number, number];
 
-interface Props {
-  onComplete: () => void;
-}
+const FULL = "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)";
+const BOX  = "polygon(42% 36%, 58% 36%, 58% 64%, 42% 64%)";
 
-export default function IntroLoader({ onComplete }: Props) {
+// Diagonal expand: top-left → top edge → bottom-left → full
+const EXPAND_KF = [
+  BOX,
+  "polygon(0% 0%, 58% 36%, 58% 64%, 42% 64%)",
+  "polygon(0% 0%, 100% 0%, 58% 64%, 42% 64%)",
+  "polygon(0% 0%, 100% 0%, 58% 64%, 0% 100%)",
+  FULL,
+];
+
+// Phase timings (ms)
+const T = { p1: 1200, p2: 1900, p3: 2500, p4: 3350, p5: 5200 };
+
+export default function IntroLoader({ onComplete }: { onComplete: () => void }) {
   const [phase, setPhase] = useState(0);
-  // 0 → revealing text right-to-left
-  // 1 → zooming in
-  // 2 → splitting apart
-  // 3 → done
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase(1), 1400);
-    const t2 = setTimeout(() => setPhase(2), 2100);
-    const t3 = setTimeout(() => {
-      setPhase(3);
-      onComplete();
-    }, 2900);
-    return () => [t1, t2, t3].forEach(clearTimeout);
+    const ts = [
+      setTimeout(() => setPhase(1), T.p1),
+      setTimeout(() => setPhase(2), T.p2),
+      setTimeout(() => setPhase(3), T.p3),
+      setTimeout(() => { setPhase(4); onComplete(); }, T.p4),
+      setTimeout(() => setPhase(5), T.p5),
+    ];
+    return () => ts.forEach(clearTimeout);
   }, [onComplete]);
 
-  if (phase === 3) return null;
+  if (phase === 5) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] pointer-events-none">
-      {/* Top panel */}
+    <div className="fixed inset-0 z-[9999] overflow-hidden">
+
+      {/* Main overlay — full black → contracts to box → burnt orange → expands → slides up */}
       <motion.div
-        className="absolute inset-x-0 top-0 bg-[#0a0a0a]"
-        style={{ height: "50%" }}
-        animate={phase >= 2 ? { y: "-100%" } : { y: 0 }}
-        transition={{ duration: 0.85, ease: EASE }}
+        className="absolute inset-0"
+        style={{ backgroundColor: "#0a0a0a", clipPath: FULL }}
+        animate={
+          phase >= 4
+            ? { y: "-100%", clipPath: FULL, backgroundColor: "#c85442" }
+            : phase >= 3
+            ? { clipPath: EXPAND_KF, backgroundColor: "#c85442" }
+            : phase >= 2
+            ? { clipPath: BOX, backgroundColor: "#0a0a0a" }
+            : { clipPath: FULL, backgroundColor: "#0a0a0a" }
+        }
+        transition={
+          phase >= 4
+            ? { y: { duration: 1.7, ease: EASE }, clipPath: { duration: 0 }, backgroundColor: { duration: 0 } }
+            : phase >= 3
+            ? { clipPath: { duration: 0.75, ease: "easeInOut" }, backgroundColor: { duration: 0.05 } }
+            : { clipPath: { duration: 0.55, ease: EASE }, backgroundColor: { duration: 0 } }
+        }
       />
 
-      {/* Bottom panel */}
-      <motion.div
-        className="absolute inset-x-0 bottom-0 bg-[#0a0a0a]"
-        style={{ height: "50%" }}
-        animate={phase >= 2 ? { y: "100%" } : { y: 0 }}
-        transition={{ duration: 0.85, ease: EASE }}
-      />
-
-      {/* Logo centred over the panels */}
-      <div className="absolute inset-0 flex items-center justify-center">
+      {/* Full logo — types in left→right, fades at phase 1 */}
+      <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 2 }}>
         <motion.div
+          initial={{ clipPath: "inset(0 100% 0 0)", opacity: 1 }}
           animate={
-            phase >= 2
-              ? { scale: 1.6, opacity: 0 }
-              : phase >= 1
-              ? { scale: 1.25 }
-              : { scale: 1 }
+            phase >= 1
+              ? { clipPath: "inset(0 0% 0 0)", opacity: 0 }
+              : { clipPath: "inset(0 0% 0 0)", opacity: 1 }
           }
-          transition={{ duration: 0.65, ease: EASE }}
-          style={{
-            clipPath:
-              phase === 0
-                ? "inset(0 0 0 100%)"
-                : "inset(0 0 0 0%)",
-          }}
+          transition={
+            phase >= 1
+              ? { opacity: { duration: 0.3, ease: "easeOut" }, clipPath: { duration: 0 } }
+              : { clipPath: { duration: 1.0, ease: EASE }, opacity: { duration: 0 } }
+          }
         >
-          {/* clip-path driven reveal right → left on mount */}
-          <motion.div
-            initial={{ clipPath: "inset(0 0 0 100%)" }}
-            animate={{ clipPath: "inset(0 0 0 0%)" }}
-            transition={{ duration: 0.9, ease: EASE, delay: 0.15 }}
-          >
-            <h1 className="text-6xl md:text-8xl font-bold text-white whitespace-nowrap select-none">
-              studio
-              <span className="text-amber-400">mudiaga</span>
-            </h1>
-          </motion.div>
+          <Image
+            src="/Group.svg"
+            alt="Studio Mudiaga"
+            width={460}
+            height={73}
+            priority
+            unoptimized
+          />
         </motion.div>
       </div>
 
-      {/* Thin amber line that sweeps right → left under the logo */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="relative overflow-hidden h-px w-[520px] md:w-[760px]">
-          <motion.div
-            className="absolute inset-y-0 left-0 bg-amber-400/60"
-            initial={{ scaleX: 0, transformOrigin: "right" }}
-            animate={{ scaleX: [0, 1, 1, 0] }}
-            transition={{
-              duration: 1.2,
-              ease: EASE,
-              delay: 0.1,
-              times: [0, 0.45, 0.55, 1],
-            }}
-            style={{ width: "100%" }}
+      {/* M mark — fades in at phase 1, fades out at phase 2 */}
+      <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 3 }}>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{
+            opacity: phase >= 2 ? 0 : phase >= 1 ? 1 : 0,
+            scale:   phase >= 2 ? 0.9 : phase >= 1 ? 1 : 0.85,
+          }}
+          transition={{
+            opacity: { duration: 0.35, ease: "easeOut" },
+            scale:   { duration: 0.45, ease: EASE },
+          }}
+        >
+          <Image
+            src="/Vector.svg"
+            alt="M"
+            width={72}
+            height={62}
+            priority
+            unoptimized
           />
-        </div>
+        </motion.div>
       </div>
+
     </div>
   );
 }

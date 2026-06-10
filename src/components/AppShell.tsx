@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import IntroLoader from "./IntroLoader";
+import CustomCursor from "./CustomCursor";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
+  const handleComplete = useCallback(() => setReady(true), []);
 
   return (
     <>
-      <IntroLoader onComplete={() => setReady(true)} />
+      <CustomCursor />
+      <IntroLoader onComplete={handleComplete} />
       <div
         style={{
           opacity: ready ? 1 : 0,

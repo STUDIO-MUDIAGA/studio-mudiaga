@@ -1,113 +1,192 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
-const WORDS = ["Curated", "Living."];
+const EASE = [0.76, 0, 0.24, 1] as [number, number, number, number];
+const SLIDE_DURATION = 5; // seconds
+
+const slides = [
+  {
+    image: "/IMG_1654.JPG",
+    tag: "Furniture · Handcrafted",
+    title: "Artisan\nTable",
+    subtitle: "Hand-carved solid wood pieces that anchor every room with intention.",
+    cta: { label: "View Collection", href: "/furniture" },
+  },
+  {
+    image: "/IMG_1656.JPG",
+    tag: "Furniture · Dining",
+    title: "The Dining\nExperience",
+    subtitle: "Where craftsmanship meets art — furniture that tells a story.",
+    cta: { label: "Shop Furniture", href: "/furniture" },
+  },
+  {
+    image: "/IMG_1666.JPG",
+    tag: "Shortlets · Lagos",
+    title: "The Media\nLounge",
+    subtitle: "Curated interiors, bespoke furniture — a space designed to be lived in.",
+    cta: { label: "Book Now", href: "/shortlets" },
+  },
+  {
+    image: "/IMG_1672.JPG",
+    tag: "Shortlets · Reading Nook",
+    title: "Raw &\nRefined",
+    subtitle: "Exposed brick, warm light, handcrafted chairs. Comfort in every detail.",
+    cta: { label: "Explore Stays", href: "/shortlets" },
+  },
+  {
+    image: "/IMG_1675.JPG",
+    tag: "Shortlets · Living",
+    title: "Spaces That\nInspire",
+    subtitle: "Every corner considered. Every material chosen with purpose.",
+    cta: { label: "Book Now", href: "/shortlets" },
+  },
+];
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
 
   const { scrollY } = useScroll();
-  const bgY = useTransform(scrollY, [0, 500], [0, 80]);
-  const contentOpacity = useTransform(scrollY, [0, 350], [1, 0]);
+  const bgY = useTransform(scrollY, [0, 600], [0, 90]);
+  const contentOpacity = useTransform(scrollY, [0, 400], [1, 0]);
+
+  // Auto-advance — resets timer on every slide change (including manual clicks)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActive((prev) => (prev + 1) % slides.length);
+    }, SLIDE_DURATION * 1000);
+    return () => clearInterval(timer);
+  }, [active]);
+
+  const slide = slides[active];
 
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
+      className="relative min-h-screen overflow-hidden"
+      data-cursor="Explore project"
     >
-      {/* Parallax background — single image, no blur filters */}
-      <motion.div style={{ y: bgY }} className="absolute inset-0 z-0 will-change-transform">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=75')",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/65 via-[#0a0a0a]/45 to-[#0a0a0a]" />
-      </motion.div>
+      {/* Slides — diagonal clip-path wipe. Active slide is always z-index 1 (on top). */}
+      <div className="absolute inset-0 z-0">
+        {slides.map((s, i) => (
+          <motion.div
+            key={i}
+            className="absolute inset-0"
+            style={{ zIndex: active === i ? 1 : 0 }}
+            initial={false}
+            animate={{
+              clipPath:
+                active === i
+                  ? "polygon(0% 0%, 100% 0%, 100% 100%, -30% 100%)"
+                  : "polygon(0% 0%, 0% 0%, -30% 100%, 0% 100%)",
+            }}
+            transition={{ duration: 1.4, ease: EASE }}
+          >
+            <motion.div style={{ y: bgY }} className="absolute inset-0 will-change-transform">
+              <div
+                className="absolute inset-0 bg-cover bg-center scale-105"
+                style={{ backgroundImage: `url('${s.image}')` }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" />
+            </motion.div>
+          </motion.div>
+        ))}
+      </div>
 
-      {/* Content */}
+      {/* Bottom-left content */}
       <motion.div
         style={{ opacity: contentOpacity }}
-        className="relative z-10 max-w-6xl mx-auto px-6 text-center"
+        className="absolute bottom-20 z-10 w-full"
       >
-        {/* Location pill */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-          className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm text-white/60 mb-8"
-        >
-          <MapPin size={13} className="text-amber-400" />
-          Lagos · Abuja · Port Harcourt
-        </motion.div>
-
-        {/* Headline — staggered word reveal */}
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.05] mb-8 overflow-hidden">
-          {WORDS.map((word, i) => (
-            <motion.span
-              key={word}
-              className={`block ${i === 1 ? "text-gradient" : "text-white"}`}
-              initial={{ y: "110%", opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{
-                duration: 0.7,
-                delay: 0.25 + i * 0.12,
-                ease: [0.22, 1, 0.36, 1],
-              }}
+        <div style={{ maxWidth: 1200, margin: "0 auto", paddingLeft: 48, paddingRight: 48, width: "100%" }}>
+          <div className="max-w-xl">
+            <motion.p
+              key={`tag-${active}`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="text-white/50 text-xs tracking-[0.25em] uppercase mb-5"
             >
-              {word}
-            </motion.span>
-          ))}
-        </h1>
+              {slide.tag}
+            </motion.p>
 
-        <motion.p
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
-          className="text-white/50 text-lg md:text-xl max-w-xl mx-auto mb-12 leading-relaxed"
-        >
-          Premium shortlet apartments and handcrafted furniture — designed for the way you live.
-        </motion.p>
+            <AnimatePresence mode="wait">
+              <motion.h1
+                key={`title-${active}`}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+                className="text-5xl md:text-7xl font-bold text-white leading-[1.05] mb-5 whitespace-pre-line"
+                style={{ fontFamily: "var(--font-playfair)" }}
+              >
+                {slide.title}
+              </motion.h1>
+            </AnimatePresence>
 
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.75, ease: "easeOut" }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-        >
-          <Link
-            href="/shortlets"
-            className="group inline-flex items-center gap-2.5 bg-amber-400 hover:bg-amber-300 active:scale-[0.97] text-black font-semibold px-8 py-3.5 rounded-full text-sm transition-all duration-200 shadow-[0_0_24px_2px_#fbbf2440] hover:shadow-[0_0_32px_6px_#fbbf2455]"
-          >
-            Book a Shortlet
-            <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform duration-200" />
-          </Link>
-          <Link
-            href="/furniture"
-            className="group inline-flex items-center gap-2.5 bg-white/6 hover:bg-white/10 active:scale-[0.97] border border-white/12 hover:border-white/22 text-white font-medium px-8 py-3.5 rounded-full text-sm transition-all duration-200 backdrop-blur-sm"
-          >
-            Shop Furniture
-            <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform duration-200" />
-          </Link>
-        </motion.div>
+            <motion.p
+              key={`sub-${active}`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-white/55 text-sm md:text-base leading-relaxed mb-8 max-w-sm"
+            >
+              {slide.subtitle}
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <Link
+                href={slide.cta.href}
+                className="group inline-flex items-center gap-3 text-white text-sm font-medium"
+              >
+                <span className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center group-hover:bg-white/10 transition-colors duration-200">
+                  <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform duration-200" />
+                </span>
+                {slide.cta.label}
+              </Link>
+            </motion.div>
+          </div>
+        </div>
       </motion.div>
 
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2"
+      {/* Progress dots — active dot fills over SLIDE_DURATION seconds */}
+      <div
+        className="absolute z-20 flex items-center gap-3"
+        style={{ bottom: 40, left: "50%", transform: "translateX(-50%)" }}
       >
-        <span className="text-white/30 text-xs tracking-widest uppercase">Scroll</span>
-        <div className="w-px h-10 bg-gradient-to-b from-white/30 to-transparent animate-[pulse_2s_ease-in-out_infinite]" />
-      </motion.div>
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setActive(i)}
+            aria-label={`Slide ${i + 1}`}
+            className="relative overflow-hidden"
+            style={{ width: i === active ? 48 : 28, height: 2 }}
+          >
+            {/* Track */}
+            <span className="absolute inset-0 bg-white/25" />
+            {/* Fill — keyed to active so it resets on every slide change */}
+            {i === active && (
+              <motion.span
+                key={`fill-${active}`}
+                className="absolute inset-0 bg-white"
+                style={{ originX: 0 }}
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: SLIDE_DURATION, ease: "linear" }}
+              />
+            )}
+          </button>
+        ))}
+      </div>
     </section>
   );
 }
