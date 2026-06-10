@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import AppShell from "@/components/AppShell";
 
 const inter = Inter({
@@ -43,7 +42,6 @@ export default function RootLayout({
         <AppShell>
           <Navbar />
           <main className="flex-1">{children}</main>
-          <Footer />
         </AppShell>
       </body>
     </html>
