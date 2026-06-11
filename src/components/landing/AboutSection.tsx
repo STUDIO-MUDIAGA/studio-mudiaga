@@ -3,14 +3,45 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform, useSpring, useMotionValueEvent, useInView } from "framer-motion";
 import { useEffect } from "react";
-import Image from "next/image";
 import { useNavTheme } from "@/context/NavTheme";
+
+const PILLARS = [
+  {
+    icon: (
+      <svg width="72" height="44" viewBox="0 0 72 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 34 C10 18 20 38 30 26 C38 16 44 32 54 22 C60 16 64 24 68 20" stroke="#0a0a0a" strokeWidth="1.1" strokeLinecap="round" fill="none"/>
+        <path d="M4 34 C6 30 4 28 7 26" stroke="#0a0a0a" strokeWidth="1.1" strokeLinecap="round" fill="none"/>
+      </svg>
+    ),
+    title: "Culturally Grounded",
+    body: "Great design draws from history, identity, and the rhythms of African life. Every space we create is an act of cultural expression, not just decoration.",
+  },
+  {
+    icon: (
+      <svg width="72" height="44" viewBox="0 0 72 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 36 Q14 10 36 10 Q58 10 58 36" stroke="#0a0a0a" strokeWidth="1.1" strokeLinecap="round" fill="none"/>
+        <line x1="8" y1="36" x2="64" y2="36" stroke="#0a0a0a" strokeWidth="1.1" strokeLinecap="round"/>
+      </svg>
+    ),
+    title: "Artistic & Intentional",
+    body: "Every room has a story waiting to be told. We design with purpose and precision, layering meaning into every material, every form, and every finish until the space speaks for itself.",
+  },
+  {
+    icon: (
+      <svg width="72" height="44" viewBox="0 0 72 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 30 C16 30 26 12 44 20 C54 24 62 18 66 14" stroke="#0a0a0a" strokeWidth="1.1" strokeLinecap="round" fill="none"/>
+        <path d="M58 10 L66 14 L60 20" stroke="#0a0a0a" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+      </svg>
+    ),
+    title: "Client-Centered",
+    body: "Your vision is our starting point. We listen deeply, collaborate closely, and translate who you are into environments that feel personal, elevated, and unmistakably yours.",
+  },
+];
 
 export default function AboutSection() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { setTheme } = useNavTheme();
 
-  // Entry zoom: 0→1 as section scrolls from bottom-of-viewport to 25% from top
   const { scrollYProgress } = useScroll({
     target: wrapperRef,
     offset: ["start end", "start 0.25"],
@@ -18,12 +49,10 @@ export default function AboutSection() {
 
   const smoothProg = useSpring(scrollYProgress, { stiffness: 60, damping: 20, mass: 0.8 });
 
-  // Switch to brown only when zoom is ~complete (smoothProg >= 0.88)
   useMotionValueEvent(smoothProg, "change", (v) => {
     if (v >= 0.88) setTheme("light");
   });
 
-  // Switch back to dark when section exits the viewport (scrolling back up)
   const isInView = useInView(wrapperRef, { margin: "-5% 0px -5% 0px" });
   useEffect(() => {
     if (!isInView) setTheme("dark");
@@ -133,17 +162,48 @@ export default function AboutSection() {
               </p>
             </div>
           </div>
-        </div>
 
-        {/* ── Full-width image ──────────────────────────────────────── */}
-        <div style={{ position: "relative", width: "100%", height: "clamp(320px, 45vw, 680px)" }}>
-          <Image
-            src="/IMG_1672.JPG"
-            alt="Studio Mudiaga interior"
-            fill
-            className="object-cover"
-            sizes="100vw"
-          />
+          {/* ── Divider ───────────────────────────────────────────── */}
+          <div style={{ borderTop: "1px solid rgba(10,10,10,0.12)", marginBottom: "clamp(56px, 7vw, 100px)" }} />
+
+          {/* ── Three pillars ─────────────────────────────────────── */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "clamp(32px, 4vw, 64px)",
+              paddingBottom: "clamp(80px, 10vw, 140px)",
+            }}
+          >
+            {PILLARS.map((p) => (
+              <div key={p.title} style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+                <div style={{ height: 44 }}>{p.icon}</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  <h3
+                    style={{
+                      fontFamily: "var(--font-dm-sans)",
+                      fontSize: "clamp(13px, 1vw, 16px)",
+                      fontWeight: 500,
+                      letterSpacing: "0.01em",
+                      color: "#0a0a0a",
+                    }}
+                  >
+                    {p.title}
+                  </h3>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-dm-sans)",
+                      fontSize: "clamp(12px, 0.9vw, 14px)",
+                      lineHeight: 1.85,
+                      color: "rgba(10,10,10,0.55)",
+                    }}
+                  >
+                    {p.body}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </motion.section>
     </div>
