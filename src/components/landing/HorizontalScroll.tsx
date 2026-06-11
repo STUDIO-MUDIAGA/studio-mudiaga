@@ -167,11 +167,19 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
         className="absolute inset-0 z-20 pointer-events-none"
         style={{ opacity: contentOpacity, y: contentY }}
       >
-        {/* Main content row — vertically centered */}
-        <div
-          className="absolute inset-0 flex items-center"
-          style={{ paddingLeft: "13vw", paddingRight: "13vw" }}
-        >
+        {/* Main content row — vertically centered, left edge matches navbar logo */}
+        <div className="absolute inset-0 flex items-center">
+          <div
+            style={{
+              maxWidth: 1200,
+              margin: "0 auto",
+              width: "100%",
+              paddingLeft: 48,
+              paddingRight: 64,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
           {/* Left — oversized editorial heading */}
           <h2
             style={{
@@ -254,6 +262,7 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
               />
               View Project
             </button>
+          </div>
           </div>
         </div>
 
