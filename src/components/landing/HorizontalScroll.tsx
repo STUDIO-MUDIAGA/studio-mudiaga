@@ -70,9 +70,10 @@ export default function HorizontalScroll() {
 
 // heading broken into lines → words for per-word stagger animation
 const HEADING_LINES = [
-  ["Together,", "we", "shape", "homes"],
-  ["rooted", "in", "simplicity"],
-  ["and", "crafted", "with", "care."],
+  ["Together,", "we", "shape"],
+  ["homes", "rooted", "in"],
+  ["simplicity", "and"],
+  ["crafted", "with", "care."],
 ];
 
 // total words = 11; reverse-stagger on exit: last word exits first
@@ -218,12 +219,12 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
             <h2
               style={{
                 fontFamily: "var(--font-playfair)",
-                fontSize: "clamp(20px, 2.7vw, 46px)",
+                fontSize: "clamp(38px, 5vw, 80px)",
                 fontWeight: 300,
-                lineHeight: 1.15,
+                lineHeight: 1.12,
                 color: "white",
-                width: "38vw",
-                flexShrink: 0,
+                flex: "1 1 0",
+                minWidth: 0,
               }}
             >
               {HEADING_LINES.map((line, li) => {
@@ -257,16 +258,15 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
               })}
             </h2>
 
-            {/* Spacer */}
-            <div style={{ flex: 1 }} />
-
             {/* Right — two paragraphs + button, enter after heading */}
             <motion.div
               variants={rightColVariants}
               initial="hidden"
               animate={headingVisible ? "visible" : "hidden"}
               style={{
-                width: "22vw",
+                width: 240,
+                flexShrink: 0,
+                marginLeft: "clamp(24px, 3vw, 56px)",
                 display: "flex",
                 flexDirection: "column",
                 gap: 28,
