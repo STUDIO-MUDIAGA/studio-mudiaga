@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useEffect } from "react";
-import { motion, useScroll, useTransform, useSpring, useInView } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform, useSpring, useMotionValueEvent, useInView } from "framer-motion";
+import { useEffect } from "react";
 import Image from "next/image";
 import { useNavTheme } from "@/context/NavTheme";
 
@@ -9,18 +10,24 @@ export default function AboutSection() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { setTheme } = useNavTheme();
 
-  // Switch logo to brown when section is in viewport, white when not
-  const isInView = useInView(wrapperRef, { margin: "-15% 0px -15% 0px" });
-  useEffect(() => {
-    setTheme(isInView ? "light" : "dark");
-  }, [isInView, setTheme]);
-
+  // Entry zoom: 0→1 as section scrolls from bottom-of-viewport to 25% from top
   const { scrollYProgress } = useScroll({
     target: wrapperRef,
     offset: ["start end", "start 0.25"],
   });
 
   const smoothProg = useSpring(scrollYProgress, { stiffness: 60, damping: 20, mass: 0.8 });
+
+  // Switch to brown only when zoom is ~complete (smoothProg >= 0.88)
+  useMotionValueEvent(smoothProg, "change", (v) => {
+    if (v >= 0.88) setTheme("light");
+  });
+
+  // Switch back to dark when section exits the viewport (scrolling back up)
+  const isInView = useInView(wrapperRef, { margin: "-5% 0px -5% 0px" });
+  useEffect(() => {
+    if (!isInView) setTheme("dark");
+  }, [isInView, setTheme]);
 
   const scale        = useTransform(smoothProg, [0, 1], [0.88, 1]);
   const y            = useTransform(smoothProg, [0, 1], [72, 0]);
