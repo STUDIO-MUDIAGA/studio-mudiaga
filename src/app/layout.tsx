@@ -3,6 +3,7 @@ import { Inter, Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import AppShell from "@/components/AppShell";
+import { NavThemeProvider } from "@/context/NavTheme";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -39,10 +40,12 @@ export default function RootLayout({
       className={`${inter.variable} ${playfair.variable} ${dmSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#0a0a0a] text-white">
-        <AppShell>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-        </AppShell>
+        <NavThemeProvider>
+          <AppShell>
+            <Navbar />
+            <main className="flex-1">{children}</main>
+          </AppShell>
+        </NavThemeProvider>
       </body>
     </html>
   );

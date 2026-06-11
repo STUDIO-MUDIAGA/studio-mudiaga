@@ -51,7 +51,6 @@ export default function Hero() {
   const [active, setActive] = useState(0);
 
   const { scrollY } = useScroll();
-  const bgY = useTransform(scrollY, [0, 600], [0, 90]);
   const contentOpacity = useTransform(scrollY, [0, 400], [1, 0]);
 
   // Auto-advance — resets timer on every slide change (including manual clicks)
@@ -76,7 +75,7 @@ export default function Hero() {
           <motion.div
             key={i}
             className="absolute inset-0"
-            style={{ zIndex: active === i ? 1 : 0 }}
+            style={{ zIndex: active === i ? 1 : 0, willChange: "clip-path" }}
             initial={false}
             animate={{
               clipPath:
@@ -86,14 +85,14 @@ export default function Hero() {
             }}
             transition={{ duration: 1.4, ease: EASE }}
           >
-            <motion.div style={{ y: bgY }} className="absolute inset-0 will-change-transform">
+            <div className="absolute inset-0">
               <div
-                className="absolute inset-0 bg-cover bg-center scale-105"
+                className="absolute inset-0 bg-cover bg-center"
                 style={{ backgroundImage: `url('${s.image}')` }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30" />
               <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" />
-            </motion.div>
+            </div>
           </motion.div>
         ))}
       </div>

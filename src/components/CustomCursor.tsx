@@ -43,23 +43,32 @@ export default function CustomCursor() {
   return (
     <motion.div
       className="fixed top-0 left-0 z-[9997] pointer-events-none"
-      style={{ x, y }}
+      style={{ x, y, willChange: "transform" }}
       animate={{ opacity: visible ? 1 : 0 }}
       transition={{ opacity: { duration: 0.2 } }}
     >
       {/* centering wrapper */}
-      <div style={{ transform: "translate(-50%, -50%)" }}>
+      <div style={{ transform: "translate(-50%, -50%)", position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        {/* outer ring */}
+        <motion.div
+          className="absolute rounded-full"
+          animate={{
+            width: expanded ? 148 : 36,
+            height: expanded ? 148 : 36,
+            borderColor: "rgba(255,255,255,0.5)",
+            borderWidth: 1,
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 28, mass: 0.6 }}
+        />
+        {/* inner filled circle */}
         <motion.div
           className="rounded-full flex items-center justify-center overflow-hidden"
           animate={{
             width: expanded ? 120 : 12,
             height: expanded ? 120 : 12,
-            backgroundColor: expanded ? "rgba(0,0,0,1)" : "rgba(0,0,0,1)",
-            borderColor: expanded ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0)",
-            borderWidth: expanded ? 1 : 0,
+            backgroundColor: "rgba(0,0,0,1)",
           }}
           transition={{ type: "spring", stiffness: 350, damping: 28, mass: 0.5 }}
-          style={{ backdropFilter: "none" }}
         >
           <motion.p
             animate={{ opacity: expanded ? 1 : 0, scale: expanded ? 1 : 0.7 }}
