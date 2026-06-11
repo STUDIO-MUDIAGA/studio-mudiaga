@@ -327,23 +327,42 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
           </div>
         </div>
 
-        {/* Keep scrolling circle — bottom center */}
-        <div
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full border border-white/30 flex items-center justify-center"
-        >
-          <span
-            style={{
-              color: "rgba(255,255,255,0.55)",
-              fontSize: 8,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              textAlign: "center",
-              lineHeight: 1.6,
-              fontFamily: "var(--font-dm-sans)",
-            }}
+        {/* Keep scrolling — rotating circular text */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2" style={{ width: 90, height: 90 }}>
+          {/* Outer ring (static) */}
+          <div className="absolute inset-0 rounded-full border border-white/20" />
+
+          {/* Rotating text path */}
+          <motion.svg
+            width="90"
+            height="90"
+            viewBox="0 0 90 90"
+            style={{ position: "absolute", inset: 0 }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
           >
-            Keep<br />Scrolling
-          </span>
+            <defs>
+              <path id="ks-path" d="M45,45 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0" />
+            </defs>
+            <text
+              fill="rgba(255,255,255,0.55)"
+              fontSize="7"
+              fontFamily="var(--font-dm-sans)"
+              letterSpacing="2.6"
+            >
+              <textPath href="#ks-path">
+                KEEP SCROLLING · KEEP SCROLLING ·
+              </textPath>
+            </text>
+          </motion.svg>
+
+          {/* Centre — static down arrow */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <svg width="12" height="14" viewBox="0 0 12 14" fill="none">
+              <line x1="6" y1="0" x2="6" y2="11" stroke="rgba(255,255,255,0.5)" strokeWidth="1"/>
+              <path d="M1 7l5 5 5-5" stroke="rgba(255,255,255,0.5)" strokeWidth="1" fill="none"/>
+            </svg>
+          </div>
         </div>
       </motion.div>
     </div>
