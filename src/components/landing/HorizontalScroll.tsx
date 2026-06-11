@@ -170,17 +170,17 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
         {/* Main content row — vertically centered */}
         <div
           className="absolute inset-0 flex items-center"
-          style={{ paddingLeft: "9vw", paddingRight: "9vw" }}
+          style={{ paddingLeft: "13vw", paddingRight: "13vw" }}
         >
           {/* Left — oversized editorial heading */}
           <h2
             style={{
               fontFamily: "var(--font-playfair)",
-              fontSize: "clamp(42px, 6.5vw, 110px)",
+              fontSize: "clamp(36px, 5vw, 84px)",
               fontWeight: 300,
               lineHeight: 1.04,
               color: "white",
-              width: "44vw",
+              width: "34vw",
               flexShrink: 0,
             }}
           >
@@ -195,7 +195,7 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
           {/* Right — two paragraphs + button */}
           <div
             style={{
-              width: "32vw",
+              width: "22vw",
               display: "flex",
               flexDirection: "column",
               gap: 28,
