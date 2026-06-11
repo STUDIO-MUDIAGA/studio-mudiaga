@@ -300,7 +300,7 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
               <button
                 className="relative self-start pointer-events-auto group"
                 style={{
-                  padding: "14px 28px",
+                  padding: "20px 44px",
                   color: "#0a0a0a",
                   fontSize: 11,
                   letterSpacing: "0.22em",
@@ -309,10 +309,10 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
                   background: "white",
                 }}
               >
-                <span className="absolute top-0 left-0 w-3 h-3 border-t border-l border-black/30 group-hover:border-black transition-colors duration-300" />
-                <span className="absolute top-0 right-0 w-3 h-3 border-t border-r border-black/30 group-hover:border-black transition-colors duration-300" />
-                <span className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-black/30 group-hover:border-black transition-colors duration-300" />
-                <span className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-black/30 group-hover:border-black transition-colors duration-300" />
+                <span className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-black/50 group-hover:border-black transition-colors duration-300" />
+                <span className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-black/50 group-hover:border-black transition-colors duration-300" />
+                <span className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-black/50 group-hover:border-black transition-colors duration-300" />
+                <span className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-black/50 group-hover:border-black transition-colors duration-300" />
                 <span
                   style={{
                     display: "inline-block",
