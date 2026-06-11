@@ -47,9 +47,11 @@ export default function Navbar() {
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
-      // HorizontalScroll wrapper is 300vh — navbar must not reappear inside it
-      const horizEnd = window.innerHeight * 3;
       setScrolled(y > 40);
+
+      // Show only in the early white-panel zone (before the image zoom goes dark)
+      // ~1.5 × vh ≈ midway through the editorial zoom, white bg still visible
+      const whiteZoneEnd = window.innerHeight * 1.5;
 
       if (y <= 60) {
         // Back at the very top — always show
@@ -57,8 +59,8 @@ export default function Navbar() {
       } else if (y > lastScrollY.current + 4) {
         // Scrolling down — always hide
         setNavVisible(false);
-      } else if (y < lastScrollY.current - 4 && y > horizEnd) {
-        // Scrolling up AND past the horizontal scroll zone — show again
+      } else if (y < lastScrollY.current - 4 && y < whiteZoneEnd) {
+        // Scrolling up AND back inside the early white editorial zone — show
         setNavVisible(true);
       }
       lastScrollY.current = y;
