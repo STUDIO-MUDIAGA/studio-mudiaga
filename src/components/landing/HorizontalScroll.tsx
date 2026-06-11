@@ -75,22 +75,34 @@ const HEADING_LINES = [
   ["you", "live."],
 ];
 
+// total words = 7; reverse-stagger on exit: last word exits first
+const TOTAL_WORDS = 7;
+
 const wordVariants = {
-  hidden: { y: "105%", opacity: 1 },
+  hidden: (i: number) => ({
+    y: "105%",
+    transition: {
+      type: "spring" as const,
+      stiffness: 80,
+      damping: 18,
+      delay: (TOTAL_WORDS - 1 - i) * 0.04,
+    },
+  }),
   visible: (i: number) => ({
     y: "0%",
-    opacity: 1,
-    transition: { type: "spring" as const, stiffness: 55, damping: 14, mass: 1.1, delay: i * 0.07 },
+    transition: {
+      type: "spring" as const,
+      stiffness: 55,
+      damping: 14,
+      mass: 1.1,
+      delay: i * 0.07,
+    },
   }),
 };
 
 const rightColVariants = {
-  hidden: { opacity: 0, y: 18 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: "easeOut" as const, delay: 0.52 },
-  },
+  hidden: { opacity: 0, y: 0, transition: { duration: 0.3, ease: "easeIn" as const } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: "easeOut" as const, delay: 0.52 } },
 };
 
 function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
