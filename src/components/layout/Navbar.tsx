@@ -47,12 +47,18 @@ export default function Navbar() {
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
+      // HorizontalScroll wrapper is 300vh — navbar must not reappear inside it
+      const horizEnd = window.innerHeight * 3;
       setScrolled(y > 40);
+
       if (y <= 60) {
+        // Back at the very top — always show
         setNavVisible(true);
       } else if (y > lastScrollY.current + 4) {
+        // Scrolling down — always hide
         setNavVisible(false);
-      } else if (y < lastScrollY.current - 4) {
+      } else if (y < lastScrollY.current - 4 && y > horizEnd) {
+        // Scrolling up AND past the horizontal scroll zone — show again
         setNavVisible(true);
       }
       lastScrollY.current = y;
