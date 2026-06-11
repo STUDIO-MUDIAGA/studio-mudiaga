@@ -99,12 +99,10 @@ export default function AboutSection() {
                   color: "rgba(10,10,10,0.7)",
                 }}
               >
-                Studio Mudiaga was built on a single belief — that the spaces
-                we inhabit shape the way we live. We work closely with each
-                client to understand how they move, rest and gather, then
-                translate that into rooms that feel both considered and
-                completely alive. Every shortlet, every piece of furniture,
-                carries that same intention.
+                Studiomudiaga is a contemporary African design brand that
+                transforms both personal and professional spaces — blending
+                minimalism, culture, and soul into environments that function
+                beautifully and feel unforgettable.
               </p>
               <p
                 style={{
@@ -114,8 +112,9 @@ export default function AboutSection() {
                   color: "rgba(10,10,10,0.7)",
                 }}
               >
-                At Studio Mudiaga, we don&apos;t just furnish spaces — we shape
-                the feeling of home.
+                Founded by Mudiaga, the brand emerged from a personal journey
+                of longing for spaces that reflect clarity, identity, and
+                intention.
               </p>
             </div>
           </div>
