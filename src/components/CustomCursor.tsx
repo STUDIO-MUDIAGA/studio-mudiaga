@@ -54,12 +54,12 @@ export default function CustomCursor() {
           animate={{
             width: expanded ? 120 : 12,
             height: expanded ? 120 : 12,
-            backgroundColor: expanded ? "rgba(10,10,10,0.55)" : "rgba(255,255,255,0.9)",
+            backgroundColor: expanded ? "rgba(0,0,0,1)" : "rgba(0,0,0,1)",
             borderColor: expanded ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0)",
             borderWidth: expanded ? 1 : 0,
           }}
           transition={{ type: "spring", stiffness: 350, damping: 28, mass: 0.5 }}
-          style={{ backdropFilter: expanded ? "blur(8px)" : "none" }}
+          style={{ backdropFilter: "none" }}
         >
           <motion.p
             animate={{ opacity: expanded ? 1 : 0, scale: expanded ? 1 : 0.7 }}
