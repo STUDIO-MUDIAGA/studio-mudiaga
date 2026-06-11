@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   motion,
   useScroll,
@@ -68,11 +68,35 @@ export default function HorizontalScroll() {
   );
 }
 
+// heading broken into lines → words for per-word stagger animation
+const HEADING_LINES = [
+  ["Spaces", "crafted"],
+  ["for", "the", "way"],
+  ["you", "live."],
+];
+
+const wordVariants = {
+  hidden: { y: "105%", opacity: 1 },
+  visible: (i: number) => ({
+    y: "0%",
+    opacity: 1,
+    transition: { type: "spring" as const, stiffness: 55, damping: 14, mass: 1.1, delay: i * 0.07 },
+  }),
+};
+
+const rightColVariants = {
+  hidden: { opacity: 0, y: 18 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: "easeOut" as const, delay: 0.52 },
+  },
+};
+
 function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
   const effectiveProg = useMotionValue(0);
-  // Tracks whether the image has fully filled the screen at least once.
-  // Only after that do we allow smooth zoom-out on backward scroll.
   const hasFilledScreen = useRef(false);
+  const [headingVisible, setHeadingVisible] = useState(false);
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     const prev = scrollYProgress.getPrevious() ?? v;
@@ -82,15 +106,15 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
     if (v < 0.42)  hasFilledScreen.current = false;
 
     if (goingForward) {
-      // Always track forward progress
       effectiveProg.set(v);
     } else if (hasFilledScreen.current) {
-      // Scrolled back from full-screen → smooth zoom-out
       effectiveProg.set(v);
     } else {
-      // Never reached full-screen → snap to contained, no partial reverse
       effectiveProg.set(Math.min(v, 0.42));
     }
+
+    // drive heading word animations
+    setHeadingVisible(v >= 0.88);
   });
 
   const clipPath = useTransform(
@@ -103,10 +127,8 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
   const textOpacity  = useTransform(effectiveProg, [0.42, 0.68], [1, 0]);
   const labelOpacity = useTransform(effectiveProg, [0.42, 0.60], [1, 0]);
 
-  // Overlay darkens + content fades in once image fills screen
   const overlayDark    = useTransform(effectiveProg, [0.78, 0.95], [0.3, 0.68]);
   const contentOpacity = useTransform(effectiveProg, [0.86, 0.97], [0, 1]);
-  const contentY       = useTransform(effectiveProg, [0.86, 0.97], [24, 0]);
 
   return (
     <div className="w-screen h-full flex-shrink-0 bg-white relative overflow-hidden flex items-center justify-center">
@@ -165,7 +187,7 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
       {/* Full-screen overlay content */}
       <motion.div
         className="absolute inset-0 z-20 pointer-events-none"
-        style={{ opacity: contentOpacity, y: contentY }}
+        style={{ opacity: contentOpacity }}
       >
         {/* Main content row — vertically centered, left edge matches navbar logo */}
         <div className="absolute inset-0 flex items-center">
@@ -180,89 +202,115 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
               alignItems: "center",
             }}
           >
-          {/* Left — oversized editorial heading */}
-          <h2
-            style={{
-              fontFamily: "var(--font-playfair)",
-              fontSize: "clamp(36px, 5vw, 84px)",
-              fontWeight: 300,
-              lineHeight: 1.04,
-              color: "white",
-              width: "34vw",
-              flexShrink: 0,
-            }}
-          >
-            Spaces crafted
-            <br />for the way
-            <br />you live.
-          </h2>
-
-          {/* Spacer */}
-          <div style={{ flex: 1 }} />
-
-          {/* Right — two paragraphs + button */}
-          <div
-            style={{
-              width: "22vw",
-              display: "flex",
-              flexDirection: "column",
-              gap: 28,
-            }}
-          >
-            <p
+            {/* Left — heading with per-word slide-up entrance */}
+            <h2
               style={{
-                color: "rgba(255,255,255,0.6)",
-                fontSize: 14,
-                lineHeight: 1.8,
-                fontFamily: "var(--font-dm-sans)",
-              }}
-            >
-              Studio Mudiaga brings together bespoke shortlet apartments and
-              handcrafted furniture — each space considered, each detail
-              purposeful.
-            </p>
-            <p
-              style={{
-                color: "rgba(255,255,255,0.6)",
-                fontSize: 14,
-                lineHeight: 1.8,
-                fontFamily: "var(--font-dm-sans)",
-              }}
-            >
-              We design for real living, guided by your vision — so every room
-              feels like it was made for you, because it was.
-            </p>
-
-            {/* Corner-bracket button */}
-            <button
-              className="relative self-start pointer-events-auto group"
-              style={{
-                padding: "14px 28px",
+                fontFamily: "var(--font-playfair)",
+                fontSize: "clamp(36px, 5vw, 84px)",
+                fontWeight: 300,
+                lineHeight: 1.15,
                 color: "white",
-                fontSize: 11,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                fontFamily: "var(--font-dm-sans)",
-                background: "transparent",
+                width: "34vw",
+                flexShrink: 0,
               }}
             >
-              <span className="absolute top-0 left-0 w-3 h-3 border-t border-l border-white/50 group-hover:border-white transition-colors duration-300" />
-              <span className="absolute top-0 right-0 w-3 h-3 border-t border-r border-white/50 group-hover:border-white transition-colors duration-300" />
-              <span className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-white/50 group-hover:border-white transition-colors duration-300" />
-              <span className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-white/50 group-hover:border-white transition-colors duration-300" />
-              <span
+              {HEADING_LINES.map((line, li) => {
+                // global word index for delay sequencing across lines
+                const wordsBefore = HEADING_LINES.slice(0, li).reduce((n, l) => n + l.length, 0);
+                return (
+                  <span key={li} style={{ display: "block" }}>
+                    {line.map((word, wi) => (
+                      <span
+                        key={wi}
+                        style={{ display: "inline-block", overflow: "hidden", verticalAlign: "bottom" }}
+                      >
+                        <motion.span
+                          custom={wordsBefore + wi}
+                          variants={wordVariants}
+                          initial="hidden"
+                          animate={headingVisible ? "visible" : "hidden"}
+                          style={{ display: "inline-block" }}
+                        >
+                          {word}
+                        </motion.span>
+                      </span>
+                    ))}
+                    {/* space between words on the same line */}
+                    {li < HEADING_LINES.length - 1 && <>{" "}</>}
+                  </span>
+                );
+              })}
+            </h2>
+
+            {/* Spacer */}
+            <div style={{ flex: 1 }} />
+
+            {/* Right — two paragraphs + button, enter after heading */}
+            <motion.div
+              variants={rightColVariants}
+              initial="hidden"
+              animate={headingVisible ? "visible" : "hidden"}
+              style={{
+                width: "22vw",
+                display: "flex",
+                flexDirection: "column",
+                gap: 28,
+              }}
+            >
+              <p
                 style={{
-                  display: "inline-block",
-                  width: 7,
-                  height: 7,
-                  background: "#c85442",
-                  marginRight: 10,
-                  verticalAlign: "middle",
+                  color: "rgba(255,255,255,0.6)",
+                  fontSize: 14,
+                  lineHeight: 1.8,
+                  fontFamily: "var(--font-dm-sans)",
                 }}
-              />
-              View Project
-            </button>
-          </div>
+              >
+                Studio Mudiaga brings together bespoke shortlet apartments and
+                handcrafted furniture — each space considered, each detail
+                purposeful.
+              </p>
+              <p
+                style={{
+                  color: "rgba(255,255,255,0.6)",
+                  fontSize: 14,
+                  lineHeight: 1.8,
+                  fontFamily: "var(--font-dm-sans)",
+                }}
+              >
+                We design for real living, guided by your vision — so every room
+                feels like it was made for you, because it was.
+              </p>
+
+              {/* Corner-bracket button */}
+              <button
+                className="relative self-start pointer-events-auto group"
+                style={{
+                  padding: "14px 28px",
+                  color: "white",
+                  fontSize: 11,
+                  letterSpacing: "0.22em",
+                  textTransform: "uppercase",
+                  fontFamily: "var(--font-dm-sans)",
+                  background: "transparent",
+                }}
+              >
+                <span className="absolute top-0 left-0 w-3 h-3 border-t border-l border-white/50 group-hover:border-white transition-colors duration-300" />
+                <span className="absolute top-0 right-0 w-3 h-3 border-t border-r border-white/50 group-hover:border-white transition-colors duration-300" />
+                <span className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-white/50 group-hover:border-white transition-colors duration-300" />
+                <span className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-white/50 group-hover:border-white transition-colors duration-300" />
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: 7,
+                    height: 7,
+                    background: "#c85442",
+                    marginRight: 10,
+                    verticalAlign: "middle",
+                  }}
+                />
+                View Project
+              </button>
+            </motion.div>
           </div>
         </div>
 
