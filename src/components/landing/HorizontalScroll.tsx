@@ -296,7 +296,7 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
                 feels like it was made for you, because it was.
               </p>
 
-              {/* Corner-bracket button */}
+              {/* Corner-bracket button — corners float outside the white box */}
               <button
                 className="group pointer-events-auto"
                 style={{
@@ -315,14 +315,11 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
                   whiteSpace: "nowrap",
                 }}
               >
-                {/* top-left */}
-                <svg className="absolute top-0 left-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M16 1H1V16" stroke="#0a0a0a" strokeWidth="1"/></svg>
-                {/* top-right */}
-                <svg className="absolute top-0 right-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M0 1H15V16" stroke="#0a0a0a" strokeWidth="1"/></svg>
-                {/* bottom-left */}
-                <svg className="absolute bottom-0 left-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M16 15H1V0" stroke="#0a0a0a" strokeWidth="1"/></svg>
-                {/* bottom-right */}
-                <svg className="absolute bottom-0 right-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M0 15H15V0" stroke="#0a0a0a" strokeWidth="1"/></svg>
+                {/* corners offset outward by 7px — floats outside the white rect */}
+                <svg className="absolute opacity-60 group-hover:opacity-100 transition-opacity duration-300" style={{ top: -7, left: -7 }} width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M20 0.5H0.5V20" stroke="white" strokeWidth="1"/></svg>
+                <svg className="absolute opacity-60 group-hover:opacity-100 transition-opacity duration-300" style={{ top: -7, right: -7 }} width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M0 0.5H19.5V20" stroke="white" strokeWidth="1"/></svg>
+                <svg className="absolute opacity-60 group-hover:opacity-100 transition-opacity duration-300" style={{ bottom: -7, left: -7 }} width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M20 19.5H0.5V0" stroke="white" strokeWidth="1"/></svg>
+                <svg className="absolute opacity-60 group-hover:opacity-100 transition-opacity duration-300" style={{ bottom: -7, right: -7 }} width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M0 19.5H19.5V0" stroke="white" strokeWidth="1"/></svg>
                 <span style={{ width: 7, height: 7, background: "#c85442", flexShrink: 0 }} />
                 View Project
               </button>
