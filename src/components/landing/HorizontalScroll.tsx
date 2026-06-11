@@ -218,23 +218,28 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
             <h2
               style={{
                 fontFamily: "var(--font-playfair)",
-                fontSize: "clamp(36px, 5vw, 84px)",
+                fontSize: "clamp(20px, 2.7vw, 46px)",
                 fontWeight: 300,
                 lineHeight: 1.15,
                 color: "white",
-                width: "34vw",
+                width: "38vw",
                 flexShrink: 0,
               }}
             >
               {HEADING_LINES.map((line, li) => {
-                // global word index for delay sequencing across lines
                 const wordsBefore = HEADING_LINES.slice(0, li).reduce((n, l) => n + l.length, 0);
                 return (
                   <span key={li} style={{ display: "block" }}>
                     {line.map((word, wi) => (
                       <span
                         key={wi}
-                        style={{ display: "inline-block", overflow: "hidden", verticalAlign: "bottom" }}
+                        style={{
+                          display: "inline-block",
+                          overflow: "hidden",
+                          verticalAlign: "bottom",
+                          // space after every word except the last on each line
+                          marginRight: wi < line.length - 1 ? "0.28em" : 0,
+                        }}
                       >
                         <motion.span
                           custom={wordsBefore + wi}
@@ -247,8 +252,6 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
                         </motion.span>
                       </span>
                     ))}
-                    {/* space between words on the same line */}
-                    {li < HEADING_LINES.length - 1 && <>{" "}</>}
                   </span>
                 );
               })}
