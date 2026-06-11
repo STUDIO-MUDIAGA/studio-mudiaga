@@ -298,35 +298,32 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
 
               {/* Corner-bracket button */}
               <button
-                className="relative self-start pointer-events-auto group"
+                className="group pointer-events-auto"
                 style={{
-                  padding: "20px 44px",
+                  position: "relative",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  alignSelf: "flex-start",
+                  gap: 10,
+                  padding: "14px 28px",
                   color: "#0a0a0a",
-                  fontSize: 11,
-                  letterSpacing: "0.22em",
+                  fontSize: 12,
+                  letterSpacing: "0.18em",
                   textTransform: "uppercase",
                   fontFamily: "var(--font-dm-sans)",
                   background: "white",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {/* top-left */}
-                <svg className="absolute top-0 left-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M18 1H1V18" stroke="#0a0a0a" strokeWidth="1.2"/></svg>
+                <svg className="absolute top-0 left-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M16 1H1V16" stroke="#0a0a0a" strokeWidth="1"/></svg>
                 {/* top-right */}
-                <svg className="absolute top-0 right-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M0 1H17V18" stroke="#0a0a0a" strokeWidth="1.2"/></svg>
+                <svg className="absolute top-0 right-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M0 1H15V16" stroke="#0a0a0a" strokeWidth="1"/></svg>
                 {/* bottom-left */}
-                <svg className="absolute bottom-0 left-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M18 17H1V0" stroke="#0a0a0a" strokeWidth="1.2"/></svg>
+                <svg className="absolute bottom-0 left-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M16 15H1V0" stroke="#0a0a0a" strokeWidth="1"/></svg>
                 {/* bottom-right */}
-                <svg className="absolute bottom-0 right-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M0 17H17V0" stroke="#0a0a0a" strokeWidth="1.2"/></svg>
-                <span
-                  style={{
-                    display: "inline-block",
-                    width: 7,
-                    height: 7,
-                    background: "#c85442",
-                    marginRight: 10,
-                    verticalAlign: "middle",
-                  }}
-                />
+                <svg className="absolute bottom-0 right-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M0 15H15V0" stroke="#0a0a0a" strokeWidth="1"/></svg>
+                <span style={{ width: 7, height: 7, background: "#c85442", flexShrink: 0 }} />
                 View Project
               </button>
             </motion.div>
