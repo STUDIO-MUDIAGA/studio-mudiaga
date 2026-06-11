@@ -80,12 +80,12 @@ export default function AboutSection() {
           <h2
             style={{
               fontFamily: "var(--font-playfair)",
-              fontSize: "clamp(40px, 5.5vw, 90px)",
+              fontSize: "clamp(28px, 3.4vw, 62px)",
               fontWeight: 300,
               lineHeight: 1.1,
               color: "#0a0a0a",
-              paddingTop: "clamp(64px, 8vw, 120px)",
-              paddingBottom: "clamp(48px, 6vw, 88px)",
+              paddingTop: "clamp(36px, 4vw, 60px)",
+              paddingBottom: "clamp(24px, 2.5vw, 40px)",
               maxWidth: 820,
             }}
           >
@@ -95,15 +95,15 @@ export default function AboutSection() {
           </h2>
 
           {/* ── Divider ───────────────────────────────────────────── */}
-          <div style={{ borderTop: "1px solid rgba(10,10,10,0.12)", marginBottom: "clamp(40px, 5vw, 72px)" }} />
+          <div style={{ borderTop: "1px solid rgba(10,10,10,0.12)", marginBottom: "clamp(20px, 2.2vw, 36px)" }} />
 
           {/* ── Two-column body ───────────────────────────────────── */}
           <div
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 2fr",
-              gap: "clamp(32px, 4vw, 80px)",
-              paddingBottom: "clamp(64px, 8vw, 120px)",
+              gap: "clamp(24px, 3vw, 64px)",
+              paddingBottom: "clamp(28px, 3vw, 48px)",
             }}
           >
             {/* Left — label */}
@@ -138,8 +138,8 @@ export default function AboutSection() {
               <p
                 style={{
                   fontFamily: "var(--font-dm-sans)",
-                  fontSize: "clamp(14px, 1.2vw, 17px)",
-                  lineHeight: 1.85,
+                  fontSize: "clamp(12px, 1vw, 15px)",
+                  lineHeight: 1.8,
                   color: "rgba(10,10,10,0.7)",
                 }}
               >
@@ -151,8 +151,8 @@ export default function AboutSection() {
               <p
                 style={{
                   fontFamily: "var(--font-dm-sans)",
-                  fontSize: "clamp(14px, 1.2vw, 17px)",
-                  lineHeight: 1.85,
+                  fontSize: "clamp(12px, 1vw, 15px)",
+                  lineHeight: 1.8,
                   color: "rgba(10,10,10,0.7)",
                 }}
               >
@@ -164,25 +164,25 @@ export default function AboutSection() {
           </div>
 
           {/* ── Divider ───────────────────────────────────────────── */}
-          <div style={{ borderTop: "1px solid rgba(10,10,10,0.12)", marginBottom: "clamp(56px, 7vw, 100px)" }} />
+          <div style={{ borderTop: "1px solid rgba(10,10,10,0.12)", marginBottom: "clamp(28px, 3vw, 48px)" }} />
 
           {/* ── Three pillars ─────────────────────────────────────── */}
           <div
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "clamp(32px, 4vw, 64px)",
-              paddingBottom: "clamp(80px, 10vw, 140px)",
+              gap: "clamp(24px, 3vw, 48px)",
+              paddingBottom: "clamp(48px, 5vw, 80px)",
             }}
           >
             {PILLARS.map((p) => (
-              <div key={p.title} style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-                <div style={{ height: 44 }}>{p.icon}</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div key={p.title} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                <div style={{ height: 40 }}>{p.icon}</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <h3
                     style={{
                       fontFamily: "var(--font-dm-sans)",
-                      fontSize: "clamp(13px, 1vw, 16px)",
+                      fontSize: "clamp(12px, 0.9vw, 15px)",
                       fontWeight: 500,
                       letterSpacing: "0.01em",
                       color: "#0a0a0a",
@@ -193,8 +193,8 @@ export default function AboutSection() {
                   <p
                     style={{
                       fontFamily: "var(--font-dm-sans)",
-                      fontSize: "clamp(12px, 0.9vw, 14px)",
-                      lineHeight: 1.85,
+                      fontSize: "clamp(11px, 0.8vw, 13px)",
+                      lineHeight: 1.8,
                       color: "rgba(10,10,10,0.55)",
                     }}
                   >
