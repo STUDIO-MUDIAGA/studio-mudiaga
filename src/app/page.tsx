@@ -1,9 +1,11 @@
-import Hero from "@/components/landing/Hero";
+import HorizontalScroll from "@/components/landing/HorizontalScroll";
+import AboutSection from "@/components/landing/AboutSection";
 
 export default function HomePage() {
   return (
     <>
-      <Hero />
+      <HorizontalScroll />
+      <AboutSection />
     </>
   );
 }
