@@ -2,18 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
-
-const MARQUEE_ITEMS = [
-  "Shortlet Apartments",
-  "Bespoke Furniture",
-  "Curated Living",
-  "Studio Mudiaga",
-  "Lagos & Abuja",
-  "Designed With Care",
-];
-
-// doubled for seamless loop
-const MARQUEE_DOUBLED = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
+import Image from "next/image";
 
 export default function AboutSection() {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -25,52 +14,16 @@ export default function AboutSection() {
 
   const smoothProg = useSpring(scrollYProgress, { stiffness: 60, damping: 20, mass: 0.8 });
 
-  // section zooms + rises up from below as it enters
-  const scale = useTransform(smoothProg, [0, 1], [0.88, 1]);
-  const y = useTransform(smoothProg, [0, 1], [72, 0]);
+  const scale        = useTransform(smoothProg, [0, 1], [0.88, 1]);
+  const y            = useTransform(smoothProg, [0, 1], [72, 0]);
   const borderRadius = useTransform(smoothProg, [0, 1], [28, 0]);
 
   return (
     <div ref={wrapperRef}>
       <motion.section
-        className="relative min-h-screen bg-[#0c0c0a] overflow-hidden"
+        className="relative bg-[#f8f7f4] overflow-hidden"
         style={{ scale, y, borderRadius, transformOrigin: "center top" }}
       >
-        {/* ── Marquee ─────────────────────────────────────────────── */}
-        <div className="overflow-hidden border-b border-white/8 py-7">
-          <motion.div
-            className="flex items-center"
-            style={{ whiteSpace: "nowrap" }}
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
-          >
-            {MARQUEE_DOUBLED.map((item, i) => (
-              <span key={i} className="inline-flex items-center gap-6 pr-6">
-                <span
-                  className="text-white/80 italic"
-                  style={{
-                    fontFamily: "var(--font-playfair)",
-                    fontSize: "clamp(28px, 4vw, 60px)",
-                    fontWeight: 300,
-                  }}
-                >
-                  {item}
-                </span>
-                <span
-                  style={{
-                    display: "inline-block",
-                    width: 8,
-                    height: 8,
-                    borderRadius: "50%",
-                    background: "rgba(255,255,255,0.25)",
-                  }}
-                />
-              </span>
-            ))}
-          </motion.div>
-        </div>
-
-        {/* ── About body ──────────────────────────────────────────── */}
         <div
           style={{
             maxWidth: 1200,
@@ -79,86 +32,104 @@ export default function AboutSection() {
             paddingRight: 64,
           }}
         >
-          {/* Section label */}
-          <div className="flex items-center gap-3 mt-20 mb-16">
-            <span
-              style={{
-                display: "inline-block",
-                width: 6,
-                height: 6,
-                background: "#c85442",
-                borderRadius: "50%",
-              }}
-            />
-            <span
-              className="text-white/40 tracking-[0.3em] uppercase"
-              style={{ fontSize: 10, fontFamily: "var(--font-dm-sans)" }}
-            >
-              About Studio
-            </span>
-          </div>
-
-          {/* Body paragraph */}
-          <p
+          {/* ── Headline ──────────────────────────────────────────── */}
+          <h2
             style={{
               fontFamily: "var(--font-playfair)",
-              fontSize: "clamp(22px, 2.6vw, 42px)",
+              fontSize: "clamp(40px, 5.5vw, 90px)",
               fontWeight: 300,
-              lineHeight: 1.5,
-              color: "rgba(255,255,255,0.85)",
+              lineHeight: 1.1,
+              color: "#0a0a0a",
+              paddingTop: "clamp(64px, 8vw, 120px)",
+              paddingBottom: "clamp(48px, 6vw, 88px)",
               maxWidth: 820,
             }}
           >
-            Studio Mudiaga is a Lagos-based{" "}
-            <em>design-led living studio</em> — shaping spaces through
-            handcrafted furniture and{" "}
-            <em>curated shortlet apartments</em> that feel intentional from
-            every angle.
-          </p>
+            Defined by warmth,
+            <br />simplicity and
+            <br />intentional craft.
+          </h2>
 
-          {/* Divider */}
-          <div className="border-t border-white/8 mt-20 mb-16" />
+          {/* ── Divider ───────────────────────────────────────────── */}
+          <div style={{ borderTop: "1px solid rgba(10,10,10,0.12)", marginBottom: "clamp(40px, 5vw, 72px)" }} />
 
-          {/* Two-column categories */}
-          <div className="grid grid-cols-2 gap-8 pb-24">
-            {[
-              {
-                index: "01",
-                title: "Shortlet Apartments",
-                body: "Fully furnished, design-forward spaces in Lagos and Abuja — available for short and extended stays.",
-              },
-              {
-                index: "02",
-                title: "Bespoke Furniture",
-                body: "Handcrafted pieces built to last. Each item designed around the space it will live in.",
-              },
-            ].map((item) => (
-              <div key={item.index}>
-                <p
-                  className="text-white/20 mb-6"
-                  style={{ fontSize: 11, fontFamily: "var(--font-dm-sans)", letterSpacing: "0.2em" }}
-                >
-                  {item.index}
-                </p>
-                <h3
-                  className="text-white mb-4"
+          {/* ── Two-column body ───────────────────────────────────── */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 2fr",
+              gap: "clamp(32px, 4vw, 80px)",
+              paddingBottom: "clamp(64px, 8vw, 120px)",
+            }}
+          >
+            {/* Left — label */}
+            <div style={{ paddingTop: 4 }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  color: "#0a0a0a",
+                  fontSize: 11,
+                  letterSpacing: "0.25em",
+                  textTransform: "uppercase",
+                  fontFamily: "var(--font-dm-sans)",
+                }}
+              >
+                <span
                   style={{
-                    fontFamily: "var(--font-playfair)",
-                    fontSize: "clamp(20px, 2vw, 32px)",
-                    fontWeight: 300,
+                    display: "inline-block",
+                    width: 6,
+                    height: 6,
+                    background: "#0a0a0a",
+                    flexShrink: 0,
                   }}
-                >
-                  {item.title}
-                </h3>
-                <p
-                  className="text-white/40 leading-relaxed"
-                  style={{ fontSize: 14, fontFamily: "var(--font-dm-sans)" }}
-                >
-                  {item.body}
-                </p>
-              </div>
-            ))}
+                />
+                About Studio
+              </span>
+            </div>
+
+            {/* Right — paragraphs */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+              <p
+                style={{
+                  fontFamily: "var(--font-dm-sans)",
+                  fontSize: "clamp(14px, 1.2vw, 17px)",
+                  lineHeight: 1.85,
+                  color: "rgba(10,10,10,0.7)",
+                }}
+              >
+                Studio Mudiaga was built on a single belief — that the spaces
+                we inhabit shape the way we live. We work closely with each
+                client to understand how they move, rest and gather, then
+                translate that into rooms that feel both considered and
+                completely alive. Every shortlet, every piece of furniture,
+                carries that same intention.
+              </p>
+              <p
+                style={{
+                  fontFamily: "var(--font-dm-sans)",
+                  fontSize: "clamp(14px, 1.2vw, 17px)",
+                  lineHeight: 1.85,
+                  color: "rgba(10,10,10,0.7)",
+                }}
+              >
+                At Studio Mudiaga, we don&apos;t just furnish spaces — we shape
+                the feeling of home.
+              </p>
+            </div>
           </div>
+        </div>
+
+        {/* ── Full-width image ──────────────────────────────────────── */}
+        <div style={{ position: "relative", width: "100%", height: "clamp(320px, 45vw, 680px)" }}>
+          <Image
+            src="/IMG_1672.JPG"
+            alt="Studio Mudiaga interior"
+            fill
+            className="object-cover"
+            sizes="100vw"
+          />
         </div>
       </motion.section>
     </div>
