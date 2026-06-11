@@ -1,11 +1,19 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { useRef, useEffect } from "react";
+import { motion, useScroll, useTransform, useSpring, useInView } from "framer-motion";
 import Image from "next/image";
+import { useNavTheme } from "@/context/NavTheme";
 
 export default function AboutSection() {
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const { setTheme } = useNavTheme();
+
+  // Switch logo to brown when section is in viewport, white when not
+  const isInView = useInView(wrapperRef, { margin: "-15% 0px -15% 0px" });
+  useEffect(() => {
+    setTheme(isInView ? "light" : "dark");
+  }, [isInView, setTheme]);
 
   const { scrollYProgress } = useScroll({
     target: wrapperRef,
