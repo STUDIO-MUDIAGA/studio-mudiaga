@@ -70,13 +70,14 @@ export default function HorizontalScroll() {
 
 // heading broken into lines → words for per-word stagger animation
 const HEADING_LINES = [
-  ["Spaces", "crafted"],
-  ["for", "the", "way"],
-  ["you", "live."],
+  ["Together,", "we", "shape"],
+  ["homes", "rooted", "in"],
+  ["simplicity", "and"],
+  ["crafted", "with", "care."],
 ];
 
-// total words = 7; reverse-stagger on exit: last word exits first
-const TOTAL_WORDS = 7;
+// total words = 11; reverse-stagger on exit: last word exits first
+const TOTAL_WORDS = 11;
 
 const wordVariants = {
   hidden: (i: number) => ({
