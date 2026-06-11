@@ -70,10 +70,9 @@ export default function HorizontalScroll() {
 
 // heading broken into lines → words for per-word stagger animation
 const HEADING_LINES = [
-  ["Together,", "we", "shape"],
-  ["homes", "rooted", "in"],
-  ["simplicity", "and"],
-  ["crafted", "with", "care."],
+  ["Together,", "we", "shape", "homes"],
+  ["rooted", "in", "simplicity"],
+  ["and", "crafted", "with", "care."],
 ];
 
 // total words = 11; reverse-stagger on exit: last word exits first
