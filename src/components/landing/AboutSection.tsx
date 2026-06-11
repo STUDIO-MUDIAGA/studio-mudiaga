@@ -66,7 +66,7 @@ export default function AboutSection() {
     <div ref={wrapperRef}>
       <motion.section
         className="relative bg-[#f8f7f4] overflow-hidden"
-        style={{ scale, y, borderRadius, transformOrigin: "center top" }}
+        style={{ scale, y, borderRadius, transformOrigin: "center top", minHeight: "100vh" }}
       >
         <div
           style={{
