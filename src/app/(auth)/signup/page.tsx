@@ -9,7 +9,7 @@ import AuthSplitLayout from "@/components/auth/AuthSplitLayout";
 const HERO = "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80";
 
 const inputClass =
-  "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder-white/25 focus:outline-none focus:border-amber-400/60 transition-colors";
+  "w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3.5 text-white text-sm placeholder-white/25 focus:outline-none focus:border-amber-400 transition-colors";
 
 function GoogleIcon() {
   return (
@@ -66,17 +66,22 @@ export default function SignupPage() {
     return (
       <AuthSplitLayout
         image={HERO}
-        quote="Your next great space is waiting for you."
+        quote="Your next great space is waiting."
         tagline="Curated shortlets and handcrafted furniture across Nigeria."
+        topRight={
+          <p className="text-white/40 text-sm">
+            Already have an account?{" "}
+            <Link href="/login" className="text-amber-400 font-medium hover:text-amber-300 transition-colors">Sign In</Link>
+          </p>
+        }
       >
-        <div className="text-center py-12">
+        <div className="text-center py-8">
           <div className="w-16 h-16 bg-amber-400/10 border border-amber-400/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Mail size={24} className="text-amber-400" />
           </div>
-          <h2 className="text-white text-2xl font-semibold mb-3">Check your email</h2>
-          <p className="text-white/40 text-sm leading-relaxed mb-10">
-            We sent a confirmation link to{" "}
-            <span className="text-white/70">{email}</span>.<br />
+          <h2 className="text-white text-2xl font-bold mb-3">Check your email</h2>
+          <p className="text-white/40 text-sm leading-relaxed mb-8">
+            We sent a confirmation link to <span className="text-white/70">{email}</span>.<br />
             Click it to activate your account.
           </p>
           <Link href="/login" className="text-amber-400 text-sm font-medium hover:text-amber-300 transition-colors">
@@ -90,39 +95,36 @@ export default function SignupPage() {
   return (
     <AuthSplitLayout
       image={HERO}
-      quote="Your next great space is waiting for you."
+      quote="Your next great space is waiting."
       tagline="Curated shortlets and handcrafted furniture across Nigeria."
-    >
-      {/* Heading */}
-      <div className="mb-10">
-        <h1 className="text-white text-3xl font-semibold mb-2">Create your account</h1>
-        <p className="text-white/40 text-sm leading-relaxed">
-          Join Studio Mudiaga and unlock premium living experiences.
+      topRight={
+        <p className="text-white/40 text-sm">
+          Already have an account?{" "}
+          <Link href="/login" className="text-amber-400 font-medium hover:text-amber-300 transition-colors">Sign In</Link>
         </p>
-      </div>
+      }
+    >
+      <h1 className="text-white text-3xl font-bold mb-2">Create your account</h1>
+      <p className="text-white/50 text-sm mb-8">Join Studio Mudiaga and unlock premium living.</p>
 
-      {/* Google */}
       <button
         onClick={handleGoogle}
         disabled={googleLoading}
-        className="w-full flex items-center justify-center gap-3 bg-white/5 border border-white/10 rounded-xl py-3.5 text-white text-sm font-medium hover:bg-white/10 hover:border-white/20 transition-colors disabled:opacity-50 mb-7"
+        className="w-full flex items-center justify-center gap-3 border border-zinc-700 rounded-xl py-3.5 text-white text-sm font-medium hover:bg-white/5 transition-colors disabled:opacity-50 mb-5"
       >
         <GoogleIcon />
         {googleLoading ? "Redirecting…" : "Sign up with Google"}
       </button>
 
-      <div className="flex items-center gap-4 mb-7">
-        <div className="flex-1 h-px bg-white/10" />
-        <span className="text-white/25 text-xs uppercase tracking-widest">or</span>
-        <div className="flex-1 h-px bg-white/10" />
+      <div className="flex items-center gap-4 mb-6">
+        <div className="flex-1 h-px bg-zinc-800" />
+        <span className="text-white/30 text-xs">Or sign up with</span>
+        <div className="flex-1 h-px bg-zinc-800" />
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleSignup} className="space-y-5">
+      <form onSubmit={handleSignup} className="space-y-4">
         <div>
-          <label className="block text-white/50 text-xs font-medium uppercase tracking-wide mb-2">
-            Full name <span className="text-amber-400 normal-case">*</span>
-          </label>
+          <label className="block text-white/60 text-sm mb-2">Full name</label>
           <input
             type="text"
             placeholder="e.g. Emeka Obi"
@@ -134,12 +136,10 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <label className="block text-white/50 text-xs font-medium uppercase tracking-wide mb-2">
-            Email address <span className="text-amber-400 normal-case">*</span>
-          </label>
+          <label className="block text-white/60 text-sm mb-2">Email</label>
           <input
             type="email"
-            placeholder="e.g. emeka@example.com"
+            placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -147,49 +147,41 @@ export default function SignupPage() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-white/50 text-xs font-medium uppercase tracking-wide mb-2">
-              Password
-            </label>
+            <label className="block text-white/60 text-sm mb-2">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Min 8 characters"
+                placeholder="Min 8 chars"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
-                className={`${inputClass} pr-11`}
+                className={`${inputClass} pr-10`}
               />
-              <button type="button" onClick={() => setShowPassword((p) => !p)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
+              <button type="button" onClick={() => setShowPassword((p) => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
                 {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
           </div>
           <div>
-            <label className="block text-white/50 text-xs font-medium uppercase tracking-wide mb-2">
-              Confirm password
-            </label>
+            <label className="block text-white/60 text-sm mb-2">Confirm</label>
             <div className="relative">
               <input
                 type={showConfirm ? "text" : "password"}
-                placeholder="Repeat password"
+                placeholder="Repeat"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className={`${inputClass} pr-11`}
+                className={`${inputClass} pr-10`}
               />
-              <button type="button" onClick={() => setShowConfirm((p) => !p)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
+              <button type="button" onClick={() => setShowConfirm((p) => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
                 {showConfirm ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
           </div>
         </div>
-
-        <p className="text-white/25 text-xs leading-relaxed">
-          Password must be at least 8 characters, including a number and a special character.
-        </p>
 
         {error && (
           <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3">
@@ -197,27 +189,18 @@ export default function SignupPage() {
           </p>
         )}
 
-        <div className="pt-2">
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-amber-400 text-black font-semibold rounded-xl py-4 text-sm hover:bg-amber-300 transition-colors disabled:opacity-50"
-          >
-            {loading ? "Creating account…" : "Create account"}
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-amber-400 text-black font-semibold rounded-xl py-3.5 text-sm hover:bg-amber-300 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          {loading ? "Creating account…" : <>Create Account <span className="text-base leading-none">→</span></>}
+        </button>
       </form>
 
-      <p className="mt-8 text-center text-white/35 text-sm">
-        Already have an account?{" "}
-        <Link href="/login" className="text-white font-medium hover:text-amber-400 transition-colors">
-          Sign in
-        </Link>
-      </p>
-
       <p className="mt-5 text-center text-white/20 text-xs leading-relaxed">
-        By creating an account, you agree to our{" "}
-        <Link href="/terms" className="underline underline-offset-2 hover:text-white/40 transition-colors">Terms of Service</Link>
+        By creating an account you agree to our{" "}
+        <Link href="/terms" className="underline underline-offset-2 hover:text-white/40 transition-colors">Terms</Link>
         {" "}and{" "}
         <Link href="/privacy-policy" className="underline underline-offset-2 hover:text-white/40 transition-colors">Privacy Policy</Link>.
       </p>

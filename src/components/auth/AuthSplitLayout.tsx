@@ -6,54 +6,50 @@ import Link from "next/link";
 interface Props {
   image: string;
   quote: string;
-  tagline: string;
-  brand?: string;
+  tagline?: string;
+  topRight?: React.ReactNode;
   children: React.ReactNode;
 }
 
-export default function AuthSplitLayout({ image, quote, tagline, brand = "Studio Mudiaga — Curated Living", children }: Props) {
+export default function AuthSplitLayout({ image, quote, tagline, topRight, children }: Props) {
   return (
-    <div className="min-h-screen flex">
-      {/* ── Left panel — image ──────────────────────────────────── */}
-      <div className="hidden lg:flex lg:w-[52%] relative flex-col">
-        <Image
-          src={image}
-          alt="Studio Mudiaga"
-          fill
-          className="object-cover"
-          priority
-        />
-        {/* gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30" />
-
-        {/* Logo top-left */}
-        <div className="relative z-10 p-10">
-          <Link href="/">
-            <Image src="/Group.svg" alt="Studio Mudiaga" width={32} height={32} className="invert opacity-90" />
-          </Link>
-        </div>
-
-        {/* Quote bottom-left */}
-        <div className="relative z-10 mt-auto p-10 pb-12">
-          <p className="text-white text-xl font-playfair italic leading-snug mb-2 max-w-sm">
-            &ldquo;{quote}&rdquo;
-          </p>
-          <p className="text-white/50 text-sm mb-6 max-w-xs leading-relaxed">{tagline}</p>
-          <p className="text-white/30 text-xs tracking-widest uppercase">{brand}</p>
+    <div className="flex h-screen bg-[#0c0c0c]">
+      {/* ── Left panel ── */}
+      <div className="hidden lg:block lg:w-[45%] shrink-0 relative overflow-hidden">
+        <Image src={image} alt="Studio Mudiaga" fill className="object-cover" priority />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+        <div className="absolute bottom-0 left-0 p-10">
+          <p className="text-white text-2xl font-bold leading-tight mb-2">{quote}</p>
+          {tagline && <p className="text-white/50 text-sm leading-relaxed max-w-xs">{tagline}</p>}
         </div>
       </div>
 
-      {/* ── Right panel — form ──────────────────────────────────── */}
-      <div className="flex-1 flex flex-col justify-center px-8 sm:px-14 lg:px-16 xl:px-20 py-12 overflow-y-auto">
-        {/* Mobile logo */}
-        <div className="lg:hidden mb-10">
-          <Link href="/">
-            <Image src="/Group.svg" alt="Studio Mudiaga" width={28} height={28} className="invert" />
-          </Link>
+      {/* ── Right panel ── */}
+      <div className="flex-1 flex flex-col bg-[#0c0c0c] overflow-y-auto">
+        {/* Top bar */}
+        <div className="flex items-center justify-between px-8 lg:px-12 py-5 shrink-0">
+          <div className="lg:hidden">
+            <Link href="/">
+              <Image src="/Group.svg" alt="Studio Mudiaga" width={28} height={28} className="invert" />
+            </Link>
+          </div>
+          {topRight ?? <div />}
         </div>
 
-        <div className="w-full max-w-md mx-auto">
-          {children}
+        {/* Form — vertically centered */}
+        <div className="flex-1 flex items-center justify-center px-8 lg:px-16 xl:px-24 py-8">
+          <div className="w-full max-w-[400px]">
+            {children}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between px-8 lg:px-12 py-5 shrink-0">
+          <p className="text-white/20 text-xs">© 2025 Studio Mudiaga</p>
+          <div className="flex items-center gap-5">
+            <Link href="/privacy-policy" className="text-white/20 text-xs hover:text-white/40 transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="text-white/20 text-xs hover:text-white/40 transition-colors">Support</Link>
+          </div>
         </div>
       </div>
     </div>

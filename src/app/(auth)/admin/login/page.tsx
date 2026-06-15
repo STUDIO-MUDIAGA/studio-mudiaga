@@ -10,7 +10,7 @@ import AuthSplitLayout from "@/components/auth/AuthSplitLayout";
 const HERO = "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=80";
 
 const inputClass =
-  "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder-white/25 focus:outline-none focus:border-amber-400/60 transition-colors";
+  "w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3.5 text-white text-sm placeholder-white/25 focus:outline-none focus:border-amber-400 transition-colors";
 
 function GoogleIcon() {
   return (
@@ -69,44 +69,43 @@ export default function AdminLoginPage() {
       image={HERO}
       quote="Manage with clarity, lead with vision."
       tagline="The Studio Mudiaga admin portal — your command centre for shortlets, furniture, and guests."
-      brand="Studio Mudiaga — Admin Portal"
+      topRight={
+        <p className="text-white/40 text-sm">
+          <Link href="/login" className="hover:text-white/60 transition-colors">← Customer login</Link>
+        </p>
+      }
     >
-      {/* Heading */}
-      <div className="flex items-center gap-4 mb-10">
-        <div className="w-11 h-11 bg-amber-400/10 border border-amber-400/20 rounded-xl flex items-center justify-center shrink-0">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-10 h-10 bg-amber-400/10 border border-amber-400/20 rounded-xl flex items-center justify-center shrink-0">
           <ShieldCheck size={18} className="text-amber-400" />
         </div>
         <div>
-          <h1 className="text-white text-2xl font-semibold leading-tight">Admin Access</h1>
+          <h1 className="text-white text-2xl font-bold leading-tight">Admin Access</h1>
           <p className="text-white/35 text-xs mt-0.5">Studio Mudiaga management portal</p>
         </div>
       </div>
 
-      {/* Google */}
       <button
         onClick={handleGoogle}
         disabled={googleLoading}
-        className="w-full flex items-center justify-center gap-3 bg-white/5 border border-white/10 rounded-xl py-3.5 text-white text-sm font-medium hover:bg-white/10 hover:border-white/20 transition-colors disabled:opacity-50 mb-7"
+        className="w-full flex items-center justify-center gap-3 border border-zinc-700 rounded-xl py-3.5 text-white text-sm font-medium hover:bg-white/5 transition-colors disabled:opacity-50 mb-5"
       >
         <GoogleIcon />
         {googleLoading ? "Redirecting…" : "Continue with Google"}
       </button>
 
-      <div className="flex items-center gap-4 mb-7">
-        <div className="flex-1 h-px bg-white/10" />
-        <span className="text-white/25 text-xs uppercase tracking-widest">or</span>
-        <div className="flex-1 h-px bg-white/10" />
+      <div className="flex items-center gap-4 mb-6">
+        <div className="flex-1 h-px bg-zinc-800" />
+        <span className="text-white/30 text-xs">Or sign in with</span>
+        <div className="flex-1 h-px bg-zinc-800" />
       </div>
 
-      {/* Form */}
       <form onSubmit={handleLogin} className="space-y-5">
         <div>
-          <label className="block text-white/50 text-xs font-medium uppercase tracking-wide mb-2">
-            Admin email
-          </label>
+          <label className="block text-white/60 text-sm mb-2">Admin email</label>
           <input
             type="email"
-            placeholder="e.g. admin@studiomudiaga.com"
+            placeholder="admin@studiomudiaga.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -116,9 +115,7 @@ export default function AdminLoginPage() {
         </div>
 
         <div>
-          <label className="block text-white/50 text-xs font-medium uppercase tracking-wide mb-2">
-            Password
-          </label>
+          <label className="block text-white/60 text-sm mb-2">Password</label>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -145,22 +142,14 @@ export default function AdminLoginPage() {
           </p>
         )}
 
-        <div className="pt-2">
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-amber-400 text-black font-semibold rounded-xl py-4 text-sm hover:bg-amber-300 transition-colors disabled:opacity-50"
-          >
-            {loading ? "Verifying…" : "Sign in to Admin"}
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-amber-400 text-black font-semibold rounded-xl py-3.5 text-sm hover:bg-amber-300 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          {loading ? "Verifying…" : <>Sign in to Admin <span className="text-base leading-none">→</span></>}
+        </button>
       </form>
-
-      <p className="mt-10 text-center">
-        <Link href="/login" className="text-white/20 text-xs hover:text-white/40 transition-colors">
-          Back to customer login
-        </Link>
-      </p>
     </AuthSplitLayout>
   );
 }
