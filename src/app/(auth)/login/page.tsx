@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import AuthSplitLayout from "@/components/auth/AuthSplitLayout";
+
+const HERO = "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,50 +24,39 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-      return;
-    }
-
+    if (error) { setError(error.message); setLoading(false); return; }
     router.push("/account");
     router.refresh();
   };
 
-  const handleGoogleLogin = async () => {
+  const handleGoogle = async () => {
     setGoogleLoading(true);
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/account`,
-      },
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=/account` },
     });
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="w-full max-w-md"
+    <AuthSplitLayout
+      image={HERO}
+      quote="Every great stay begins with the right space."
+      tagline="Discover curated shortlet apartments and handcrafted furniture across Nigeria."
     >
-      {/* Logo */}
-      <div className="mb-10 text-center">
-        <Link href="/">
-          <Image src="/Group.svg" alt="Studio Mudiaga" width={40} height={40} className="mx-auto mb-4 invert" />
-        </Link>
-        <h1 className="font-playfair text-3xl text-white mb-1">Welcome back</h1>
-        <p className="text-white/40 text-sm">Sign in to your Studio Mudiaga account</p>
+      {/* Heading */}
+      <div className="mb-8">
+        <h1 className="text-white text-3xl font-semibold mb-2">Welcome back</h1>
+        <p className="text-white/40 text-sm leading-relaxed">
+          Sign in to manage your bookings and orders.
+        </p>
       </div>
 
       {/* Google */}
       <button
-        onClick={handleGoogleLogin}
+        onClick={handleGoogle}
         disabled={googleLoading}
-        className="w-full flex items-center justify-center gap-3 bg-white/5 border border-white/10 rounded-2xl py-3.5 text-white text-sm font-medium hover:bg-white/10 hover:border-white/20 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 mb-6"
+        className="w-full flex items-center justify-center gap-3 bg-white/6 border border-white/12 rounded-xl py-3 text-white text-sm font-medium hover:bg-white/10 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 mb-6"
       >
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
           <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
@@ -77,7 +67,7 @@ export default function LoginPage() {
         {googleLoading ? "Redirecting…" : "Continue with Google"}
       </button>
 
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-3 mb-6">
         <div className="flex-1 h-px bg-white/10" />
         <span className="text-white/25 text-xs uppercase tracking-widest">or</span>
         <div className="flex-1 h-px bg-white/10" />
@@ -85,39 +75,43 @@ export default function LoginPage() {
 
       {/* Form */}
       <form onSubmit={handleLogin} className="space-y-4">
-        <div className="relative">
-          <Mail size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+        <div>
+          <label className="block text-white/60 text-xs font-medium mb-1.5">Email address</label>
           <input
             type="email"
-            placeholder="Email address"
+            placeholder="e.g. you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-5 py-3.5 text-white text-sm placeholder-white/30 focus:outline-none focus:border-amber-400/50 transition-colors"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-amber-400/50 focus:bg-white/8 transition-all"
           />
         </div>
 
-        <div className="relative">
-          <Lock size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-12 py-3.5 text-white text-sm placeholder-white/30 focus:outline-none focus:border-amber-400/50 transition-colors"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword((p) => !p)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
-          >
-            {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-          </button>
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="text-white/60 text-xs font-medium">Password</label>
+          </div>
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-11 text-white text-sm placeholder-white/20 focus:outline-none focus:border-amber-400/50 focus:bg-white/8 transition-all"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((p) => !p)}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+            >
+              {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+            </button>
+          </div>
         </div>
 
         {error && (
-          <p className="text-red-400 text-sm bg-red-400/10 border border-red-400/20 rounded-xl px-4 py-2.5">
+          <p className="text-red-400 text-xs bg-red-400/8 border border-red-400/15 rounded-lg px-3.5 py-2.5">
             {error}
           </p>
         )}
@@ -125,23 +119,32 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-amber-400 text-black font-semibold rounded-2xl py-3.5 text-sm hover:bg-amber-300 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 shadow-[0_0_20px_2px_#fbbf2425] mt-2"
+          className="w-full bg-amber-400 text-black font-semibold rounded-xl py-3 text-sm hover:bg-amber-300 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 mt-2"
         >
           {loading ? "Signing in…" : "Sign in"}
         </button>
       </form>
 
-      <div className="mt-6 text-center space-y-3">
+      <div className="mt-6 space-y-3 text-center">
         <p className="text-white/30 text-sm">
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="text-amber-400 hover:text-amber-300 transition-colors font-medium">
-            Create one
+          <Link href="/signup" className="text-white hover:text-amber-400 font-medium transition-colors">
+            Sign up
           </Link>
         </p>
-        <Link href="/admin/login" className="block text-white/20 text-xs hover:text-white/40 transition-colors">
-          Admin access
-        </Link>
+        <p className="text-white/15 text-xs">
+          <Link href="/admin/login" className="hover:text-white/30 transition-colors">
+            Admin access
+          </Link>
+        </p>
       </div>
-    </motion.div>
+
+      <p className="mt-8 text-center text-white/20 text-xs leading-relaxed">
+        By signing in, you agree to our{" "}
+        <Link href="/terms" className="underline hover:text-white/40 transition-colors">Terms of Service</Link>
+        {" "}and{" "}
+        <Link href="/privacy-policy" className="underline hover:text-white/40 transition-colors">Privacy Policy</Link>.
+      </p>
+    </AuthSplitLayout>
   );
 }

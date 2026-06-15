@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
-import { Eye, EyeOff, Mail, Lock, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import AuthSplitLayout from "@/components/auth/AuthSplitLayout";
+
+const HERO = "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=80";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -24,21 +26,10 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    if (signInError) { setError(signInError.message); setLoading(false); return; }
 
-    if (signInError) {
-      setError(signInError.message);
-      setLoading(false);
-      return;
-    }
-
-    // Verify admin role
     if (data.user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", data.user.id)
-        .single();
-
+      const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).single();
       if (profile?.role !== "admin") {
         await supabase.auth.signOut();
         setError("Access denied. This area is for admin users only.");
@@ -51,37 +42,37 @@ export default function AdminLoginPage() {
     router.refresh();
   };
 
-  const handleGoogleLogin = async () => {
+  const handleGoogle = async () => {
     setGoogleLoading(true);
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?type=admin`,
-      },
+      options: { redirectTo: `${window.location.origin}/auth/callback?type=admin` },
     });
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="w-full max-w-sm"
+    <AuthSplitLayout
+      image={HERO}
+      quote="Manage with clarity, lead with vision."
+      tagline="The Studio Mudiaga admin portal — your command centre for shortlets, furniture, and guests."
+      brand="Studio Mudiaga — Admin Portal"
     >
-      {/* Header */}
-      <div className="mb-10 text-center">
-        <div className="w-12 h-12 bg-amber-400/10 border border-amber-400/20 rounded-2xl flex items-center justify-center mx-auto mb-5">
-          <ShieldCheck size={22} className="text-amber-400" />
+      {/* Heading */}
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-10 h-10 bg-amber-400/10 border border-amber-400/20 rounded-xl flex items-center justify-center shrink-0">
+          <ShieldCheck size={18} className="text-amber-400" />
         </div>
-        <h1 className="font-playfair text-2xl text-white mb-1">Admin Access</h1>
-        <p className="text-white/30 text-sm">Studio Mudiaga management portal</p>
+        <div>
+          <h1 className="text-white text-2xl font-semibold leading-tight">Admin Access</h1>
+          <p className="text-white/35 text-xs mt-0.5">Studio Mudiaga management portal</p>
+        </div>
       </div>
 
       {/* Google */}
       <button
-        onClick={handleGoogleLogin}
+        onClick={handleGoogle}
         disabled={googleLoading}
-        className="w-full flex items-center justify-center gap-3 bg-white/5 border border-white/10 rounded-2xl py-3.5 text-white text-sm font-medium hover:bg-white/10 hover:border-white/20 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 mb-5"
+        className="w-full flex items-center justify-center gap-3 bg-white/6 border border-white/12 rounded-xl py-3 text-white text-sm font-medium hover:bg-white/10 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 mb-6"
       >
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
           <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
@@ -92,7 +83,7 @@ export default function AdminLoginPage() {
         {googleLoading ? "Redirecting…" : "Continue with Google"}
       </button>
 
-      <div className="flex items-center gap-4 mb-5">
+      <div className="flex items-center gap-3 mb-6">
         <div className="flex-1 h-px bg-white/10" />
         <span className="text-white/25 text-xs uppercase tracking-widest">or</span>
         <div className="flex-1 h-px bg-white/10" />
@@ -100,41 +91,43 @@ export default function AdminLoginPage() {
 
       {/* Form */}
       <form onSubmit={handleLogin} className="space-y-4">
-        <div className="relative">
-          <Mail size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+        <div>
+          <label className="block text-white/60 text-xs font-medium mb-1.5">Admin email</label>
           <input
             type="email"
-            placeholder="Admin email"
+            placeholder="e.g. admin@studiomudiaga.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="username"
-            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-5 py-3.5 text-white text-sm placeholder-white/30 focus:outline-none focus:border-amber-400/50 transition-colors"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-amber-400/50 focus:bg-white/8 transition-all"
           />
         </div>
 
-        <div className="relative">
-          <Lock size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete="current-password"
-            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-12 py-3.5 text-white text-sm placeholder-white/30 focus:outline-none focus:border-amber-400/50 transition-colors"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword((p) => !p)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
-          >
-            {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-          </button>
+        <div>
+          <label className="block text-white/60 text-xs font-medium mb-1.5">Password</label>
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-11 text-white text-sm placeholder-white/20 focus:outline-none focus:border-amber-400/50 focus:bg-white/8 transition-all"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((p) => !p)}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+            >
+              {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+            </button>
+          </div>
         </div>
 
         {error && (
-          <p className="text-red-400 text-sm bg-red-400/10 border border-red-400/20 rounded-xl px-4 py-2.5">
+          <p className="text-red-400 text-xs bg-red-400/8 border border-red-400/15 rounded-lg px-3.5 py-2.5">
             {error}
           </p>
         )}
@@ -142,7 +135,7 @@ export default function AdminLoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-amber-400 text-black font-semibold rounded-2xl py-3.5 text-sm hover:bg-amber-300 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 shadow-[0_0_20px_2px_#fbbf2425]"
+          className="w-full bg-amber-400 text-black font-semibold rounded-xl py-3 text-sm hover:bg-amber-300 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 mt-1"
         >
           {loading ? "Verifying…" : "Sign in to Admin"}
         </button>
@@ -153,6 +146,6 @@ export default function AdminLoginPage() {
           Back to customer login
         </Link>
       </p>
-    </motion.div>
+    </AuthSplitLayout>
   );
 }
