@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from "react";
 import IntroLoader from "./IntroLoader";
-import CustomCursor from "./CustomCursor";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
@@ -10,7 +9,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <CustomCursor />
       <IntroLoader onComplete={handleComplete} />
       <div
         style={{
