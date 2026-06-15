@@ -1,5 +1,5 @@
 -- profiles table — one row per auth user
-create table if not exists profiles (
+create table if not exists public.profiles (
   id uuid references auth.users on delete cascade primary key,
   email text,
   full_name text,
@@ -9,31 +9,30 @@ create table if not exists profiles (
 );
 
 -- Row-level security
-alter table profiles enable row level security;
+alter table public.profiles enable row level security;
+
+drop policy if exists "Users can view own profile" on public.profiles;
+drop policy if exists "Users can update own profile" on public.profiles;
+drop policy if exists "Admins can read all profiles" on public.profiles;
 
 create policy "Users can view own profile"
-  on profiles for select
+  on public.profiles for select
   using (auth.uid() = id);
 
 create policy "Users can update own profile"
-  on profiles for update
+  on public.profiles for update
   using (auth.uid() = id);
 
--- Admins can read all profiles (needed for admin dashboard)
-create policy "Admins can read all profiles"
-  on profiles for select
-  using (
-    exists (
-      select 1 from profiles
-      where id = auth.uid() and role = 'admin'
-    )
-  );
-
 -- Auto-create a profile row whenever a new user signs up
-create or replace function handle_new_user()
-returns trigger as $$
+-- set search_path = public so supabase_auth_admin can resolve the table
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
 begin
-  insert into profiles (id, email, full_name, avatar_url)
+  insert into public.profiles (id, email, full_name, avatar_url)
   values (
     new.id,
     new.email,
@@ -43,9 +42,9 @@ begin
   on conflict (id) do nothing;
   return new;
 end;
-$$ language plpgsql security definer;
+$$;
 
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
-  for each row execute procedure handle_new_user();
+  for each row execute procedure public.handle_new_user();
