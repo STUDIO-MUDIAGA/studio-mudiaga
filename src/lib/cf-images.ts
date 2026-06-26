@@ -1,57 +1,65 @@
-const ACCOUNT_HASH = process.env.NEXT_PUBLIC_CLOUDFLARE_IMAGES_ACCOUNT_HASH ?? "";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { randomUUID } from "crypto";
+
+const R2_PUBLIC_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_URL ?? "";
+
+function getClient() {
+  return new S3Client({
+    region: "auto",
+    endpoint: process.env.R2_ENDPOINT!,
+    credentials: {
+      accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+    },
+  });
+}
+
+const BUCKET = process.env.R2_BUCKET_NAME ?? "studio-mudiaga";
 
 /**
- * Build a Cloudflare Images delivery URL.
- * variant: "public" (original), "thumb" (200px), "card" (800px), etc.
- * Define variants in your Cloudflare Images dashboard.
+ * Build a public R2 delivery URL from a stored key.
+ * Prefix: "shortlets/", "furniture/", "brand/" etc.
+ * If the key is already a full URL (placeholder), return as-is.
  */
-export function cfImageUrl(imageId: string, variant: "public" | "thumb" | "card" | "hero" = "public"): string {
-  if (!imageId) return "";
-  // Already a full URL (Unsplash placeholder etc.) — return as-is
-  if (imageId.startsWith("http")) return imageId;
-  return `https://imagedelivery.net/${ACCOUNT_HASH}/${imageId}/${variant}`;
+export function cfImageUrl(key: string): string {
+  if (!key) return "";
+  if (key.startsWith("http")) return key;
+  return `${R2_PUBLIC_URL}/${key}`;
 }
 
 /**
- * Upload a file to Cloudflare Images from the server side.
- * Call this only from API routes (uses secret token).
+ * Upload a file to Cloudflare R2.
+ * Returns the storage key and the public delivery URL.
  */
-export async function uploadToCF(file: File | Blob, filename?: string): Promise<{ id: string; url: string }> {
-  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-  const apiToken = process.env.CLOUDFLARE_API_TOKEN;
-  if (!accountId || !apiToken) throw new Error("Cloudflare credentials not configured");
+export async function uploadToCF(
+  file: File | Blob,
+  prefix: "shortlets" | "furniture" | "brand" = "shortlets",
+): Promise<{ key: string; url: string }> {
+  const ext = file instanceof File ? file.name.split(".").pop() ?? "jpg" : "jpg";
+  const key = `${prefix}/${randomUUID()}.${ext}`;
 
-  const body = new FormData();
-  body.append("file", file, filename ?? "upload");
+  const buffer = Buffer.from(await file.arrayBuffer());
 
-  const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/images/v1`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiToken}` },
-    body,
-  });
+  const client = getClient();
+  await client.send(
+    new PutObjectCommand({
+      Bucket: BUCKET,
+      Key: key,
+      Body: buffer,
+      ContentType: file.type || "image/jpeg",
+      CacheControl: "public, max-age=31536000, immutable",
+    }),
+  );
 
-  const json = await res.json() as { success: boolean; result?: { id: string; variants: string[] }; errors?: { message: string }[] };
-  if (!json.success || !json.result) {
-    throw new Error(json.errors?.[0]?.message ?? "Cloudflare upload failed");
-  }
-
-  return {
-    id: json.result.id,
-    url: cfImageUrl(json.result.id, "public"),
-  };
+  return { key, url: cfImageUrl(key) };
 }
 
 /**
- * Delete an image from Cloudflare Images by ID.
+ * Delete a file from R2 by its storage key.
+ * Skips full URLs (placeholder / external images).
  */
-export async function deleteFromCF(imageId: string): Promise<void> {
-  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-  const apiToken = process.env.CLOUDFLARE_API_TOKEN;
-  if (!accountId || !apiToken) return;
-  if (!imageId || imageId.startsWith("http")) return; // skip placeholders
-
-  await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/images/v1/${imageId}`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${apiToken}` },
-  });
+export async function deleteFromCF(key: string): Promise<void> {
+  if (!key || key.startsWith("http")) return;
+  const client = getClient();
+  await client.send(new DeleteObjectCommand({ Bucket: BUCKET, Key: key }));
 }

@@ -10,8 +10,11 @@ const db = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
+const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
+
 export async function POST(req: NextRequest) {
-  // Verify caller is an authenticated admin
+  // Auth check
   const token = req.headers.get("authorization")?.replace("Bearer ", "") ?? "";
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -21,24 +24,25 @@ export async function POST(req: NextRequest) {
   const { data: profile } = await db.from("profiles").select("role").eq("id", user.id).single();
   if (profile?.role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
+  // Parse form
   const formData = await req.formData();
   const file = formData.get("file");
+  const rawPrefix = formData.get("prefix");
+  const prefix = (rawPrefix === "furniture" || rawPrefix === "brand") ? rawPrefix : "shortlets";
+
   if (!file || !(file instanceof File)) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
-
-  if (file.size > 10 * 1024 * 1024) {
+  if (file.size > MAX_BYTES) {
     return NextResponse.json({ error: "File exceeds 10 MB limit" }, { status: 400 });
   }
-
-  const allowed = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
-  if (!allowed.includes(file.type)) {
+  if (!ALLOWED_TYPES.includes(file.type)) {
     return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });
   }
 
   try {
-    const result = await uploadToCF(file, file.name);
-    return NextResponse.json(result); // { id, url }
+    const result = await uploadToCF(file, prefix);
+    return NextResponse.json(result); // { key, url }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Upload failed";
     return NextResponse.json({ error: message }, { status: 500 });
