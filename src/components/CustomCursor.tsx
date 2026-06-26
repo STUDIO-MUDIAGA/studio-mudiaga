@@ -6,29 +6,39 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export default function CustomCursor() {
   const pathname = usePathname();
+  const isAdmin = pathname.startsWith("/admin");
+
   const [label, setLabel] = useState<string | null>(null);
   const [visible, setVisible] = useState(false);
 
-  if (pathname.startsWith("/admin")) return null;
-
   const rawX = useMotionValue(-200);
   const rawY = useMotionValue(-200);
-
   const x = useSpring(rawX, { stiffness: 350, damping: 30, mass: 0.4 });
   const y = useSpring(rawY, { stiffness: 350, damping: 30, mass: 0.4 });
 
+  // Toggle admin-mode class so the CSS cursor:none rule is lifted
   useEffect(() => {
+    if (isAdmin) {
+      document.body.classList.add("admin-mode");
+    } else {
+      document.body.classList.remove("admin-mode");
+    }
+    return () => document.body.classList.remove("admin-mode");
+  }, [isAdmin]);
+
+  // Mouse tracking — skip on admin pages
+  useEffect(() => {
+    if (isAdmin) return;
+
     const onMove = (e: MouseEvent) => {
       rawX.set(e.clientX);
       rawY.set(e.clientY);
       setVisible(true);
     };
-
     const onOver = (e: MouseEvent) => {
       const el = (e.target as Element)?.closest("[data-cursor]");
       setLabel(el ? el.getAttribute("data-cursor") : null);
     };
-
     const onLeave = () => setVisible(false);
 
     window.addEventListener("mousemove", onMove);
@@ -40,7 +50,9 @@ export default function CustomCursor() {
       window.removeEventListener("mouseover", onOver);
       document.documentElement.removeEventListener("mouseleave", onLeave);
     };
-  }, [rawX, rawY]);
+  }, [isAdmin, rawX, rawY]);
+
+  if (isAdmin) return null;
 
   const expanded = !!label;
 
@@ -51,27 +63,15 @@ export default function CustomCursor() {
       animate={{ opacity: visible ? 1 : 0 }}
       transition={{ opacity: { duration: 0.2 } }}
     >
-      {/* centering wrapper */}
       <div style={{ transform: "translate(-50%, -50%)", position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        {/* outer ring */}
         <motion.div
           className="absolute rounded-full"
-          animate={{
-            width: expanded ? 148 : 36,
-            height: expanded ? 148 : 36,
-            borderColor: "rgba(255,255,255,0.5)",
-            borderWidth: 1,
-          }}
+          animate={{ width: expanded ? 148 : 36, height: expanded ? 148 : 36, borderColor: "rgba(255,255,255,0.5)", borderWidth: 1 }}
           transition={{ type: "spring", stiffness: 300, damping: 28, mass: 0.6 }}
         />
-        {/* inner filled circle */}
         <motion.div
           className="rounded-full flex items-center justify-center overflow-hidden"
-          animate={{
-            width: expanded ? 120 : 12,
-            height: expanded ? 120 : 12,
-            backgroundColor: "rgba(0,0,0,1)",
-          }}
+          animate={{ width: expanded ? 120 : 12, height: expanded ? 120 : 12, backgroundColor: "rgba(0,0,0,1)" }}
           transition={{ type: "spring", stiffness: 350, damping: 28, mass: 0.5 }}
         >
           <motion.p

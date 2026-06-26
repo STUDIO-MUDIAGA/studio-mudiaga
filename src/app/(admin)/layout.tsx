@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -108,11 +107,6 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  useEffect(() => {
-    document.body.classList.add("admin-mode");
-    return () => document.body.classList.remove("admin-mode");
-  }, []);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex">
