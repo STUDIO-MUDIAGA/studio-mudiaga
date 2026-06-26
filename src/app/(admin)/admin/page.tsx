@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import {
-  LayoutDashboard, CalendarDays, ShoppingBag,
-  Building2, Sofa, Users, TrendingUp,
-} from "lucide-react";
+import { LayoutDashboard, CalendarDays, ShoppingBag, Building2, Sofa, Users, TrendingUp } from "lucide-react";
+
+const NAVY = "#1e156d";
 
 const quickLinks = [
   { label: "Manage Shortlets", href: "/admin/shortlets", icon: Building2,    desc: "Add, edit, or remove listings" },
@@ -41,54 +40,56 @@ export default function AdminDashboard() {
   }, []);
 
   const statCards = [
-    { label: "Active Shortlets",  value: stats.shortlets, icon: Building2    },
-    { label: "Furniture Items",   value: stats.furniture,  icon: Sofa         },
-    { label: "Total Bookings",    value: stats.bookings,   icon: CalendarDays },
-    { label: "Registered Users",  value: stats.users,      icon: Users        },
+    { label: "Active Shortlets", value: stats.shortlets, icon: Building2,   color: "#ede9fd" },
+    { label: "Furniture Items",  value: stats.furniture,  icon: Sofa,        color: "#fdf0e9" },
+    { label: "Total Bookings",   value: stats.bookings,   icon: CalendarDays, color: "#e9f0fd" },
+    { label: "Registered Users", value: stats.users,      icon: Users,       color: "#e9fdf0" },
   ];
 
   return (
     <div style={{ maxWidth: 1100 }}>
       {/* Header */}
-      <div style={{ marginBottom: 36 }}>
-        <p style={{ color: "#fbbf24", fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 6px", display: "flex", alignItems: "center", gap: 6 }}>
+      <div style={{ marginBottom: 32 }}>
+        <p style={{ color: NAVY, fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 6px", display: "flex", alignItems: "center", gap: 6 }}>
           <LayoutDashboard size={10} /> Overview
         </p>
-        <h1 style={{ color: "#fff", fontSize: 26, fontWeight: 700, margin: "0 0 4px" }}>Dashboard</h1>
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>Welcome back, {user?.email}</p>
+        <h1 style={{ color: "#0a0a0a", fontSize: 26, fontWeight: 700, margin: "0 0 4px" }}>Dashboard</h1>
+        <p style={{ color: "#888", fontSize: 13, margin: 0 }}>Welcome back, {user?.email}</p>
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 36 }}>
-        {statCards.map(({ label, value, icon: Icon }) => (
-          <div key={label} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: "20px 20px 18px" }}>
-            <Icon size={15} style={{ color: "#fbbf24", marginBottom: 16, display: "block" }} />
-            <p style={{ color: "#fff", fontSize: 32, fontWeight: 700, margin: "0 0 4px", lineHeight: 1 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 32 }}>
+        {statCards.map(({ label, value, icon: Icon, color }) => (
+          <div key={label} style={{ background: "#fff", border: "1px solid #e8e8e4", borderRadius: 16, padding: "20px 20px 18px" }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: color, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
+              <Icon size={16} style={{ color: NAVY }} />
+            </div>
+            <p style={{ color: "#0a0a0a", fontSize: 32, fontWeight: 700, margin: "0 0 4px", lineHeight: 1 }}>
               {loading ? "—" : value}
             </p>
-            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, margin: 0 }}>{label}</p>
+            <p style={{ color: "#888", fontSize: 12, margin: 0 }}>{label}</p>
           </div>
         ))}
       </div>
 
       {/* Manage */}
-      <div style={{ marginBottom: 32 }}>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 14px" }}>Manage</p>
+      <div style={{ marginBottom: 28 }}>
+        <p style={{ color: "#aaa", fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 12px" }}>Manage</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
           {quickLinks.map(({ label, href, icon: Icon, desc }) => (
             <Link
               key={href}
               href={href}
-              style={{ display: "flex", alignItems: "flex-start", gap: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: 18, textDecoration: "none" }}
-              onMouseOver={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; }}
-              onMouseOut={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.03)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
+              style={{ display: "flex", alignItems: "flex-start", gap: 14, background: "#fff", border: "1px solid #e8e8e4", borderRadius: 16, padding: 18, textDecoration: "none", transition: "all 0.15s" }}
+              onMouseOver={(e) => { e.currentTarget.style.borderColor = NAVY; e.currentTarget.style.boxShadow = "0 2px 12px rgba(30,21,109,0.08)"; }}
+              onMouseOut={(e) => { e.currentTarget.style.borderColor = "#e8e8e4"; e.currentTarget.style.boxShadow = "none"; }}
             >
-              <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(251,191,36,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <Icon size={15} style={{ color: "#fbbf24" }} />
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: "#f0effe", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <Icon size={16} style={{ color: NAVY }} />
               </div>
               <div>
-                <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, fontWeight: 500, margin: "0 0 3px" }}>{label}</p>
-                <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, margin: 0 }}>{desc}</p>
+                <p style={{ color: "#0a0a0a", fontSize: 13, fontWeight: 600, margin: "0 0 3px" }}>{label}</p>
+                <p style={{ color: "#aaa", fontSize: 12, margin: 0 }}>{desc}</p>
               </div>
             </Link>
           ))}
@@ -96,10 +97,10 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent activity */}
-      <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: 24 }}>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 20px" }}>Recent Activity</p>
+      <div style={{ background: "#fff", border: "1px solid #e8e8e4", borderRadius: 16, padding: 24 }}>
+        <p style={{ color: "#aaa", fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 20px" }}>Recent Activity</p>
         <div style={{ textAlign: "center", padding: "32px 0" }}>
-          <p style={{ color: "rgba(255,255,255,0.15)", fontSize: 13, margin: 0 }}>Bookings and orders will appear here once customers start transacting.</p>
+          <p style={{ color: "#ccc", fontSize: 13, margin: 0 }}>Bookings and orders will appear here once customers start transacting.</p>
         </div>
       </div>
     </div>

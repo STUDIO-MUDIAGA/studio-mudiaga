@@ -6,13 +6,10 @@ import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import AuthSplitLayout from "@/components/auth/AuthSplitLayout";
 
+const ORANGE = "#c46442";
 const HERO = "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80";
 
-const inputStyle = {
-  width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-  borderRadius: 12, padding: "13px 16px", color: "#fff", fontSize: 13,
-  outline: "none", boxSizing: "border-box" as const, transition: "border-color 0.2s",
-};
+const inputStyle = { width: "100%", background: "#fafaf9", border: "1px solid #e8e8e4", borderRadius: 12, padding: "13px 16px", color: "#0a0a0a", fontSize: 13, outline: "none", boxSizing: "border-box" as const };
 
 function GoogleIcon() {
   return (
@@ -27,7 +24,6 @@ function GoogleIcon() {
 
 export default function LoginPage() {
   const supabase = createClient();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -36,9 +32,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+    e.preventDefault(); setError(""); setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) { setError(error.message); setLoading(false); return; }
     window.location.href = "/account";
@@ -46,10 +40,7 @@ export default function LoginPage() {
 
   const handleGoogle = async () => {
     setGoogleLoading(true);
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=/account` },
-    });
+    await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/auth/callback?next=/account` } });
   };
 
   return (
@@ -58,76 +49,51 @@ export default function LoginPage() {
       quote="Every great stay begins with the right space."
       tagline="Curated shortlets and handcrafted furniture across Nigeria."
       topRight={
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>
+        <p style={{ color: "#aaa", fontSize: 13 }}>
           Don&apos;t have an account?{" "}
-          <Link href="/signup" style={{ color: "#fbbf24", fontWeight: 600, textDecoration: "none" }}>Sign Up</Link>
+          <Link href="/signup" style={{ color: ORANGE, fontWeight: 600, textDecoration: "none" }}>Sign Up</Link>
         </p>
       }
     >
-      <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 700, margin: "0 0 6px" }}>Welcome back</h1>
-      <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, margin: "0 0 28px" }}>Sign in to your Studio Mudiaga account.</p>
+      <h1 style={{ color: "#0a0a0a", fontSize: 28, fontWeight: 700, margin: "0 0 6px" }}>Welcome back</h1>
+      <p style={{ color: "#aaa", fontSize: 13, margin: "0 0 28px" }}>Sign in to your Studio Mudiaga account.</p>
 
-      {/* Google */}
-      <button
-        onClick={handleGoogle}
-        disabled={googleLoading}
-        style={{
-          width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-          border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "13px 16px",
-          background: "rgba(255,255,255,0.04)", color: "#fff", fontSize: 13, fontWeight: 500,
-          cursor: "pointer", marginBottom: 20, opacity: googleLoading ? 0.5 : 1,
-        }}
-      >
+      <button onClick={handleGoogle} disabled={googleLoading} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, border: "1px solid #e8e8e4", borderRadius: 12, padding: "13px 16px", background: "#fff", color: "#0a0a0a", fontSize: 13, fontWeight: 500, cursor: "pointer", marginBottom: 20, opacity: googleLoading ? 0.5 : 1 }}>
         <GoogleIcon />
         {googleLoading ? "Redirecting…" : "Continue with Google"}
       </button>
 
-      {/* Divider */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-        <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.07)" }} />
-        <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 11 }}>or sign in with email</span>
-        <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.07)" }} />
+        <div style={{ flex: 1, height: 1, background: "#f0f0ee" }} />
+        <span style={{ color: "#ccc", fontSize: 11 }}>or sign in with email</span>
+        <div style={{ flex: 1, height: 1, background: "#f0f0ee" }} />
       </div>
 
       <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <div>
-          <label style={{ display: "block", color: "rgba(255,255,255,0.5)", fontSize: 12, marginBottom: 7 }}>Email</label>
+          <label style={{ display: "block", color: "#888", fontSize: 12, marginBottom: 7 }}>Email</label>
           <input style={inputStyle} type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="username" />
         </div>
-
         <div>
-          <label style={{ display: "block", color: "rgba(255,255,255,0.5)", fontSize: 12, marginBottom: 7 }}>Password</label>
+          <label style={{ display: "block", color: "#888", fontSize: 12, marginBottom: 7 }}>Password</label>
           <div style={{ position: "relative" }}>
             <input style={{ ...inputStyle, paddingRight: 44 }} type={showPassword ? "text" : "password"} placeholder="minimum 8 characters" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
-            <button type="button" onClick={() => setShowPassword((p) => !p)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "rgba(255,255,255,0.3)", cursor: "pointer", padding: 0 }}>
+            <button type="button" onClick={() => setShowPassword((p) => !p)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#ccc", cursor: "pointer", padding: 0 }}>
               {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
             </button>
           </div>
         </div>
-
-        {error && (
-          <p style={{ color: "#f87171", fontSize: 12, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 10, padding: "10px 14px", margin: 0 }}>{error}</p>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            width: "100%", background: "#fbbf24", color: "#000", border: "none", borderRadius: 12,
-            padding: "13px 16px", fontSize: 13, fontWeight: 700, cursor: loading ? "not-allowed" : "pointer",
-            opacity: loading ? 0.6 : 1, marginTop: 4,
-          }}
-        >
+        {error && <p style={{ color: "#dc2626", fontSize: 12, background: "#fff5f5", border: "1px solid #fecaca", borderRadius: 10, padding: "10px 14px", margin: 0 }}>{error}</p>}
+        <button type="submit" disabled={loading} style={{ width: "100%", background: ORANGE, color: "#fff", border: "none", borderRadius: 12, padding: "13px 16px", fontSize: 13, fontWeight: 700, cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.6 : 1, marginTop: 4 }}>
           {loading ? "Signing in…" : "Sign In →"}
         </button>
       </form>
 
       <p style={{ textAlign: "center", marginTop: 16 }}>
-        <Link href="/forgot-password" style={{ color: "#fbbf24", fontSize: 13, textDecoration: "none" }}>Forgot password?</Link>
+        <Link href="/forgot-password" style={{ color: ORANGE, fontSize: 13, textDecoration: "none" }}>Forgot password?</Link>
       </p>
-
       <p style={{ textAlign: "center", marginTop: 24 }}>
-        <Link href="/admin/login" style={{ color: "rgba(255,255,255,0.15)", fontSize: 11, textDecoration: "none" }}>Admin access</Link>
+        <Link href="/admin/login" style={{ color: "#ddd", fontSize: 11, textDecoration: "none" }}>Admin access</Link>
       </p>
     </AuthSplitLayout>
   );
