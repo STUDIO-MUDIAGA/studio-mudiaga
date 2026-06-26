@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
 
 const steps = [
   { n: "1", label: "Enter your\nemail" },
@@ -12,7 +11,6 @@ const steps = [
 ];
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const supabase = createClient();
 
   const [step, setStep] = useState<"email" | "otp">("email");
@@ -84,8 +82,7 @@ export default function AdminLoginPage() {
       return;
     }
 
-    router.push("/admin");
-    router.refresh();
+    window.location.href = "/admin";
   };
 
   const handleOtpChange = (index: number, value: string) => {
