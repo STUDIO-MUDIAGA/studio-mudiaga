@@ -4,13 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
 import AuthSplitLayout from "@/components/auth/AuthSplitLayout";
 
 const HERO = "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80";
 
-const inputClass =
-  "w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3.5 text-white text-sm placeholder-white/25 focus:outline-none focus:border-amber-400 transition-colors";
+const inputStyle = {
+  width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: 12, padding: "13px 16px", color: "#fff", fontSize: 13,
+  outline: "none", boxSizing: "border-box" as const, transition: "border-color 0.2s",
+};
 
 function GoogleIcon() {
   return (
@@ -24,7 +26,6 @@ function GoogleIcon() {
 }
 
 export default function LoginPage() {
-  const router = useRouter();
   const supabase = createClient();
 
   const [email, setEmail] = useState("");
@@ -40,8 +41,7 @@ export default function LoginPage() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) { setError(error.message); setLoading(false); return; }
-    router.push("/account");
-    router.refresh();
+    window.location.href = "/account";
   };
 
   const handleGoogle = async () => {
@@ -58,91 +58,76 @@ export default function LoginPage() {
       quote="Every great stay begins with the right space."
       tagline="Curated shortlets and handcrafted furniture across Nigeria."
       topRight={
-        <p className="text-white/40 text-sm">
+        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="text-amber-400 font-medium hover:text-amber-300 transition-colors">
-            Sign Up
-          </Link>
+          <Link href="/signup" style={{ color: "#fbbf24", fontWeight: 600, textDecoration: "none" }}>Sign Up</Link>
         </p>
       }
     >
-      <h1 className="text-white text-3xl font-bold mb-2">Welcome back!</h1>
-      <p className="text-white/50 text-sm mb-8">Please enter your details to sign in.</p>
+      <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 700, margin: "0 0 6px" }}>Welcome back</h1>
+      <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, margin: "0 0 28px" }}>Sign in to your Studio Mudiaga account.</p>
 
+      {/* Google */}
       <button
         onClick={handleGoogle}
         disabled={googleLoading}
-        className="w-full flex items-center justify-center gap-3 border border-zinc-700 rounded-xl py-3.5 text-white text-sm font-medium hover:bg-white/5 transition-colors disabled:opacity-50 mb-5"
+        style={{
+          width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+          border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "13px 16px",
+          background: "rgba(255,255,255,0.04)", color: "#fff", fontSize: 13, fontWeight: 500,
+          cursor: "pointer", marginBottom: 20, opacity: googleLoading ? 0.5 : 1,
+        }}
       >
         <GoogleIcon />
         {googleLoading ? "Redirecting…" : "Continue with Google"}
       </button>
 
-      <div className="flex items-center gap-4 mb-6">
-        <div className="flex-1 h-px bg-zinc-800" />
-        <span className="text-white/30 text-xs">Or sign in with</span>
-        <div className="flex-1 h-px bg-zinc-800" />
+      {/* Divider */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+        <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.07)" }} />
+        <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 11 }}>or sign in with email</span>
+        <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.07)" }} />
       </div>
 
-      <form onSubmit={handleLogin} className="space-y-5">
+      <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <div>
-          <label className="block text-white/60 text-sm mb-2">Email</label>
-          <input
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="username"
-            className={inputClass}
-          />
+          <label style={{ display: "block", color: "rgba(255,255,255,0.5)", fontSize: 12, marginBottom: 7 }}>Email</label>
+          <input style={inputStyle} type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="username" />
         </div>
 
         <div>
-          <label className="block text-white/60 text-sm mb-2">Password</label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="minimum 8 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-              className={`${inputClass} pr-12`}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((p) => !p)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
-            >
+          <label style={{ display: "block", color: "rgba(255,255,255,0.5)", fontSize: 12, marginBottom: 7 }}>Password</label>
+          <div style={{ position: "relative" }}>
+            <input style={{ ...inputStyle, paddingRight: 44 }} type={showPassword ? "text" : "password"} placeholder="minimum 8 characters" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
+            <button type="button" onClick={() => setShowPassword((p) => !p)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "rgba(255,255,255,0.3)", cursor: "pointer", padding: 0 }}>
               {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
             </button>
           </div>
         </div>
 
         {error && (
-          <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3">
-            {error}
-          </p>
+          <p style={{ color: "#f87171", fontSize: 12, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 10, padding: "10px 14px", margin: 0 }}>{error}</p>
         )}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-amber-400 text-black font-semibold rounded-xl py-3.5 text-sm hover:bg-amber-300 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+          style={{
+            width: "100%", background: "#fbbf24", color: "#000", border: "none", borderRadius: 12,
+            padding: "13px 16px", fontSize: 13, fontWeight: 700, cursor: loading ? "not-allowed" : "pointer",
+            opacity: loading ? 0.6 : 1, marginTop: 4,
+          }}
         >
-          {loading ? "Signing in…" : <>Sign In <span className="text-base leading-none">→</span></>}
+          {loading ? "Signing in…" : "Sign In →"}
         </button>
       </form>
 
-      <p className="text-center mt-5">
-        <Link href="/forgot-password" className="text-amber-400 text-sm hover:text-amber-300 transition-colors">
-          Forgot password?
-        </Link>
+      <p style={{ textAlign: "center", marginTop: 16 }}>
+        <Link href="/forgot-password" style={{ color: "#fbbf24", fontSize: 13, textDecoration: "none" }}>Forgot password?</Link>
       </p>
 
-      <p className="mt-6 text-center text-white/20 text-xs">
-        <Link href="/admin/login" className="hover:text-white/40 transition-colors">Admin access</Link>
+      <p style={{ textAlign: "center", marginTop: 24 }}>
+        <Link href="/admin/login" style={{ color: "rgba(255,255,255,0.15)", fontSize: 11, textDecoration: "none" }}>Admin access</Link>
       </p>
     </AuthSplitLayout>
   );

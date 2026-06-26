@@ -1,15 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { CalendarDays, ShoppingBag, MapPin, Package } from "lucide-react";
-
-const card = (delay: number) => ({
-  initial: { opacity: 0, y: 16 },
-  animate: { opacity: 1, y: 0 },
-  transition: { delay, duration: 0.4 },
-});
 
 export default function AccountPage() {
   const { profile, user } = useAuth();
@@ -18,97 +11,80 @@ export default function AccountPage() {
   return (
     <div>
       {/* Greeting */}
-      <motion.div {...card(0)} className="mb-10">
-        <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-1">My Account</p>
-        <h1 className="font-playfair text-3xl md:text-4xl text-white">Hello, {displayName}</h1>
-        <p className="text-white/40 mt-2 text-sm">{user?.email}</p>
-      </motion.div>
+      <div style={{ marginBottom: 36 }}>
+        <p style={{ color: "#fbbf24", fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 8px" }}>My Account</p>
+        <h1 style={{ color: "#fff", fontSize: 32, fontWeight: 700, margin: "0 0 6px" }}>Hello, {displayName}</h1>
+        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>{user?.email}</p>
+      </div>
 
       {/* Stats row */}
-      <motion.div {...card(0.1)} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 32 }}>
         {[
           { label: "Bookings", value: "0", icon: CalendarDays },
           { label: "Orders", value: "0", icon: ShoppingBag },
           { label: "Shortlets viewed", value: "0", icon: MapPin },
           { label: "Items in cart", value: "0", icon: Package },
         ].map(({ label, value, icon: Icon }) => (
-          <div key={label} className="bg-white/5 border border-white/10 rounded-2xl p-5">
-            <Icon size={18} className="text-amber-400 mb-3" />
-            <p className="text-2xl font-bold text-white">{value}</p>
-            <p className="text-white/40 text-xs mt-0.5">{label}</p>
+          <div key={label} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: "20px" }}>
+            <Icon size={16} color="#fbbf24" style={{ marginBottom: 12 }} />
+            <p style={{ color: "#fff", fontSize: 26, fontWeight: 700, margin: "0 0 4px" }}>{value}</p>
+            <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, margin: 0 }}>{label}</p>
           </div>
         ))}
-      </motion.div>
+      </div>
 
       {/* Sections */}
-      <div className="grid md:grid-cols-2 gap-6">
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
         {/* Bookings */}
-        <motion.div {...card(0.15)} className="bg-white/5 border border-white/10 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-white font-semibold flex items-center gap-2">
-              <CalendarDays size={16} className="text-amber-400" /> Shortlet Bookings
+        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+            <h2 style={{ color: "#fff", fontSize: 14, fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
+              <CalendarDays size={14} color="#fbbf24" /> Shortlet Bookings
             </h2>
-            <Link href="/shortlets" className="text-amber-400 text-xs hover:text-amber-300 transition-colors">
-              Browse
-            </Link>
+            <Link href="/shortlets" style={{ color: "#fbbf24", fontSize: 12, textDecoration: "none" }}>Browse</Link>
           </div>
-          <div className="text-center py-10">
-            <p className="text-white/20 text-sm">No bookings yet</p>
-            <Link
-              href="/shortlets"
-              className="mt-4 inline-block text-xs bg-amber-400/10 border border-amber-400/20 text-amber-400 rounded-full px-4 py-2 hover:bg-amber-400/20 transition-colors"
-            >
+          <div style={{ textAlign: "center", padding: "36px 0" }}>
+            <p style={{ color: "rgba(255,255,255,0.2)", fontSize: 13, margin: "0 0 14px" }}>No bookings yet</p>
+            <Link href="/shortlets" style={{ display: "inline-block", fontSize: 12, background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.18)", color: "#fbbf24", borderRadius: 20, padding: "7px 16px", textDecoration: "none" }}>
               Explore shortlets
             </Link>
           </div>
-        </motion.div>
+        </div>
 
         {/* Orders */}
-        <motion.div {...card(0.2)} className="bg-white/5 border border-white/10 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-white font-semibold flex items-center gap-2">
-              <ShoppingBag size={16} className="text-amber-400" /> Furniture Orders
+        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+            <h2 style={{ color: "#fff", fontSize: 14, fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
+              <ShoppingBag size={14} color="#fbbf24" /> Furniture Orders
             </h2>
-            <Link href="/furniture" className="text-amber-400 text-xs hover:text-amber-300 transition-colors">
-              Shop
-            </Link>
+            <Link href="/furniture" style={{ color: "#fbbf24", fontSize: 12, textDecoration: "none" }}>Shop</Link>
           </div>
-          <div className="text-center py-10">
-            <p className="text-white/20 text-sm">No orders yet</p>
-            <Link
-              href="/furniture"
-              className="mt-4 inline-block text-xs bg-amber-400/10 border border-amber-400/20 text-amber-400 rounded-full px-4 py-2 hover:bg-amber-400/20 transition-colors"
-            >
+          <div style={{ textAlign: "center", padding: "36px 0" }}>
+            <p style={{ color: "rgba(255,255,255,0.2)", fontSize: 13, margin: "0 0 14px" }}>No orders yet</p>
+            <Link href="/furniture" style={{ display: "inline-block", fontSize: 12, background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.18)", color: "#fbbf24", borderRadius: 20, padding: "7px 16px", textDecoration: "none" }}>
               Shop the collection
             </Link>
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Profile card */}
-      <motion.div {...card(0.25)} className="mt-6 bg-white/5 border border-white/10 rounded-2xl p-6">
-        <h2 className="text-white font-semibold mb-4">Profile</h2>
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div>
-            <p className="text-white/30 text-xs mb-1">Full name</p>
-            <p className="text-white text-sm">{profile?.full_name ?? "—"}</p>
-          </div>
-          <div>
-            <p className="text-white/30 text-xs mb-1">Email</p>
-            <p className="text-white text-sm">{user?.email}</p>
-          </div>
-          <div>
-            <p className="text-white/30 text-xs mb-1">Account type</p>
-            <p className="text-white text-sm capitalize">{profile?.role ?? "customer"}</p>
-          </div>
-          <div>
-            <p className="text-white/30 text-xs mb-1">Member since</p>
-            <p className="text-white text-sm">
-              {user?.created_at ? new Date(user.created_at).toLocaleDateString("en-NG", { month: "long", year: "numeric" }) : "—"}
-            </p>
-          </div>
+      <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: 24 }}>
+        <h2 style={{ color: "#fff", fontSize: 14, fontWeight: 600, margin: "0 0 20px" }}>Profile</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          {[
+            { label: "Full name", value: profile?.full_name ?? "—" },
+            { label: "Email", value: user?.email ?? "—" },
+            { label: "Account type", value: profile?.role ?? "customer" },
+            { label: "Member since", value: user?.created_at ? new Date(user.created_at).toLocaleDateString("en-NG", { month: "long", year: "numeric" }) : "—" },
+          ].map(({ label, value }) => (
+            <div key={label}>
+              <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.1em" }}>{label}</p>
+              <p style={{ color: "#fff", fontSize: 13, margin: 0, textTransform: label === "Account type" ? "capitalize" : "none" }}>{value}</p>
+            </div>
+          ))}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
