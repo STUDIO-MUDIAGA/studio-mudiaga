@@ -1,65 +1,137 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
 const steps = [
-  { n: "1", label: "Sign in to\nyour account" },
-  { n: "2", label: "Manage\nproperties" },
-  { n: "3", label: "Track &\nanalyse" },
+  { n: "1", label: "Enter your\nemail" },
+  { n: "2", label: "Verify\nOTP code" },
+  { n: "3", label: "Access\ngranted" },
 ];
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const supabase = createClient();
 
+  const [step, setStep] = useState<"email" | "otp">("email");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [resendCountdown, setResendCountdown] = useState(0);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Countdown timer for resend
+  useEffect(() => {
+    if (resendCountdown <= 0) return;
+    const t = setTimeout(() => setResendCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCountdown]);
+
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-    if (signInError) {
-      setError(signInError.message);
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: false },
+    });
+
+    if (otpError) {
+      setError(otpError.message);
       setLoading(false);
       return;
     }
 
-    if (data.user) {
-      const { data: role } = await supabase.rpc("get_my_role");
+    setStep("otp");
+    setResendCountdown(60);
+    setLoading(false);
+    setTimeout(() => otpRefs.current[0]?.focus(), 100);
+  };
 
-      if (role !== "admin") {
-        await supabase.auth.signOut();
-        setError("Access denied. Admin accounts only.");
-        setLoading(false);
-        return;
-      }
+  const handleVerifyOtp = async (code: string) => {
+    setError("");
+    setLoading(true);
+
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      email,
+      token: code,
+      type: "email",
+    });
+
+    if (verifyError) {
+      setError("Invalid or expired code. Please try again.");
+      setOtp(["", "", "", "", "", ""]);
+      setLoading(false);
+      setTimeout(() => otpRefs.current[0]?.focus(), 50);
+      return;
+    }
+
+    // Check admin role
+    const { data: role } = await supabase.rpc("get_my_role");
+    if (role !== "admin") {
+      await supabase.auth.signOut();
+      setError("Access denied. This email is not authorised as admin.");
+      setStep("email");
+      setOtp(["", "", "", "", "", ""]);
+      setLoading(false);
+      return;
     }
 
     router.push("/admin");
     router.refresh();
   };
 
+  const handleOtpChange = (index: number, value: string) => {
+    const char = value.replace(/\D/g, "").slice(-1);
+    const next = [...otp];
+    next[index] = char;
+    setOtp(next);
+
+    if (char && index < 5) {
+      otpRefs.current[index + 1]?.focus();
+    }
+
+    if (next.every((d) => d !== "")) {
+      handleVerifyOtp(next.join(""));
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleOtpPaste = (e: React.ClipboardEvent) => {
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (pasted.length === 6) {
+      const next = pasted.split("");
+      setOtp(next);
+      otpRefs.current[5]?.focus();
+      handleVerifyOtp(pasted);
+    }
+  };
+
+  const handleResend = async () => {
+    if (resendCountdown > 0) return;
+    setError("");
+    setResendCountdown(60);
+    await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+  };
+
+  const activeStep = step === "email" ? 0 : 1;
+
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
 
       {/* ── Left panel — image ── */}
       <div
-        style={{
-          width: "45%",
-          flexShrink: 0,
-          position: "relative",
-          overflow: "hidden",
-        }}
+        style={{ width: "45%", flexShrink: 0, position: "relative", overflow: "hidden" }}
         className="hidden lg:block"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -68,217 +140,200 @@ export default function AdminLoginPage() {
           alt=""
           style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
         />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 60%, transparent 100%)" }} />
-        <div style={{ position: "absolute", bottom: 0, left: 0, padding: "40px" }}>
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.15) 60%, transparent 100%)" }} />
+
+        <div style={{ position: "absolute", bottom: "40px", left: "40px", right: "40px" }}>
           <h2 style={{ color: "#fff", fontSize: "24px", fontWeight: 700, lineHeight: 1.3, marginBottom: "8px" }}>
             Manage your Studio.
           </h2>
-          <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "13px", maxWidth: "260px", lineHeight: 1.6 }}>
+          <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "13px", maxWidth: "260px", lineHeight: 1.6, marginBottom: "24px" }}>
             Your command centre for shortlets, furniture, and guests.
           </p>
-        </div>
-        {/* Step cards */}
-        <div style={{ position: "absolute", bottom: "140px", left: "40px", right: "40px", display: "flex", gap: "10px" }}>
-          {steps.map(({ n, label }, i) => (
-            <div
-              key={n}
-              style={{
-                flex: 1,
-                borderRadius: "14px",
-                padding: "14px",
-                background: i === 0 ? "rgba(251,191,36,0.15)" : "rgba(255,255,255,0.07)",
-                border: i === 0 ? "1px solid rgba(251,191,36,0.3)" : "1px solid rgba(255,255,255,0.1)",
-                backdropFilter: "blur(8px)",
-              }}
-            >
+
+          {/* Step cards */}
+          <div style={{ display: "flex", gap: "10px" }}>
+            {steps.map(({ n, label }, i) => (
               <div
+                key={n}
                 style={{
-                  width: "22px",
-                  height: "22px",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "10px",
-                  fontWeight: 700,
-                  marginBottom: "10px",
-                  background: i === 0 ? "#fbbf24" : "rgba(255,255,255,0.15)",
-                  color: i === 0 ? "#000" : "rgba(255,255,255,0.5)",
+                  flex: 1,
+                  borderRadius: "14px",
+                  padding: "14px",
+                  background: i === activeStep ? "rgba(251,191,36,0.15)" : "rgba(255,255,255,0.06)",
+                  border: i === activeStep ? "1px solid rgba(251,191,36,0.35)" : "1px solid rgba(255,255,255,0.08)",
+                  backdropFilter: "blur(8px)",
+                  transition: "all 0.3s ease",
                 }}
               >
-                {n}
+                <div style={{
+                  width: "22px", height: "22px", borderRadius: "50%",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "10px", fontWeight: 700, marginBottom: "10px",
+                  background: i === activeStep ? "#fbbf24" : "rgba(255,255,255,0.12)",
+                  color: i === activeStep ? "#000" : "rgba(255,255,255,0.4)",
+                  transition: "all 0.3s ease",
+                }}>
+                  {n}
+                </div>
+                <p style={{
+                  fontSize: "11px", fontWeight: 500, lineHeight: 1.4, whiteSpace: "pre-line",
+                  color: i === activeStep ? "#fbbf24" : "rgba(255,255,255,0.35)",
+                  transition: "color 0.3s ease",
+                }}>
+                  {label}
+                </p>
               </div>
-              <p style={{ fontSize: "11px", fontWeight: 500, lineHeight: 1.4, color: i === 0 ? "#fbbf24" : "rgba(255,255,255,0.4)", whiteSpace: "pre-line" }}>
-                {label}
-              </p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
       {/* ── Right panel — form ── */}
-      <div
-        style={{
-          flex: 1,
-          background: "#0c0c0c",
-          display: "flex",
-          flexDirection: "column",
-          overflowY: "auto",
-        }}
-      >
+      <div style={{ flex: 1, background: "#0c0c0c", display: "flex", flexDirection: "column", overflowY: "auto" }}>
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 48px" }}>
           <div style={{ width: "100%", maxWidth: "380px" }}>
 
-            {/* Heading */}
-            <div style={{ textAlign: "center", marginBottom: "32px" }}>
-              <h2 style={{ color: "#fff", fontSize: "22px", fontWeight: 700, marginBottom: "6px" }}>
-                Admin Sign In
-              </h2>
-              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "13px" }}>
-                Enter your credentials to access the portal.
-              </p>
-            </div>
+            {step === "email" ? (
+              <>
+                <div style={{ textAlign: "center", marginBottom: "32px" }}>
+                  <h2 style={{ color: "#fff", fontSize: "22px", fontWeight: 700, marginBottom: "6px" }}>Admin Sign In</h2>
+                  <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "13px" }}>
+                    Enter your email and we'll send you a sign-in code.
+                  </p>
+                </div>
 
-            {/* Form */}
-            <form onSubmit={handleLogin}>
-              {/* Email */}
-              <div style={{ marginBottom: "16px" }}>
-                <label style={{ display: "block", color: "rgba(255,255,255,0.45)", fontSize: "12px", marginBottom: "6px" }}>
-                  Email
-                </label>
-                <input
-                  type="email"
-                  placeholder="eg. admin@studiomudiaga.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="username"
-                  style={{
-                    width: "100%",
-                    background: "#111",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: "12px",
-                    padding: "12px 16px",
-                    color: "#fff",
-                    fontSize: "14px",
-                    outline: "none",
-                    boxSizing: "border-box",
-                  }}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(251,191,36,0.4)")}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
-                />
-              </div>
+                <form onSubmit={handleSendOtp}>
+                  <div style={{ marginBottom: "20px" }}>
+                    <label style={{ display: "block", color: "rgba(255,255,255,0.45)", fontSize: "12px", marginBottom: "6px" }}>
+                      Email address
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="eg. admin@studiomudiaga.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      autoComplete="email"
+                      autoFocus
+                      style={{
+                        width: "100%", background: "#111",
+                        border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px",
+                        padding: "12px 16px", color: "#fff", fontSize: "14px",
+                        outline: "none", boxSizing: "border-box",
+                      }}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(251,191,36,0.4)")}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
+                    />
+                  </div>
 
-              {/* Password */}
-              <div style={{ marginBottom: "6px" }}>
-                <label style={{ display: "block", color: "rgba(255,255,255,0.45)", fontSize: "12px", marginBottom: "6px" }}>
-                  Password
-                </label>
-                <div style={{ position: "relative" }}>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    autoComplete="current-password"
-                    style={{
-                      width: "100%",
-                      background: "#111",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      borderRadius: "12px",
-                      padding: "12px 44px 12px 16px",
-                      color: "#fff",
-                      fontSize: "14px",
-                      outline: "none",
-                      boxSizing: "border-box",
-                    }}
-                    onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(251,191,36,0.4)")}
-                    onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
-                  />
+                  {error && (
+                    <div style={{ color: "#f87171", fontSize: "12px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: "10px", padding: "10px 14px", marginBottom: "16px" }}>
+                      {error}
+                    </div>
+                  )}
+
                   <button
-                    type="button"
-                    onClick={() => setShowPassword((p) => !p)}
+                    type="submit"
+                    disabled={loading}
                     style={{
-                      position: "absolute",
-                      right: "14px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      color: "rgba(255,255,255,0.25)",
-                      display: "flex",
-                      alignItems: "center",
-                      padding: 0,
+                      width: "100%", background: "#fbbf24", color: "#000", border: "none",
+                      borderRadius: "12px", padding: "13px 20px", fontSize: "14px",
+                      fontWeight: 600, cursor: loading ? "not-allowed" : "pointer",
+                      opacity: loading ? 0.6 : 1, transition: "opacity 0.15s",
                     }}
                   >
-                    {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                    {loading ? "Sending code…" : "Send sign-in code"}
                   </button>
+                </form>
+              </>
+            ) : (
+              <>
+                <div style={{ textAlign: "center", marginBottom: "32px" }}>
+                  <h2 style={{ color: "#fff", fontSize: "22px", fontWeight: 700, marginBottom: "6px" }}>Check your email</h2>
+                  <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "13px", lineHeight: 1.6 }}>
+                    We sent a 6-digit code to<br />
+                    <span style={{ color: "rgba(255,255,255,0.65)", fontWeight: 500 }}>{email}</span>
+                  </p>
                 </div>
-              </div>
 
-              <p style={{ color: "rgba(255,255,255,0.2)", fontSize: "11px", marginBottom: "20px" }}>
-                Must be at least 8 characters.
-              </p>
+                {/* OTP boxes */}
+                <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginBottom: "20px" }} onPaste={handleOtpPaste}>
+                  {otp.map((digit, i) => (
+                    <input
+                      key={i}
+                      ref={(el) => { otpRefs.current[i] = el; }}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleOtpChange(i, e.target.value)}
+                      onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                      disabled={loading}
+                      style={{
+                        width: "48px", height: "56px", textAlign: "center",
+                        background: "#111", border: digit ? "1px solid rgba(251,191,36,0.5)" : "1px solid rgba(255,255,255,0.08)",
+                        borderRadius: "12px", color: "#fff", fontSize: "20px", fontWeight: 600,
+                        outline: "none", caretColor: "#fbbf24", boxSizing: "border-box",
+                        transition: "border-color 0.15s",
+                      }}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(251,191,36,0.5)")}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = digit ? "rgba(251,191,36,0.5)" : "rgba(255,255,255,0.08)")}
+                    />
+                  ))}
+                </div>
 
-              {/* Error */}
-              {error && (
-                <div
+                {loading && (
+                  <p style={{ textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: "13px", marginBottom: "16px" }}>
+                    Verifying…
+                  </p>
+                )}
+
+                {error && (
+                  <div style={{ color: "#f87171", fontSize: "12px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: "10px", padding: "10px 14px", marginBottom: "16px" }}>
+                    {error}
+                  </div>
+                )}
+
+                <p style={{ textAlign: "center", color: "rgba(255,255,255,0.25)", fontSize: "13px" }}>
+                  Didn't receive it?{" "}
+                  <button
+                    onClick={handleResend}
+                    disabled={resendCountdown > 0}
+                    style={{
+                      background: "none", border: "none", cursor: resendCountdown > 0 ? "not-allowed" : "pointer",
+                      color: resendCountdown > 0 ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.6)",
+                      fontSize: "13px", fontWeight: 500, padding: 0,
+                    }}
+                  >
+                    {resendCountdown > 0 ? `Resend in ${resendCountdown}s` : "Resend code"}
+                  </button>
+                </p>
+
+                <button
+                  onClick={() => { setStep("email"); setError(""); setOtp(["", "", "", "", "", ""]); }}
                   style={{
-                    color: "#f87171",
-                    fontSize: "12px",
-                    background: "rgba(239,68,68,0.08)",
-                    border: "1px solid rgba(239,68,68,0.15)",
-                    borderRadius: "10px",
-                    padding: "10px 14px",
-                    marginBottom: "16px",
+                    display: "block", margin: "16px auto 0", background: "none", border: "none",
+                    color: "rgba(255,255,255,0.2)", fontSize: "12px", cursor: "pointer",
                   }}
                 >
-                  {error}
-                </div>
-              )}
+                  ← Use a different email
+                </button>
+              </>
+            )}
 
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={loading}
-                style={{
-                  width: "100%",
-                  background: "#fbbf24",
-                  color: "#000",
-                  border: "none",
-                  borderRadius: "12px",
-                  padding: "13px 20px",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  cursor: loading ? "not-allowed" : "pointer",
-                  opacity: loading ? 0.6 : 1,
-                  transition: "opacity 0.15s",
-                }}
-              >
-                {loading ? "Verifying…" : "Sign In"}
-              </button>
-            </form>
-
-            <p style={{ textAlign: "center", color: "rgba(255,255,255,0.25)", fontSize: "13px", marginTop: "24px" }}>
-              Back to{" "}
-              <Link href="/" style={{ color: "rgba(255,255,255,0.6)", fontWeight: 500, textDecoration: "none" }}>
-                Website
+            <p style={{ textAlign: "center", color: "rgba(255,255,255,0.2)", fontSize: "13px", marginTop: "28px" }}>
+              <Link href="/" style={{ color: "rgba(255,255,255,0.4)", fontWeight: 500, textDecoration: "none" }}>
+                ← Back to website
               </Link>
             </p>
           </div>
         </div>
 
-        {/* Footer */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 48px" }}>
-          <p style={{ color: "rgba(255,255,255,0.12)", fontSize: "11px" }}>© 2025 Studio Mudiaga</p>
-          <Link href="/privacy-policy" style={{ color: "rgba(255,255,255,0.12)", fontSize: "11px", textDecoration: "none" }}>
-            Privacy
-          </Link>
+          <p style={{ color: "rgba(255,255,255,0.1)", fontSize: "11px" }}>© 2025 Studio Mudiaga</p>
+          <Link href="/privacy-policy" style={{ color: "rgba(255,255,255,0.1)", fontSize: "11px", textDecoration: "none" }}>Privacy</Link>
         </div>
       </div>
-
     </div>
   );
 }
