@@ -366,8 +366,12 @@ export default function NewShortletPage() {
       host: { name: form.host_name || "Studio Mudiaga", avatar: "", superhost: form.superhost },
       tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
       available: form.available, rating: 0, review_count: 0,
-      // Extended columns — add via SQL migration before these take effect:
-      // property_type, description, checkin, checkout, min_nights, rules
+      property_type: form.property_type,
+      description: form.description,
+      checkin: form.checkin,
+      checkout: form.checkout,
+      min_nights: parseInt(form.min_nights) || 1,
+      rules: form.rules,
     };
     const res = await fetch("/api/admin/shortlets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
     if (!res.ok) { const d = await res.json(); setError(d.error ?? "Failed to save"); setSaving(false); return; }
