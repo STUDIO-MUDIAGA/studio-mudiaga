@@ -1,5 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
+
+// Service role client — bypasses RLS, safe in server-only proxy context
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  { auth: { autoRefreshToken: false, persistSession: false } }
+);
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -42,15 +50,28 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
 
-    const { data: profile } = await supabase
+    // Use service role to check role — bypasses RLS, always reliable
+    const { data: profile } = await supabaseAdmin
       .from("profiles")
       .select("role")
       .eq("id", user.id)
       .single();
 
     if (profile?.role !== "admin") {
-      await supabase.auth.signOut();
       return NextResponse.redirect(new URL("/admin/login?error=access_denied", request.url));
+    }
+  }
+
+  // ── Redirect already-logged-in admin away from login page ─────────
+  if (user && pathname === "/admin/login") {
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.role === "admin") {
+      return NextResponse.redirect(new URL("/admin", request.url));
     }
   }
 
@@ -58,9 +79,6 @@ export async function proxy(request: NextRequest) {
   if (user) {
     if (pathname === "/login" || pathname === "/signup") {
       return NextResponse.redirect(new URL("/account", request.url));
-    }
-    if (pathname === "/admin/login") {
-      return NextResponse.redirect(new URL("/admin", request.url));
     }
   }
 
