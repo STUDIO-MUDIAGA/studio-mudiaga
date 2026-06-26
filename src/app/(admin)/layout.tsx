@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import {
   LayoutDashboard, Building2, Sofa, CalendarDays,
   ShoppingBag, Users, TrendingUp, LogOut, Menu, X,
-  Settings, Bell, Search,
+  Settings, Bell, Search, ChevronDown,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -158,9 +158,12 @@ function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
         <div style={{ position: "relative" }}>
           <button
             onClick={() => setDropdownOpen((p) => !p)}
-            style={{ width: 36, height: 36, borderRadius: "50%", background: NAVY_BG, border: "2px solid #dddcf5", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+            style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #ebebeb", borderRadius: 24, padding: "4px 10px 4px 4px", cursor: "pointer" }}
           >
-            <span style={{ color: NAVY, fontSize: 13, fontWeight: 700 }}>{initial}</span>
+            <div style={{ width: 28, height: 28, borderRadius: "50%", background: NAVY_BG, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span style={{ color: NAVY, fontSize: 12, fontWeight: 700 }}>{initial}</span>
+            </div>
+            <ChevronDown size={13} color="#aaa" style={{ transition: "transform 0.15s", transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)" }} />
           </button>
 
           {dropdownOpen && (
