@@ -7,21 +7,33 @@ import { useAuth } from "@/context/AuthContext";
 import {
   LayoutDashboard, Building2, Sofa, CalendarDays,
   ShoppingBag, Users, TrendingUp, LogOut, Menu, X,
-  Settings, Bell, Search, ChevronDown,
+  Settings, Bell, Search, ChevronDown, Tag, BarChart2, Plus, List,
 } from "lucide-react";
 import { useState } from "react";
 
 const NAVY = "#1e156d";
 const NAVY_BG = "#eeedf8";
 
-const navItems = [
-  { label: "Dashboard", href: "/admin",           exact: true, icon: LayoutDashboard },
-  { label: "Shortlets",  href: "/admin/shortlets",             icon: Building2 },
-  { label: "Furniture",  href: "/admin/furniture",             icon: Sofa },
-  { label: "Bookings",   href: "/admin/bookings",              icon: CalendarDays },
-  { label: "Orders",     href: "/admin/orders",                icon: ShoppingBag },
-  { label: "Users",      href: "/admin/users",                 icon: Users },
-  { label: "Analytics",  href: "/admin/analytics",             icon: TrendingUp },
+type SubItem = { label: string; href: string; icon: React.ElementType };
+type NavItem = { label: string; href: string; exact?: boolean; icon: React.ElementType; children?: SubItem[] };
+
+const navItems: NavItem[] = [
+  { label: "Dashboard", href: "/admin", exact: true, icon: LayoutDashboard },
+  {
+    label: "Shortlets", href: "/admin/shortlets", icon: Building2,
+    children: [
+      { label: "All Apartments",      href: "/admin/shortlets",             icon: List },
+      { label: "Add Apartment",       href: "/admin/shortlets/new",         icon: Plus },
+      { label: "Apartment Metrics",   href: "/admin/shortlets/metrics",     icon: BarChart2 },
+      { label: "Apartment Bookings",  href: "/admin/shortlets/bookings",    icon: CalendarDays },
+      { label: "Categories",          href: "/admin/shortlets/categories",  icon: Tag },
+    ],
+  },
+  { label: "Furniture",  href: "/admin/furniture", icon: Sofa },
+  { label: "Bookings",   href: "/admin/bookings",  icon: CalendarDays },
+  { label: "Orders",     href: "/admin/orders",    icon: ShoppingBag },
+  { label: "Users",      href: "/admin/users",     icon: Users },
+  { label: "Analytics",  href: "/admin/analytics", icon: TrendingUp },
 ];
 
 function Sidebar({ onNav }: { onNav?: () => void }) {
@@ -37,6 +49,11 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
     router.push("/admin/login");
   };
 
+  const shortletsOpen = pathname.startsWith("/admin/shortlets");
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({ "/admin/shortlets": shortletsOpen });
+
+  const toggleExpand = (href: string) => setExpanded((p) => ({ ...p, [href]: !p[href] }));
+
   return (
     <aside style={{ width: 240, flexShrink: 0, background: "#fff", borderRight: "1px solid #ebebeb", display: "flex", flexDirection: "column", height: "100vh", position: "sticky", top: 0 }}>
       {/* Logo */}
@@ -50,20 +67,53 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
       {/* Nav */}
       <nav style={{ flex: 1, padding: "16px 12px", overflowY: "auto" }}>
         <p style={{ color: "#ccc", fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 8px 8px" }}>Main</p>
-        {navItems.map(({ label, href, icon: Icon, exact }) => {
+        {navItems.map(({ label, href, icon: Icon, exact, children }) => {
           const active = isActive(href, exact);
+          const isOpen = !!expanded[href];
+
+          if (children) {
+            return (
+              <div key={href} style={{ marginBottom: 2 }}>
+                <button
+                  onClick={() => toggleExpand(href)}
+                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: active ? NAVY_BG : "transparent", color: active ? NAVY : "#888", fontSize: 13, fontWeight: active ? 600 : 400, border: "none", cursor: "pointer", textAlign: "left" }}
+                  onMouseOver={(e) => { if (!active) { e.currentTarget.style.background = "#f8f8f8"; e.currentTarget.style.color = "#333"; } }}
+                  onMouseOut={(e) => { if (!active) { e.currentTarget.style.background = active ? NAVY_BG : "transparent"; e.currentTarget.style.color = active ? NAVY : "#888"; } }}
+                >
+                  <Icon size={15} style={{ flexShrink: 0, color: active ? NAVY : "#bbb" }} />
+                  <span style={{ flex: 1 }}>{label}</span>
+                  <ChevronDown size={13} color="#ccc" style={{ transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", flexShrink: 0 }} />
+                </button>
+                {isOpen && (
+                  <div style={{ marginLeft: 14, marginTop: 2, paddingLeft: 14, borderLeft: "1px solid #f0f0f0" }}>
+                    {children.map(({ label: cl, href: ch, icon: CIcon }) => {
+                      const childActive = pathname === ch;
+                      return (
+                        <Link
+                          key={ch}
+                          href={ch}
+                          onClick={onNav}
+                          style={{ display: "flex", alignItems: "center", gap: 9, padding: "8px 10px", borderRadius: 8, textDecoration: "none", fontSize: 12, fontWeight: childActive ? 600 : 400, marginBottom: 1, background: childActive ? NAVY_BG : "transparent", color: childActive ? NAVY : "#999" }}
+                          onMouseOver={(e) => { if (!childActive) { e.currentTarget.style.background = "#f8f8f8"; e.currentTarget.style.color = "#333"; } }}
+                          onMouseOut={(e) => { if (!childActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#999"; } }}
+                        >
+                          <CIcon size={13} style={{ flexShrink: 0, color: childActive ? NAVY : "#ccc" }} />
+                          {cl}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
           return (
             <Link
               key={href}
               href={href}
               onClick={onNav}
-              style={{
-                display: "flex", alignItems: "center", gap: 10,
-                padding: "9px 12px", borderRadius: 10, textDecoration: "none",
-                fontSize: 13, fontWeight: active ? 600 : 400, marginBottom: 2,
-                background: active ? NAVY_BG : "transparent",
-                color: active ? NAVY : "#888",
-              }}
+              style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, textDecoration: "none", fontSize: 13, fontWeight: active ? 600 : 400, marginBottom: 2, background: active ? NAVY_BG : "transparent", color: active ? NAVY : "#888" }}
               onMouseOver={(e) => { if (!active) { e.currentTarget.style.background = "#f8f8f8"; e.currentTarget.style.color = "#333"; } }}
               onMouseOut={(e) => { if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#888"; } }}
             >
