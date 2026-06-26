@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/context/AuthContext";
 import {
   Building2, Sofa, CalendarDays, Users,
   RefreshCw, TrendingUp, ArrowRight,
@@ -87,11 +86,8 @@ function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: 
 }
 
 export default function AdminDashboard() {
-  const { user } = useAuth();
   const [stats, setStats] = useState<Stats>({ shortlets: 0, furniture: 0, bookings: 0, users: 0 });
   const [loading, setLoading] = useState(true);
-
-  const displayName = user?.email?.split("@")[0] ?? "Admin";
 
   const fetchStats = async () => {
     setLoading(true);
@@ -116,11 +112,7 @@ export default function AdminDashboard() {
   return (
     <div>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
-        <div>
-          <h1 style={{ color: "#0a0a0a", fontSize: 22, fontWeight: 700, margin: "0 0 4px" }}>Welcome Back, {displayName}!</h1>
-          <p style={{ color: "#aaa", fontSize: 13, margin: 0 }}>Here&apos;s what&apos;s happening across your platform today.</p>
-        </div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", marginBottom: 28 }}>
         <button onClick={fetchStats} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 16px", borderRadius: 10, background: "#fff", border: "1px solid #ebebeb", color: "#666", fontSize: 12, cursor: "pointer", fontWeight: 500 }}>
           <RefreshCw size={13} /> Refresh Data
         </button>
