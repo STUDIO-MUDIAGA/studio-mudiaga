@@ -35,13 +35,9 @@ export default function AdminLoginPage() {
     }
 
     if (data.user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", data.user.id)
-        .single();
+      const { data: role } = await supabase.rpc("get_my_role");
 
-      if (profile?.role !== "admin") {
+      if (role !== "admin") {
         await supabase.auth.signOut();
         setError("Access denied. Admin accounts only.");
         setLoading(false);
