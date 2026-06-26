@@ -7,10 +7,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
 const navItems = [
-  { label: "About Us",     href: "/about"     },
-  { label: "Portfolio",    href: "/portfolio" },
-  { label: "Studio",       href: "/studio"    },
-  { label: "Book Us Now",  href: "/book"      },
+  { label: "About Us",     href: "/about"             },
+  { label: "Projects",     href: "/projects"          },
+  { label: "ABODE",        href: "/abode"             },
+  { label: "MUDRES",       href: "/mudres"            },
+  { label: "Book Us Now",  href: "/book"              },
 ];
 
 const leftImages = [
