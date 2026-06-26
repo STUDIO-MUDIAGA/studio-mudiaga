@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
-import { Search, User, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, User } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
+const ORANGE = "#c46442";
+
 const NAV = [
-  { label: "Properties", href: "/abode/properties" },
+  { label: "Properties",   href: "/abode/properties" },
   { label: "How it works", href: "/abode/how-it-works" },
 ];
 
@@ -15,7 +17,6 @@ export default function AbodeLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -23,39 +24,30 @@ export default function AbodeLayout({ children }: { children: React.ReactNode })
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [menuOpen]);
-
-  const isHome = pathname === "/abode";
-
   return (
-    <div style={{ minHeight: "100vh", background: "#080c10" }}>
+    <div style={{ minHeight: "100vh", background: "#fff" }}>
       {/* Navbar */}
       <header style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
-        background: scrolled || !isHome ? "rgba(8,12,16,0.92)" : "transparent",
-        backdropFilter: scrolled || !isHome ? "blur(16px)" : "none",
-        borderBottom: scrolled || !isHome ? "1px solid rgba(255,255,255,0.05)" : "none",
-        transition: "all 0.3s ease",
+        background: "#fff",
+        borderBottom: scrolled ? "1px solid #ebebeb" : "1px solid #f0f0f0",
+        transition: "border-color 0.3s",
       }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 40px", height: 68, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 40px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           {/* Logo */}
-          <Link href="/abode" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <span style={{ color: "#fff", fontSize: 18, fontWeight: 800, letterSpacing: "0.12em", lineHeight: 1 }}>ABODE</span>
-              <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase", lineHeight: 1, marginTop: 3 }}>by Studio Mudiaga</span>
-            </div>
+          <Link href="/abode" style={{ textDecoration: "none" }}>
+            <span style={{ color: "#0a0a0a", fontSize: 18, fontWeight: 800, letterSpacing: "0.12em", lineHeight: 1, display: "block" }}>ABODE</span>
+            <span style={{ color: "#bbb", fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase", display: "block", marginTop: 2 }}>by Studio Mudiaga</span>
           </Link>
 
-          {/* Desktop nav */}
-          <nav style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          {/* Center nav */}
+          <nav style={{ display: "flex", alignItems: "center", gap: 2 }}>
             {NAV.map(({ label, href }) => (
               <Link key={href} href={href} style={{
                 padding: "7px 14px", borderRadius: 8, fontSize: 13, textDecoration: "none",
-                color: pathname === href ? "#fff" : "rgba(255,255,255,0.4)",
-                background: pathname === href ? "rgba(255,255,255,0.06)" : "transparent",
+                color: pathname === href ? ORANGE : "#888",
+                background: pathname === href ? "#fdf0eb" : "transparent",
+                fontWeight: pathname === href ? 600 : 400,
               }}>
                 {label}
               </Link>
@@ -64,13 +56,13 @@ export default function AbodeLayout({ children }: { children: React.ReactNode })
 
           {/* Right actions */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <Link href="/abode/properties" style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)", fontSize: 12, textDecoration: "none" }}>
+            <Link href="/abode/properties" style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 10, background: "#f7f7f5", border: "1px solid #ebebeb", color: "#888", fontSize: 12, textDecoration: "none" }}>
               <Search size={13} /> Search
             </Link>
-            <Link href={user ? "/account" : "/login"} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 10, background: "#c49a3c", color: "#000", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
+            <Link href={user ? "/account" : "/login"} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 10, background: ORANGE, color: "#fff", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
               <User size={13} /> {user ? "Account" : "Sign in"}
             </Link>
-            <Link href="/" style={{ color: "rgba(255,255,255,0.2)", fontSize: 11, textDecoration: "none", marginLeft: 8, padding: "4px 0" }}>
+            <Link href="/" style={{ color: "#bbb", fontSize: 11, textDecoration: "none", marginLeft: 4 }}>
               Studio Mudiaga ↗
             </Link>
           </div>
@@ -80,19 +72,23 @@ export default function AbodeLayout({ children }: { children: React.ReactNode })
       <main>{children}</main>
 
       {/* Footer */}
-      <footer style={{ borderTop: "1px solid rgba(255,255,255,0.05)", padding: "40px", marginTop: 80 }}>
+      <footer style={{ borderTop: "1px solid #ebebeb", padding: "40px", marginTop: 80, background: "#fafaf9" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
-            <p style={{ color: "#fff", fontWeight: 700, fontSize: 14, letterSpacing: "0.1em", margin: "0 0 4px" }}>ABODE</p>
-            <p style={{ color: "rgba(255,255,255,0.2)", fontSize: 12, margin: 0 }}>Premium shortlets across Nigeria</p>
+            <p style={{ color: "#0a0a0a", fontWeight: 800, fontSize: 14, letterSpacing: "0.1em", margin: "0 0 4px" }}>ABODE</p>
+            <p style={{ color: "#bbb", fontSize: 12, margin: 0 }}>Premium shortlets across Nigeria</p>
           </div>
           <div style={{ display: "flex", gap: 24 }}>
-            <Link href="/abode/properties" style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, textDecoration: "none" }}>Properties</Link>
-            <Link href="/account" style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, textDecoration: "none" }}>My Bookings</Link>
-            <Link href="/" style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, textDecoration: "none" }}>Studio Mudiaga</Link>
-            <Link href="/mudres" style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, textDecoration: "none" }}>MUDRES</Link>
+            {[
+              { label: "Properties",     href: "/abode/properties" },
+              { label: "My Bookings",    href: "/account" },
+              { label: "Studio Mudiaga", href: "/" },
+              { label: "MUDRES",         href: "/mudres" },
+            ].map(({ label, href }) => (
+              <Link key={href} href={href} style={{ color: "#aaa", fontSize: 12, textDecoration: "none" }}>{label}</Link>
+            ))}
           </div>
-          <p style={{ color: "rgba(255,255,255,0.15)", fontSize: 11 }}>© {new Date().getFullYear()} Studio Mudiaga</p>
+          <p style={{ color: "#ccc", fontSize: 11 }}>© {new Date().getFullYear()} Studio Mudiaga</p>
         </div>
       </footer>
     </div>
