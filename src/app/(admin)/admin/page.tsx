@@ -1,97 +1,86 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import {
-  LayoutDashboard,
-  CalendarDays,
-  ShoppingBag,
-  Building2,
-  Sofa,
-  Users,
-  TrendingUp,
+  LayoutDashboard, CalendarDays, ShoppingBag,
+  Building2, Sofa, Users, TrendingUp,
 } from "lucide-react";
 
-const fade = (delay: number) => ({
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
-  transition: { delay, duration: 0.35 },
-});
-
 const stats = [
-  { label: "Total Bookings", value: "0", icon: CalendarDays, trend: "" },
-  { label: "Furniture Orders", value: "0", icon: ShoppingBag, trend: "" },
-  { label: "Active Shortlets", value: "0", icon: Building2, trend: "" },
-  { label: "Registered Users", value: "0", icon: Users, trend: "" },
+  { label: "Total Bookings",    value: "0", icon: CalendarDays },
+  { label: "Furniture Orders",  value: "0", icon: ShoppingBag },
+  { label: "Active Shortlets",  value: "0", icon: Building2 },
+  { label: "Registered Users",  value: "0", icon: Users },
 ];
 
 const quickLinks = [
-  { label: "Manage Shortlets", href: "/admin/shortlets", icon: Building2, desc: "Add, edit, or remove listings" },
-  { label: "Manage Furniture", href: "/admin/furniture", icon: Sofa, desc: "Manage the furniture catalogue" },
-  { label: "Bookings", href: "/admin/bookings", icon: CalendarDays, desc: "View and manage all bookings" },
-  { label: "Orders", href: "/admin/orders", icon: ShoppingBag, desc: "Track furniture orders" },
-  { label: "Users", href: "/admin/users", icon: Users, desc: "Manage registered accounts" },
-  { label: "Analytics", href: "/admin/analytics", icon: TrendingUp, desc: "Traffic and revenue insights" },
+  { label: "Manage Shortlets", href: "/admin/shortlets", icon: Building2,    desc: "Add, edit, or remove listings" },
+  { label: "Manage Furniture", href: "/admin/furniture",  icon: Sofa,         desc: "Manage the furniture catalogue" },
+  { label: "Bookings",         href: "/admin/bookings",   icon: CalendarDays, desc: "View and manage all bookings" },
+  { label: "Orders",           href: "/admin/orders",     icon: ShoppingBag,  desc: "Track furniture orders" },
+  { label: "Users",            href: "/admin/users",      icon: Users,        desc: "Manage registered accounts" },
+  { label: "Analytics",        href: "/admin/analytics",  icon: TrendingUp,   desc: "Traffic and revenue insights" },
 ];
 
 export default function AdminDashboard() {
   const { user } = useAuth();
 
   return (
-    <div>
-      <motion.div {...fade(0)} className="mb-10">
-        <p className="text-amber-400 text-[10px] font-semibold uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
+    <div style={{ maxWidth: 1100 }}>
+
+      {/* Header */}
+      <div style={{ marginBottom: 36 }}>
+        <p style={{ color: "#fbbf24", fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 6px", display: "flex", alignItems: "center", gap: 6 }}>
           <LayoutDashboard size={10} /> Overview
         </p>
-        <h1 className="text-white text-2xl font-bold">Dashboard</h1>
-        <p className="text-white/25 text-sm mt-1">Welcome back, {user?.email}</p>
-      </motion.div>
+        <h1 style={{ color: "#fff", fontSize: 26, fontWeight: 700, margin: "0 0 4px" }}>Dashboard</h1>
+        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, margin: 0 }}>Welcome back, {user?.email}</p>
+      </div>
 
       {/* Stats */}
-      <motion.div {...fade(0.08)} className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 36 }}>
         {stats.map(({ label, value, icon: Icon }) => (
-          <div
-            key={label}
-            className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-5"
-          >
-            <Icon size={15} className="text-amber-400 mb-4" />
-            <p className="text-3xl font-bold text-white">{value}</p>
-            <p className="text-white/30 text-xs mt-1">{label}</p>
+          <div key={label} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: "20px 20px 18px" }}>
+            <Icon size={15} style={{ color: "#fbbf24", marginBottom: 16, display: "block" }} />
+            <p style={{ color: "#fff", fontSize: 32, fontWeight: 700, margin: "0 0 4px", lineHeight: 1 }}>{value}</p>
+            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, margin: 0 }}>{label}</p>
           </div>
         ))}
-      </motion.div>
+      </div>
 
-      {/* Quick links */}
-      <motion.div {...fade(0.14)}>
-        <h2 className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-4">Manage</h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {quickLinks.map(({ label, href, icon: Icon, desc }, i) => (
-            <motion.div key={label} {...fade(0.14 + i * 0.04)}>
-              <Link
-                href={href}
-                className="group flex items-start gap-4 bg-white/[0.03] border border-white/[0.07] rounded-2xl p-5 hover:bg-white/[0.06] hover:border-white/[0.12] transition-all duration-200"
-              >
-                <div className="w-8 h-8 rounded-xl bg-amber-400/10 flex items-center justify-center shrink-0 group-hover:bg-amber-400/15 transition-colors">
-                  <Icon size={14} className="text-amber-400" />
-                </div>
-                <div>
-                  <p className="text-white/80 font-medium text-sm group-hover:text-white transition-colors">{label}</p>
-                  <p className="text-white/25 text-xs mt-0.5">{desc}</p>
-                </div>
-              </Link>
-            </motion.div>
+      {/* Manage */}
+      <div style={{ marginBottom: 32 }}>
+        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 14px" }}>Manage</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+          {quickLinks.map(({ label, href, icon: Icon, desc }) => (
+            <Link
+              key={href}
+              href={href}
+              style={{ display: "flex", alignItems: "flex-start", gap: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: 18, textDecoration: "none", transition: "all 0.15s" }}
+              onMouseOver={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; }}
+              onMouseOut={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.03)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
+            >
+              <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(251,191,36,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <Icon size={15} style={{ color: "#fbbf24" }} />
+              </div>
+              <div>
+                <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, fontWeight: 500, margin: "0 0 3px" }}>{label}</p>
+                <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, margin: 0 }}>{desc}</p>
+              </div>
+            </Link>
           ))}
         </div>
-      </motion.div>
+      </div>
 
       {/* Recent activity */}
-      <motion.div {...fade(0.35)} className="mt-8 bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6">
-        <h2 className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-6">Recent Activity</h2>
-        <div className="text-center py-8">
-          <p className="text-white/15 text-sm">No activity yet. Bookings and orders will appear here.</p>
+      <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: 24 }}>
+        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 20px" }}>Recent Activity</p>
+        <div style={{ textAlign: "center", padding: "32px 0" }}>
+          <p style={{ color: "rgba(255,255,255,0.15)", fontSize: 13, margin: 0 }}>No activity yet. Bookings and orders will appear here.</p>
         </div>
-      </motion.div>
+      </div>
+
     </div>
   );
 }

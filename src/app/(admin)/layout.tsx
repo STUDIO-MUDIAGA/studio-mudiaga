@@ -6,27 +6,19 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import {
-  LayoutDashboard,
-  Building2,
-  Sofa,
-  CalendarDays,
-  ShoppingBag,
-  Users,
-  TrendingUp,
-  LogOut,
-  Menu,
+  LayoutDashboard, Building2, Sofa, CalendarDays,
+  ShoppingBag, Users, TrendingUp, LogOut, Menu, X,
 } from "lucide-react";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
 
 const navItems = [
   { label: "Dashboard", href: "/admin", exact: true, icon: LayoutDashboard },
-  { label: "Shortlets", href: "/admin/shortlets", icon: Building2 },
-  { label: "Furniture", href: "/admin/furniture", icon: Sofa },
-  { label: "Bookings", href: "/admin/bookings", icon: CalendarDays },
-  { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
-  { label: "Users", href: "/admin/users", icon: Users },
-  { label: "Analytics", href: "/admin/analytics", icon: TrendingUp },
+  { label: "Shortlets",  href: "/admin/shortlets", icon: Building2 },
+  { label: "Furniture",  href: "/admin/furniture",  icon: Sofa },
+  { label: "Bookings",   href: "/admin/bookings",   icon: CalendarDays },
+  { label: "Orders",     href: "/admin/orders",     icon: ShoppingBag },
+  { label: "Users",      href: "/admin/users",      icon: Users },
+  { label: "Analytics",  href: "/admin/analytics",  icon: TrendingUp },
 ];
 
 function Sidebar({ onNav }: { onNav?: () => void }) {
@@ -43,59 +35,67 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
   };
 
   return (
-    <aside className="w-60 shrink-0 bg-zinc-950 border-r border-white/[0.06] flex flex-col h-full">
+    <aside style={{
+      width: 232, flexShrink: 0,
+      background: "#0a0a0a",
+      borderRight: "1px solid rgba(255,255,255,0.06)",
+      display: "flex", flexDirection: "column",
+      height: "100vh", position: "sticky", top: 0,
+    }}>
       {/* Logo */}
-      <div className="h-16 flex items-center px-5 border-b border-white/[0.06]">
-        <Link href="/" className="flex items-center gap-3 group">
-          <Image
-            src="/Group.svg"
-            alt="Studio Mudiaga"
-            width={20}
-            height={20}
-            className="invert opacity-80 group-hover:opacity-100 transition-opacity"
-          />
+      <div style={{ height: 64, display: "flex", alignItems: "center", padding: "0 20px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+          <Image src="/Group.svg" alt="Studio Mudiaga" width={18} height={18} style={{ filter: "invert(1)", opacity: 0.7 }} />
           <div>
-            <p className="text-white/80 text-xs font-semibold leading-none">Studio Mudiaga</p>
-            <p className="text-amber-400 text-[9px] mt-0.5 font-semibold tracking-[0.15em] uppercase">
-              Admin
-            </p>
+            <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 12, fontWeight: 600, margin: 0, lineHeight: 1 }}>Studio Mudiaga</p>
+            <p style={{ color: "#fbbf24", fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", margin: "3px 0 0" }}>Admin</p>
           </div>
         </Link>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-2.5 py-4 space-y-0.5 overflow-y-auto">
-        {navItems.map(({ label, href, icon: Icon, exact }) => (
-          <Link
-            key={href}
-            href={href}
-            onClick={onNav}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-150",
-              isActive(href, exact)
-                ? "bg-amber-400/10 text-amber-400 font-medium"
-                : "text-white/35 hover:text-white/80 hover:bg-white/[0.04]"
-            )}
-          >
-            <Icon size={14} className="shrink-0" />
-            {label}
-          </Link>
-        ))}
+      <nav style={{ flex: 1, padding: "12px 10px", overflowY: "auto" }}>
+        {navItems.map(({ label, href, icon: Icon, exact }) => {
+          const active = isActive(href, exact);
+          return (
+            <Link
+              key={href}
+              href={href}
+              onClick={onNav}
+              style={{
+                display: "flex", alignItems: "center", gap: 10,
+                padding: "9px 12px", borderRadius: 10, textDecoration: "none",
+                fontSize: 13, fontWeight: active ? 500 : 400, marginBottom: 2,
+                background: active ? "rgba(251,191,36,0.1)" : "transparent",
+                color: active ? "#fbbf24" : "rgba(255,255,255,0.4)",
+                transition: "all 0.15s",
+              }}
+            >
+              <Icon size={14} style={{ flexShrink: 0 }} />
+              {label}
+            </Link>
+          );
+        })}
       </nav>
 
-      {/* User */}
-      <div className="p-3 border-t border-white/[0.06]">
-        <div className="flex items-center gap-2.5 px-3 py-2 mb-1 rounded-xl">
-          <div className="w-6 h-6 rounded-full bg-amber-400/20 flex items-center justify-center shrink-0">
-            <span className="text-amber-400 text-[10px] font-bold uppercase">
-              {user?.email?.[0]}
-            </span>
+      {/* User / sign out */}
+      <div style={{ padding: 10, borderTop: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", marginBottom: 4 }}>
+          <div style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(251,191,36,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <span style={{ color: "#fbbf24", fontSize: 10, fontWeight: 700 }}>{user?.email?.[0]?.toUpperCase()}</span>
           </div>
-          <p className="text-white/30 text-xs truncate">{user?.email}</p>
+          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</p>
         </div>
         <button
           onClick={handleSignOut}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/30 hover:text-white/70 hover:bg-white/[0.04] text-sm transition-colors"
+          style={{
+            width: "100%", display: "flex", alignItems: "center", gap: 10,
+            padding: "9px 12px", borderRadius: 10, background: "none", border: "none",
+            color: "rgba(255,255,255,0.3)", fontSize: 13, cursor: "pointer",
+            transition: "all 0.15s", textAlign: "left",
+          }}
+          onMouseOver={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.7)"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
+          onMouseOut={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.3)"; e.currentTarget.style.background = "none"; }}
         >
           <LogOut size={14} />
           Sign out
@@ -109,40 +109,41 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex">
+    <div style={{ display: "flex", minHeight: "100vh", background: "#0a0a0a" }}>
       {/* Desktop sidebar */}
-      <div className="hidden lg:flex lg:flex-col lg:min-h-screen">
+      <div style={{ display: "none" }} className="lg-sidebar">
+        <style>{`@media(min-width:1024px){.lg-sidebar{display:flex!important}}`}</style>
         <Sidebar />
       </div>
 
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-50 flex lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-            onClick={() => setSidebarOpen(false)}
-          />
-          <div className="relative z-10 h-full">
+        <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex" }}>
+          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }} onClick={() => setSidebarOpen(false)} />
+          <div style={{ position: "relative", zIndex: 10 }}>
             <Sidebar onNav={() => setSidebarOpen(false)} />
           </div>
+          <button onClick={() => setSidebarOpen(false)} style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", color: "white", cursor: "pointer" }}>
+            <X size={20} />
+          </button>
         </div>
       )}
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Main */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
         {/* Mobile topbar */}
-        <header className="lg:hidden h-14 border-b border-white/[0.06] flex items-center justify-between px-4 shrink-0">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="text-white/40 hover:text-white transition-colors"
-          >
+        <header style={{ height: 56, borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px", flexShrink: 0 }} className="mobile-topbar">
+          <style>{`@media(min-width:1024px){.mobile-topbar{display:none!important}}`}</style>
+          <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer" }}>
             <Menu size={18} />
           </button>
-          <p className="text-white/60 text-sm font-medium">Studio Mudiaga Admin</p>
-          <div className="w-5" />
+          <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, fontWeight: 500, margin: 0 }}>Studio Mudiaga Admin</p>
+          <div style={{ width: 18 }} />
         </header>
 
-        <main className="flex-1 p-6 lg:p-8 overflow-y-auto">{children}</main>
+        <main style={{ flex: 1, padding: "36px 40px", overflowY: "auto" }}>
+          {children}
+        </main>
       </div>
     </div>
   );
