@@ -36,13 +36,15 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
 
-    const { error: otpError } = await supabase.auth.signInWithOtp({
-      email,
-      options: { shouldCreateUser: false },
+    const res = await fetch("/api/admin/send-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
     });
 
-    if (otpError) {
-      setError(otpError.message);
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      setError(body.error ?? "Failed to send code. Try again.");
       setLoading(false);
       return;
     }
@@ -121,7 +123,11 @@ export default function AdminLoginPage() {
     if (resendCountdown > 0) return;
     setError("");
     setResendCountdown(60);
-    await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+    await fetch("/api/admin/send-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
   };
 
   const activeStep = step === "email" ? 0 : 1;
