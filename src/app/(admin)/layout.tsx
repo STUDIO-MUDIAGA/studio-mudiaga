@@ -7,11 +7,12 @@ import { useAuth } from "@/context/AuthContext";
 import {
   LayoutDashboard, Building2, Sofa, CalendarDays,
   ShoppingBag, Users, TrendingUp, LogOut, Menu, X,
+  ChevronDown, Settings, Bell, Search,
 } from "lucide-react";
 import { useState } from "react";
 
 const NAVY = "#1e156d";
-const NAVY_LIGHT = "#f0effe";
+const NAVY_BG = "#eeedf8";
 
 const navItems = [
   { label: "Dashboard", href: "/admin",           exact: true, icon: LayoutDashboard },
@@ -37,25 +38,22 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
   };
 
   return (
-    <aside style={{
-      width: 232, flexShrink: 0,
-      background: NAVY,
-      display: "flex", flexDirection: "column",
-      height: "100vh", position: "sticky", top: 0,
-    }}>
+    <aside style={{ width: 240, flexShrink: 0, background: "#fff", borderRight: "1px solid #ebebeb", display: "flex", flexDirection: "column", height: "100vh", position: "sticky", top: 0 }}>
       {/* Logo */}
-      <div style={{ height: 64, display: "flex", alignItems: "center", padding: "0 20px", borderBottom: "1px solid rgba(255,255,255,0.1)", flexShrink: 0 }}>
+      <div style={{ height: 64, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px", borderBottom: "1px solid #f0f0f0", flexShrink: 0 }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <Image src="/Group.svg" alt="Studio Mudiaga" width={18} height={18} style={{ filter: "invert(1)", opacity: 0.9 }} />
+          <Image src="/Group.svg" alt="Studio Mudiaga" width={20} height={20} />
           <div>
-            <p style={{ color: "#fff", fontSize: 12, fontWeight: 600, margin: 0, lineHeight: 1 }}>Studio Mudiaga</p>
-            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", margin: "3px 0 0" }}>Admin</p>
+            <p style={{ color: "#0a0a0a", fontSize: 13, fontWeight: 700, margin: 0, lineHeight: 1 }}>Studio Mudiaga</p>
+            <p style={{ color: "#aaa", fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", margin: "3px 0 0" }}>Admin</p>
           </div>
         </Link>
+        <ChevronDown size={14} color="#ccc" />
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: "12px 10px", overflowY: "auto" }}>
+      <nav style={{ flex: 1, padding: "16px 12px", overflowY: "auto" }}>
+        <p style={{ color: "#ccc", fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 8px 8px" }}>Main</p>
         {navItems.map(({ label, href, icon: Icon, exact }) => {
           const active = isActive(href, exact);
           return (
@@ -67,41 +65,46 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
                 display: "flex", alignItems: "center", gap: 10,
                 padding: "9px 12px", borderRadius: 10, textDecoration: "none",
                 fontSize: 13, fontWeight: active ? 600 : 400, marginBottom: 2,
-                background: active ? "rgba(255,255,255,0.15)" : "transparent",
-                color: active ? "#fff" : "rgba(255,255,255,0.5)",
-                transition: "all 0.15s",
+                background: active ? NAVY_BG : "transparent",
+                color: active ? NAVY : "#888",
               }}
-              onMouseOver={(e) => { if (!active) { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.color = "rgba(255,255,255,0.8)"; } }}
-              onMouseOut={(e) => { if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.5)"; } }}
+              onMouseOver={(e) => { if (!active) { e.currentTarget.style.background = "#f8f8f8"; e.currentTarget.style.color = "#333"; } }}
+              onMouseOut={(e) => { if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#888"; } }}
             >
-              <Icon size={14} style={{ flexShrink: 0 }} />
+              <Icon size={15} style={{ flexShrink: 0, color: active ? NAVY : "#bbb" }} />
               {label}
             </Link>
           );
         })}
       </nav>
 
-      {/* User / sign out */}
-      <div style={{ padding: 10, borderTop: "1px solid rgba(255,255,255,0.1)", flexShrink: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", marginBottom: 4 }}>
-          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <span style={{ color: "#fff", fontSize: 11, fontWeight: 700 }}>{user?.email?.[0]?.toUpperCase()}</span>
-          </div>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</p>
-        </div>
-        <button
-          onClick={handleSignOut}
-          style={{
-            width: "100%", display: "flex", alignItems: "center", gap: 10,
-            padding: "9px 12px", borderRadius: 10, background: "none", border: "none",
-            color: "rgba(255,255,255,0.4)", fontSize: 13, cursor: "pointer", textAlign: "left",
-          }}
-          onMouseOver={(e) => { e.currentTarget.style.color = "#fff"; e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
-          onMouseOut={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.4)"; e.currentTarget.style.background = "none"; }}
+      {/* Bottom section */}
+      <div style={{ padding: "12px", borderTop: "1px solid #f0f0f0", flexShrink: 0 }}>
+        <Link href="/admin/settings" style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, textDecoration: "none", fontSize: 13, color: "#888", marginBottom: 2 }}
+          onMouseOver={(e) => { e.currentTarget.style.background = "#f8f8f8"; }}
+          onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; }}
         >
-          <LogOut size={14} />
-          Sign out
+          <Settings size={15} color="#bbb" />
+          Settings
+        </Link>
+        <button onClick={handleSignOut} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "none", border: "none", color: "#888", fontSize: 13, cursor: "pointer", textAlign: "left", marginBottom: 8 }}
+          onMouseOver={(e) => { e.currentTarget.style.background = "#f8f8f8"; }}
+          onMouseOut={(e) => { e.currentTarget.style.background = "none"; }}
+        >
+          <LogOut size={15} color="#bbb" />
+          Logout
         </button>
+
+        {/* User profile */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 12, background: "#fafaf9", border: "1px solid #f0f0f0" }}>
+          <div style={{ width: 32, height: 32, borderRadius: "50%", background: NAVY_BG, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <span style={{ color: NAVY, fontSize: 12, fontWeight: 700 }}>{user?.email?.[0]?.toUpperCase()}</span>
+          </div>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <p style={{ color: "#0a0a0a", fontSize: 12, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Admin</p>
+            <p style={{ color: "#bbb", fontSize: 10, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</p>
+          </div>
+        </div>
       </div>
     </aside>
   );
@@ -111,7 +114,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f5f5f3" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#f7f7f5" }}>
       {/* Desktop sidebar */}
       <div style={{ display: "none" }} className="lg-sidebar">
         <style>{`@media(min-width:1024px){.lg-sidebar{display:flex!important}}`}</style>
@@ -121,11 +124,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex" }}>
-          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)" }} onClick={() => setSidebarOpen(false)} />
+          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.3)" }} onClick={() => setSidebarOpen(false)} />
           <div style={{ position: "relative", zIndex: 10 }}>
             <Sidebar onNav={() => setSidebarOpen(false)} />
           </div>
-          <button onClick={() => setSidebarOpen(false)} style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", color: "white", cursor: "pointer" }}>
+          <button onClick={() => setSidebarOpen(false)} style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", color: "#333", cursor: "pointer" }}>
             <X size={20} />
           </button>
         </div>
@@ -133,17 +136,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Main */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        {/* Mobile topbar */}
-        <header style={{ height: 56, background: "#fff", borderBottom: "1px solid #e8e8e4", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px", flexShrink: 0 }} className="mobile-topbar">
-          <style>{`@media(min-width:1024px){.mobile-topbar{display:none!important}}`}</style>
-          <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", color: "#666", cursor: "pointer" }}>
+        {/* Topbar */}
+        <header style={{ height: 64, background: "#fff", borderBottom: "1px solid #ebebeb", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px", flexShrink: 0, gap: 16 }}>
+          <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", color: "#666", cursor: "pointer", display: "flex" }} className="mobile-menu-btn">
+            <style>{`@media(min-width:1024px){.mobile-menu-btn{display:none!important}}`}</style>
             <Menu size={18} />
           </button>
-          <p style={{ color: "#1a1a1a", fontSize: 13, fontWeight: 600, margin: 0 }}>Studio Mudiaga Admin</p>
-          <div style={{ width: 18 }} />
+
+          {/* Search */}
+          <div style={{ flex: 1, maxWidth: 400, display: "flex", alignItems: "center", gap: 8, background: "#f7f7f5", border: "1px solid #ebebeb", borderRadius: 10, padding: "8px 14px" }}>
+            <Search size={13} color="#ccc" />
+            <input placeholder="Search shortlets, orders, users…" style={{ background: "none", border: "none", outline: "none", fontSize: 13, color: "#555", flex: 1 }} />
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ position: "relative" }}>
+              <button style={{ background: "none", border: "1px solid #ebebeb", borderRadius: 10, padding: "8px 10px", cursor: "pointer", display: "flex" }}>
+                <Bell size={15} color="#888" />
+              </button>
+            </div>
+            <div style={{ width: 32, height: 32, borderRadius: "50%", background: NAVY_BG, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ color: NAVY, fontSize: 12, fontWeight: 700 }}>A</span>
+            </div>
+          </div>
         </header>
 
-        <main style={{ flex: 1, padding: "36px 40px", overflowY: "auto" }}>
+        <main style={{ flex: 1, padding: "32px 36px", overflowY: "auto" }}>
           {children}
         </main>
       </div>
