@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Building2, Sofa, CalendarDays, Users,
-  RefreshCw, TrendingUp, ArrowRight,
-} from "lucide-react";
+import { Building2, Sofa, CalendarDays, Users, TrendingUp, ArrowRight, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -15,7 +12,7 @@ const NAVY = "#1e156d";
 const NAVY_BG = "#eeedf8";
 
 const areaData = [
-  { day: "1",  value: 10 }, { day: "5",  value: 18 }, { day: "10", value: 32 },
+  { day: "1", value: 10 }, { day: "5", value: 18 }, { day: "10", value: 32 },
   { day: "15", value: 55 }, { day: "20", value: 62 }, { day: "25", value: 78 },
   { day: "30", value: 90 },
 ];
@@ -41,39 +38,12 @@ const STATUS: Record<string, { bg: string; color: string }> = {
 
 type Stats = { shortlets: number; furniture: number; bookings: number; users: number };
 
-function MiniSparkline() {
-  const pts = [4, 8, 5, 12, 9, 16, 14, 20];
-  const max = Math.max(...pts);
-  const W = 80, H = 28;
-  const points = pts.map((v, i) => `${(i / (pts.length - 1)) * W},${H - (v / max) * H}`).join(" ");
-  return (
-    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
-      <polyline points={points} fill="none" stroke={NAVY} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function StatCard({ label, value, icon: Icon, color, trend }: { label: string; value: number | string; icon: React.ElementType; color: string; trend: string }) {
-  return (
-    <div style={{ background: "#fff", border: "1px solid #ebebeb", borderRadius: 16, padding: "20px 22px", display: "flex", flexDirection: "column", gap: 14 }}>
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-        <div>
-          <p style={{ color: "#aaa", fontSize: 12, margin: "0 0 6px" }}>{label}</p>
-          <p style={{ color: "#0a0a0a", fontSize: 28, fontWeight: 700, margin: 0, lineHeight: 1 }}>
-            {typeof value === "number" ? String(value).padStart(2, "0") : value}
-          </p>
-        </div>
-        <span style={{ background: "#e8fdf0", color: "#15803d", fontSize: 10, fontWeight: 700, padding: "3px 7px", borderRadius: 20 }}>{trend}</span>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ width: 36, height: 36, borderRadius: 10, background: color, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Icon size={16} color={NAVY} />
-        </div>
-        <MiniSparkline />
-      </div>
-    </div>
-  );
-}
+const CARDS = [
+  { label: "Active Shortlets", key: "shortlets" as const, icon: Building2,    accent: NAVY,      bg: NAVY_BG,   trend: "+12%", sub: "vs last month" },
+  { label: "Furniture Items",  key: "furniture"  as const, icon: Sofa,         accent: "#c46442", bg: "#fdf0eb", trend: "+5%",  sub: "vs last month" },
+  { label: "Total Bookings",   key: "bookings"   as const, icon: CalendarDays, accent: "#1e56d6", bg: "#e9f0fd", trend: "+8%",  sub: "vs last month" },
+  { label: "Registered Users", key: "users"      as const, icon: Users,        accent: "#15803d", bg: "#e9fdf0", trend: "+6%",  sub: "vs last month" },
+];
 
 function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) {
   if (!active || !payload?.length) return null;
@@ -89,39 +59,56 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats>({ shortlets: 0, furniture: 0, bookings: 0, users: 0 });
   const [loading, setLoading] = useState(true);
 
-  const fetchStats = async () => {
-    setLoading(true);
-    const [sl, fu, st] = await Promise.all([
-      fetch("/api/admin/shortlets").then((r) => r.json()),
-      fetch("/api/admin/furniture").then((r) => r.json()),
-      fetch("/api/admin/stats").then((r) => r.json()),
-    ]);
-    setStats({ shortlets: Array.isArray(sl) ? sl.length : 0, furniture: Array.isArray(fu) ? fu.length : 0, bookings: st.bookings ?? 0, users: st.users ?? 0 });
-    setLoading(false);
-  };
-
-  useEffect(() => { fetchStats(); }, []);
-
-  const statCards = [
-    { label: "Active Shortlets", value: loading ? "—" : stats.shortlets, icon: Building2,    color: NAVY_BG,   trend: "+12%" },
-    { label: "Furniture Items",  value: loading ? "—" : stats.furniture,  icon: Sofa,         color: "#fdf0eb", trend: "+5%"  },
-    { label: "Total Bookings",   value: loading ? "—" : stats.bookings,   icon: CalendarDays, color: "#e9f0fd", trend: "+8%"  },
-    { label: "Registered Users", value: loading ? "—" : stats.users,      icon: Users,        color: "#e9fdf0", trend: "+6%"  },
-  ];
+  useEffect(() => {
+    const fetchStats = async () => {
+      const [sl, fu, st] = await Promise.all([
+        fetch("/api/admin/shortlets").then((r) => r.json()),
+        fetch("/api/admin/furniture").then((r) => r.json()),
+        fetch("/api/admin/stats").then((r) => r.json()),
+      ]);
+      setStats({ shortlets: Array.isArray(sl) ? sl.length : 0, furniture: Array.isArray(fu) ? fu.length : 0, bookings: st.bookings ?? 0, users: st.users ?? 0 });
+      setLoading(false);
+    };
+    fetchStats();
+  }, []);
 
   return (
     <div>
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", marginBottom: 28 }}>
-        <button onClick={fetchStats} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 16px", borderRadius: 10, background: "#fff", border: "1px solid #ebebeb", color: "#666", fontSize: 12, cursor: "pointer", fontWeight: 500 }}>
-          <RefreshCw size={13} /> Refresh Data
-        </button>
+      {/* Highlights */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <div>
+          <p style={{ color: "#0a0a0a", fontSize: 16, fontWeight: 700, margin: "0 0 2px" }}>Highlights</p>
+          <p style={{ color: "#bbb", fontSize: 12, margin: 0 }}>Live platform overview</p>
+        </div>
       </div>
 
-      {/* Highlights */}
-      <p style={{ color: "#0a0a0a", fontSize: 15, fontWeight: 700, margin: "0 0 14px" }}>Highlights</p>
+      {/* Stat cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 24 }}>
-        {statCards.map((c) => <StatCard key={c.label} {...c} />)}
+        {CARDS.map(({ label, key, icon: Icon, accent, bg, trend, sub }) => {
+          const val = loading ? null : stats[key];
+          return (
+            <div key={label} style={{ background: "#fff", border: "1px solid #ebebeb", borderRadius: 16, padding: "20px 22px", position: "relative", overflow: "hidden" }}>
+              {/* Accent bar */}
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: accent, borderRadius: "16px 16px 0 0" }} />
+
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
+                <div style={{ width: 38, height: 38, borderRadius: 12, background: bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Icon size={17} color={accent} />
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 4, background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 20, padding: "3px 8px" }}>
+                  <ArrowUpRight size={10} color="#15803d" />
+                  <span style={{ color: "#15803d", fontSize: 11, fontWeight: 700 }}>{trend}</span>
+                </div>
+              </div>
+
+              <p style={{ color: "#0a0a0a", fontSize: 30, fontWeight: 800, margin: "0 0 4px", lineHeight: 1, letterSpacing: "-0.5px" }}>
+                {val === null ? "—" : String(val).padStart(2, "0")}
+              </p>
+              <p style={{ color: "#aaa", fontSize: 12, margin: "0 0 2px" }}>{label}</p>
+              <p style={{ color: "#ddd", fontSize: 11, margin: 0 }}>{sub}</p>
+            </div>
+          );
+        })}
       </div>
 
       {/* Charts row */}
@@ -164,7 +151,7 @@ export default function AdminDashboard() {
             <p style={{ color: "#0a0a0a", fontSize: 14, fontWeight: 700, margin: 0 }}>Activity Split</p>
             <TrendingUp size={14} color="#ccc" />
           </div>
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 16, position: "relative" }}>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
             <div style={{ position: "relative" }}>
               <PieChart width={160} height={160}>
                 <Pie data={donutData} cx={75} cy={75} innerRadius={52} outerRadius={72} dataKey="value" strokeWidth={0}>
@@ -236,10 +223,10 @@ export default function AdminDashboard() {
           <p style={{ color: "#aaa", fontSize: 12, margin: "0 0 20px" }}>Jump to common tasks.</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {[
-              { label: "Add New Shortlet",   href: "/admin/shortlets/new", bg: NAVY_BG,   color: NAVY },
-              { label: "Add Furniture Item",  href: "/admin/furniture/new", bg: "#fdf0eb", color: "#c46442" },
-              { label: "View All Bookings",   href: "/admin/bookings",      bg: "#e9f0fd", color: "#1e56d6" },
-              { label: "Manage Users",        href: "/admin/users",         bg: "#e9fdf0", color: "#15803d" },
+              { label: "Add New Shortlet",  href: "/admin/shortlets/new", bg: NAVY_BG,   color: NAVY },
+              { label: "Add Furniture Item", href: "/admin/furniture/new", bg: "#fdf0eb", color: "#c46442" },
+              { label: "View All Bookings",  href: "/admin/bookings",      bg: "#e9f0fd", color: "#1e56d6" },
+              { label: "Manage Users",       href: "/admin/users",         bg: "#e9fdf0", color: "#15803d" },
             ].map(({ label, href, bg, color }) => (
               <Link key={href} href={href} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", borderRadius: 12, background: bg, textDecoration: "none" }}>
                 <span style={{ color, fontSize: 13, fontWeight: 600 }}>{label}</span>
