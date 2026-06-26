@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import {
   LayoutDashboard, Building2, Sofa, CalendarDays,
   ShoppingBag, Users, TrendingUp, LogOut, Menu, X,
-  ChevronDown, Settings, Bell, Search,
+  Settings, Bell, Search,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -41,14 +41,10 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
     <aside style={{ width: 240, flexShrink: 0, background: "#fff", borderRight: "1px solid #ebebeb", display: "flex", flexDirection: "column", height: "100vh", position: "sticky", top: 0 }}>
       {/* Logo */}
       <div style={{ height: 64, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px", borderBottom: "1px solid #f0f0f0", flexShrink: 0 }}>
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <Image src="/Group.svg" alt="Studio Mudiaga" width={20} height={20} />
-          <div>
-            <p style={{ color: "#0a0a0a", fontSize: 13, fontWeight: 700, margin: 0, lineHeight: 1 }}>Studio Mudiaga</p>
-            <p style={{ color: "#aaa", fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", margin: "3px 0 0" }}>Admin</p>
-          </div>
+        <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+          <Image src="/Group-1.svg" alt="Studio Mudiaga" width={130} height={21} style={{ objectFit: "contain" }} />
         </Link>
-        <ChevronDown size={14} color="#ccc" />
+        <span style={{ background: "#eeedf8", color: "#1e156d", fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", padding: "3px 7px", borderRadius: 6 }}>Admin</span>
       </div>
 
       {/* Nav */}
