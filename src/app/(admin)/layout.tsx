@@ -8,6 +8,7 @@ import {
   LayoutDashboard, Building2, Sofa, CalendarDays,
   ShoppingBag, Users, TrendingUp, LogOut, Menu, X,
   Settings, Bell, Search, ChevronDown, Tag, BarChart2, Plus, List,
+  Images, Home, Armchair,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -33,6 +34,15 @@ const navItems: NavItem[] = [
   { label: "Bookings",   href: "/admin/bookings",  icon: CalendarDays },
   { label: "Orders",     href: "/admin/orders",    icon: ShoppingBag },
   { label: "Users",      href: "/admin/users",     icon: Users },
+  {
+    label: "Media", href: "/admin/media", icon: Images,
+    children: [
+      { label: "All Media",      href: "/admin/media",          icon: Images },
+      { label: "Homepage Media", href: "/admin/media/homepage", icon: Home },
+      { label: "MUDRES Media",   href: "/admin/media/mudres",   icon: Armchair },
+      { label: "ABODE Media",    href: "/admin/media/abode",    icon: Building2 },
+    ],
+  },
   { label: "Analytics",  href: "/admin/analytics", icon: TrendingUp },
 ];
 
@@ -49,8 +59,10 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
     router.push("/admin/login");
   };
 
-  const shortletsOpen = pathname.startsWith("/admin/shortlets");
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({ "/admin/shortlets": shortletsOpen });
+  const initialExpanded = Object.fromEntries(
+    navItems.filter((n) => n.children).map((n) => [n.href, pathname.startsWith(n.href)])
+  );
+  const [expanded, setExpanded] = useState<Record<string, boolean>>(initialExpanded);
 
   const toggleExpand = (href: string) => setExpanded((p) => ({ ...p, [href]: !p[href] }));
 

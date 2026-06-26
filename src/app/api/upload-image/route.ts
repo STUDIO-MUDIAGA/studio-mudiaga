@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { uploadToCF } from "@/lib/cf-images";
+import { uploadToCF, MediaPrefix } from "@/lib/cf-images";
 
 export const runtime = "nodejs";
 
@@ -27,8 +27,9 @@ export async function POST(req: NextRequest) {
   // Parse form
   const formData = await req.formData();
   const file = formData.get("file");
-  const rawPrefix = formData.get("prefix");
-  const prefix = (rawPrefix === "furniture" || rawPrefix === "brand") ? rawPrefix : "shortlets";
+  const rawPrefix = formData.get("prefix") as string | null;
+  const VALID: MediaPrefix[] = ["shortlets", "furniture", "homepage", "mudres", "abode"];
+  const prefix: MediaPrefix = VALID.includes(rawPrefix as MediaPrefix) ? rawPrefix as MediaPrefix : "shortlets";
 
   if (!file || !(file instanceof File)) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });

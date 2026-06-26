@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
 
 const R2_PUBLIC_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_URL ?? "";
@@ -33,7 +33,7 @@ export function cfImageUrl(key: string): string {
  */
 export async function uploadToCF(
   file: File | Blob,
-  prefix: "shortlets" | "furniture" | "brand" = "shortlets",
+  prefix: MediaPrefix = "shortlets",
 ): Promise<{ key: string; url: string }> {
   const ext = file instanceof File ? file.name.split(".").pop() ?? "jpg" : "jpg";
   const key = `${prefix}/${randomUUID()}.${ext}`;
@@ -52,6 +52,33 @@ export async function uploadToCF(
   );
 
   return { key, url: cfImageUrl(key) };
+}
+
+export type MediaPrefix = "shortlets" | "furniture" | "homepage" | "mudres" | "abode";
+
+export type R2Object = { key: string; url: string; size: number; lastModified: Date };
+
+/**
+ * List all objects in R2 under an optional prefix.
+ * Pass no prefix to list everything (all media).
+ */
+export async function listFromCF(prefix?: MediaPrefix): Promise<R2Object[]> {
+  const client = getClient();
+  const res = await client.send(
+    new ListObjectsV2Command({
+      Bucket: BUCKET,
+      Prefix: prefix ? `${prefix}/` : undefined,
+      MaxKeys: 1000,
+    })
+  );
+  return (res.Contents ?? [])
+    .filter((obj) => obj.Key)
+    .map((obj) => ({
+      key: obj.Key!,
+      url: cfImageUrl(obj.Key!),
+      size: obj.Size ?? 0,
+      lastModified: obj.LastModified ?? new Date(),
+    }));
 }
 
 /**
