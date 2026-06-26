@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Building2, Sofa, CalendarDays, Users, TrendingUp, ArrowRight, ArrowUpRight } from "lucide-react";
+import { Building2, Sofa, CalendarDays, Users, TrendingUp, ArrowRight, TrendingDown, Info } from "lucide-react";
 import Link from "next/link";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -86,26 +86,33 @@ export default function AdminDashboard() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 24 }}>
         {CARDS.map(({ label, key, icon: Icon, accent, bg, trend, sub }) => {
           const val = loading ? null : stats[key];
+          const isPositive = trend.startsWith("+");
           return (
-            <div key={label} style={{ background: "#fff", border: "1px solid #ebebeb", borderRadius: 16, padding: "20px 22px", position: "relative", overflow: "hidden" }}>
-              {/* Accent bar */}
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: accent, borderRadius: "16px 16px 0 0" }} />
-
-              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
-                <div style={{ width: 38, height: 38, borderRadius: 12, background: bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Icon size={17} color={accent} />
+            <div key={label} style={{ background: "#fff", border: "1px solid #ebebeb", borderRadius: 16, padding: "20px 22px" }}>
+              {/* Label row */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ width: 30, height: 30, borderRadius: 8, background: bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <Icon size={14} color={accent} />
+                  </div>
+                  <span style={{ color: "#888", fontSize: 12, fontWeight: 500 }}>{label}</span>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 4, background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 20, padding: "3px 8px" }}>
-                  <ArrowUpRight size={10} color="#15803d" />
-                  <span style={{ color: "#15803d", fontSize: 11, fontWeight: 700 }}>{trend}</span>
-                </div>
+                <Info size={13} color="#ddd" />
               </div>
 
-              <p style={{ color: "#0a0a0a", fontSize: 30, fontWeight: 800, margin: "0 0 4px", lineHeight: 1, letterSpacing: "-0.5px" }}>
+              {/* Big number */}
+              <p style={{ color: "#0a0a0a", fontSize: 32, fontWeight: 800, margin: "0 0 10px", lineHeight: 1, letterSpacing: "-1px" }}>
                 {val === null ? "—" : String(val).padStart(2, "0")}
               </p>
-              <p style={{ color: "#aaa", fontSize: 12, margin: "0 0 2px" }}>{label}</p>
-              <p style={{ color: "#ddd", fontSize: 11, margin: 0 }}>{sub}</p>
+
+              {/* Trend */}
+              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                {isPositive
+                  ? <TrendingUp size={13} color="#16a34a" />
+                  : <TrendingDown size={13} color="#dc2626" />}
+                <span style={{ color: isPositive ? "#16a34a" : "#dc2626", fontSize: 12, fontWeight: 700 }}>{trend}</span>
+                <span style={{ color: "#bbb", fontSize: 11 }}>{sub}</span>
+              </div>
             </div>
           );
         })}
