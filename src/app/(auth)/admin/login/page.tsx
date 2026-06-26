@@ -6,17 +6,6 @@ import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
-function GoogleIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-      <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-      <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
-      <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-      <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-    </svg>
-  );
-}
-
 const steps = [
   { n: "1", label: "Sign in to\nyour account" },
   { n: "2", label: "Manage\nproperties" },
@@ -31,7 +20,6 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -65,89 +53,10 @@ export default function AdminLoginPage() {
     router.refresh();
   };
 
-  const handleGoogle = async () => {
-    setGoogleLoading(true);
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback?type=admin` },
-    });
-  };
-
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
 
-      {/* ── Left panel ── */}
-      <div
-        style={{
-          width: "45%",
-          flexShrink: 0,
-          background: "linear-gradient(135deg, #1a5c42 0%, #0f3d2e 50%, #081f18 100%)",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "40px",
-        }}
-        className="hidden lg:flex"
-      >
-        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "11px", fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-          Studio Mudiaga
-        </p>
-
-        <div>
-          <h1 style={{ color: "#fff", fontSize: "32px", fontWeight: 700, lineHeight: 1.2, marginBottom: "10px" }}>
-            Manage your<br />Studio.
-          </h1>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px", lineHeight: 1.6, maxWidth: "240px" }}>
-            Complete these steps to access your command centre.
-          </p>
-        </div>
-
-        {/* Step cards */}
-        <div style={{ display: "flex", gap: "12px" }}>
-          {steps.map(({ n, label }, i) => (
-            <div
-              key={n}
-              style={{
-                flex: 1,
-                borderRadius: "16px",
-                padding: "16px",
-                background: i === 0 ? "#fff" : "rgba(255,255,255,0.1)",
-              }}
-            >
-              <div
-                style={{
-                  width: "26px",
-                  height: "26px",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "11px",
-                  fontWeight: 700,
-                  marginBottom: "12px",
-                  background: i === 0 ? "#000" : "rgba(255,255,255,0.2)",
-                  color: "#fff",
-                }}
-              >
-                {n}
-              </div>
-              <p
-                style={{
-                  fontSize: "12px",
-                  fontWeight: 500,
-                  lineHeight: 1.4,
-                  color: i === 0 ? "#000" : "rgba(255,255,255,0.5)",
-                  whiteSpace: "pre-line",
-                }}
-              >
-                {label}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Right panel ── */}
+      {/* ── Left panel — form ── */}
       <div
         style={{
           flex: 1,
@@ -168,42 +77,6 @@ export default function AdminLoginPage() {
               <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "13px" }}>
                 Enter your credentials to access the portal.
               </p>
-            </div>
-
-            {/* Google button */}
-            <button
-              onClick={handleGoogle}
-              disabled={googleLoading}
-              style={{
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "10px",
-                background: "#1a1a1a",
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: "12px",
-                padding: "12px 20px",
-                color: "rgba(255,255,255,0.75)",
-                fontSize: "14px",
-                fontWeight: 500,
-                cursor: "pointer",
-                marginBottom: "20px",
-                opacity: googleLoading ? 0.5 : 1,
-                transition: "background 0.15s",
-              }}
-              onMouseOver={(e) => (e.currentTarget.style.background = "#222")}
-              onMouseOut={(e) => (e.currentTarget.style.background = "#1a1a1a")}
-            >
-              <GoogleIcon />
-              {googleLoading ? "Redirecting…" : "Continue with Google"}
-            </button>
-
-            {/* Divider */}
-            <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px" }}>
-              <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.07)" }} />
-              <span style={{ color: "rgba(255,255,255,0.2)", fontSize: "12px" }}>Or</span>
-              <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.07)" }} />
             </div>
 
             {/* Form */}
@@ -231,7 +104,7 @@ export default function AdminLoginPage() {
                     outline: "none",
                     boxSizing: "border-box",
                   }}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)")}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(251,191,36,0.4)")}
                   onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
                 />
               </div>
@@ -260,7 +133,7 @@ export default function AdminLoginPage() {
                       outline: "none",
                       boxSizing: "border-box",
                     }}
-                    onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)")}
+                    onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(251,191,36,0.4)")}
                     onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
                   />
                   <button
@@ -312,7 +185,7 @@ export default function AdminLoginPage() {
                 disabled={loading}
                 style={{
                   width: "100%",
-                  background: "#fff",
+                  background: "#fbbf24",
                   color: "#000",
                   border: "none",
                   borderRadius: "12px",
@@ -343,6 +216,78 @@ export default function AdminLoginPage() {
           <Link href="/privacy-policy" style={{ color: "rgba(255,255,255,0.12)", fontSize: "11px", textDecoration: "none" }}>
             Privacy
           </Link>
+        </div>
+      </div>
+
+      {/* ── Right panel — brand ── */}
+      <div
+        style={{
+          width: "45%",
+          flexShrink: 0,
+          background: "linear-gradient(135deg, #fbbf24 0%, #d97706 45%, #78350f 100%)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          padding: "40px",
+        }}
+        className="hidden lg:flex"
+      >
+        <p style={{ color: "rgba(0,0,0,0.4)", fontSize: "11px", fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase" }}>
+          Studio Mudiaga
+        </p>
+
+        <div>
+          <h1 style={{ color: "#000", fontSize: "32px", fontWeight: 700, lineHeight: 1.2, marginBottom: "10px" }}>
+            Manage your<br />Studio.
+          </h1>
+          <p style={{ color: "rgba(0,0,0,0.45)", fontSize: "13px", lineHeight: 1.6, maxWidth: "240px" }}>
+            Complete these steps to access your command centre.
+          </p>
+        </div>
+
+        {/* Step cards */}
+        <div style={{ display: "flex", gap: "12px" }}>
+          {steps.map(({ n, label }, i) => (
+            <div
+              key={n}
+              style={{
+                flex: 1,
+                borderRadius: "16px",
+                padding: "16px",
+                background: i === 0 ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.08)",
+                border: i === 0 ? "1px solid rgba(0,0,0,0.2)" : "1px solid rgba(0,0,0,0.08)",
+              }}
+            >
+              <div
+                style={{
+                  width: "26px",
+                  height: "26px",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  marginBottom: "12px",
+                  background: i === 0 ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.15)",
+                  color: i === 0 ? "#fbbf24" : "rgba(0,0,0,0.5)",
+                }}
+              >
+                {n}
+              </div>
+              <p
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  lineHeight: 1.4,
+                  color: i === 0 ? "rgba(0,0,0,0.75)" : "rgba(0,0,0,0.4)",
+                  whiteSpace: "pre-line",
+                }}
+              >
+                {label}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
