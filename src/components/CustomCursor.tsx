@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export default function CustomCursor() {
+  const pathname = usePathname();
   const [label, setLabel] = useState<string | null>(null);
   const [visible, setVisible] = useState(false);
+
+  if (pathname.startsWith("/admin")) return null;
 
   const rawX = useMotionValue(-200);
   const rawY = useMotionValue(-200);

@@ -23,7 +23,7 @@ html {
 }
 
 @media (pointer: fine) {
-  *, *::before, *::after {
+  body:not(.admin-mode) *, body:not(.admin-mode) *::before, body:not(.admin-mode) *::after {
     cursor: none !important;
   }
 }
