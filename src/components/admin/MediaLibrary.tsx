@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Upload, Trash2, Copy, Check, ImageOff, X } from "lucide-react";
+import { Upload, Trash2, Copy, Check, ImageOff, X, Loader2 } from "lucide-react";
 
 const NAVY = "#1e156d";
 const NAVY_BG = "#eeedf8";
@@ -10,6 +10,20 @@ const NAVY_BG = "#eeedf8";
 export type MediaPrefix = "shortlets" | "furniture" | "homepage" | "mudres" | "abode";
 
 type R2Object = { key: string; url: string; size: number; lastModified: string };
+
+type UploadItem = { name: string; status: "uploading" | "done" | "error"; error?: string };
+
+const PREFIX_META: Record<string, { label: string; bg: string; color: string }> = {
+  homepage:  { label: "Homepage",  bg: NAVY_BG,    color: NAVY       },
+  mudres:    { label: "MUDRES",    bg: "#fdf0eb",  color: "#c46442"  },
+  abode:     { label: "ABODE",     bg: "#fdf0eb",  color: "#c46442"  },
+  shortlets: { label: "Shortlets", bg: "#f0fdf4",  color: "#15803d"  },
+  furniture: { label: "Furniture", bg: "#f5f0fe",  color: "#7c3aed"  },
+};
+
+function getPrefix(key: string) {
+  return key.split("/")[0] ?? "";
+}
 
 function formatBytes(b: number) {
   if (b < 1024) return `${b} B`;
@@ -27,54 +41,74 @@ export default function MediaLibrary({
   const supabase = createClient();
   const [items, setItems] = useState<R2Object[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
+  const [queue, setQueue] = useState<UploadItem[]>([]);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const [drag, setDrag] = useState(false);
   const [selected, setSelected] = useState<R2Object | null>(null);
-  const [error, setError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const getToken = useCallback(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token ?? "";
+  }, [supabase]);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
-    const { data: { session } } = await supabase.auth.getSession();
-    const token = session?.access_token ?? "";
+    const token = await getToken();
     const url = prefix ? `/api/admin/media?prefix=${prefix}` : "/api/admin/media";
     const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
     const data = await res.json();
     setItems(Array.isArray(data) ? data : []);
     setLoading(false);
-  }, [prefix, supabase]);
+  }, [prefix, getToken]);
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
 
   const uploadFiles = async (files: FileList | File[]) => {
     const arr = Array.from(files);
     if (!arr.length) return;
-    setUploading(true); setError("");
-    const { data: { session } } = await supabase.auth.getSession();
-    const token = session?.access_token ?? "";
 
-    for (const file of arr) {
+    const initial: UploadItem[] = arr.map((f) => ({ name: f.name, status: "uploading" }));
+    setQueue(initial);
+
+    const token = await getToken();
+
+    for (let i = 0; i < arr.length; i++) {
+      const file = arr[i];
       const form = new FormData();
       form.append("file", file);
       form.append("prefix", prefix ?? "homepage");
-      const res = await fetch("/api/upload-image", { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: form });
-      if (!res.ok) {
-        const { error: e } = await res.json();
-        setError(e ?? "Upload failed");
+
+      try {
+        const res = await fetch("/api/upload-image", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: form,
+        });
+        if (!res.ok) {
+          const { error } = await res.json();
+          throw new Error(error ?? "Upload failed");
+        }
+        setQueue((q) => q.map((item, idx) => idx === i ? { ...item, status: "done" } : item));
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Upload failed";
+        setQueue((q) => q.map((item, idx) => idx === i ? { ...item, status: "error", error: msg } : item));
       }
     }
-    setUploading(false);
-    fetchItems();
+
+    await fetchItems();
+    setTimeout(() => setQueue([]), 4000);
   };
 
   const handleDelete = async (key: string) => {
     if (!confirm("Delete this image? This cannot be undone.")) return;
     setDeleting(key);
-    const { data: { session } } = await supabase.auth.getSession();
-    const token = session?.access_token ?? "";
-    await fetch(`/api/admin/media?key=${encodeURIComponent(key)}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    const token = await getToken();
+    await fetch(`/api/admin/media?key=${encodeURIComponent(key)}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
     setItems((p) => p.filter((i) => i.key !== key));
     if (selected?.key === key) setSelected(null);
     setDeleting(null);
@@ -86,6 +120,9 @@ export default function MediaLibrary({
     setTimeout(() => setCopied(null), 2000);
   };
 
+  const isUploading = queue.some((q) => q.status === "uploading");
+  const doneCount = queue.filter((q) => q.status === "done").length;
+
   return (
     <div>
       {/* Header */}
@@ -96,18 +133,51 @@ export default function MediaLibrary({
         </div>
         <button
           onClick={() => fileRef.current?.click()}
-          disabled={uploading}
-          style={{ display: "flex", alignItems: "center", gap: 7, background: NAVY, color: "#fff", border: "none", padding: "10px 18px", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", opacity: uploading ? 0.6 : 1 }}
+          disabled={isUploading}
+          style={{ display: "flex", alignItems: "center", gap: 7, background: NAVY, color: "#fff", border: "none", padding: "10px 18px", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: isUploading ? "not-allowed" : "pointer", opacity: isUploading ? 0.6 : 1 }}
         >
-          <Upload size={14} /> {uploading ? "Uploading…" : "Upload Images"}
+          <Upload size={14} /> Upload Images
         </button>
         <input ref={fileRef} type="file" accept="image/*" multiple style={{ display: "none" }} onChange={(e) => e.target.files && uploadFiles(e.target.files)} />
       </div>
 
-      {error && (
-        <div style={{ background: "#fff5f5", border: "1px solid #fecaca", borderRadius: 10, padding: "10px 14px", color: "#dc2626", fontSize: 13, marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          {error}
-          <button onClick={() => setError("")} style={{ background: "none", border: "none", cursor: "pointer", color: "#dc2626" }}><X size={13} /></button>
+      {/* Upload queue panel */}
+      {queue.length > 0 && (
+        <div style={{ background: "#fff", border: "1px solid #ebebeb", borderRadius: 14, padding: "14px 18px", marginBottom: 20, boxShadow: "0 2px 12px rgba(0,0,0,0.05)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+            <p style={{ color: "#0a0a0a", fontSize: 13, fontWeight: 600, margin: 0 }}>
+              {isUploading ? `Uploading ${doneCount + 1} of ${queue.length}…` : `${doneCount} of ${queue.length} uploaded`}
+            </p>
+            {!isUploading && (
+              <button onClick={() => setQueue([])} style={{ background: "none", border: "none", cursor: "pointer", color: "#bbb" }}>
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          {/* Progress bar */}
+          <div style={{ height: 4, background: "#f0f0f0", borderRadius: 4, marginBottom: 14, overflow: "hidden" }}>
+            <div style={{ height: "100%", background: NAVY, borderRadius: 4, width: `${(doneCount / queue.length) * 100}%`, transition: "width 0.4s ease" }} />
+          </div>
+
+          {/* File list */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {queue.map((item, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 20, height: 20, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {item.status === "uploading" && <Loader2 size={14} color={NAVY} style={{ animation: "spin 1s linear infinite" }} />}
+                  {item.status === "done"      && <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#f0fdf4", border: "1px solid #bbf7d0", display: "flex", alignItems: "center", justifyContent: "center" }}><Check size={10} color="#15803d" /></div>}
+                  {item.status === "error"     && <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#fff5f5", border: "1px solid #fecaca", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={10} color="#dc2626" /></div>}
+                </div>
+                <span style={{ color: item.status === "error" ? "#dc2626" : "#555", fontSize: 12, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {item.name}
+                </span>
+                {item.status === "error" && item.error && (
+                  <span style={{ color: "#dc2626", fontSize: 11, flexShrink: 0 }}>{item.error}</span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -126,7 +196,7 @@ export default function MediaLibrary({
         <p style={{ color: "#ccc", fontSize: 11, margin: "4px 0 0" }}>JPG, PNG, WebP, AVIF — max 10 MB each</p>
       </div>
 
-      {/* Stats row */}
+      {/* Stats */}
       {!loading && (
         <p style={{ color: "#bbb", fontSize: 12, marginBottom: 16 }}>
           {items.length} image{items.length !== 1 ? "s" : ""} · {formatBytes(items.reduce((s, i) => s + i.size, 0))} total
@@ -143,38 +213,57 @@ export default function MediaLibrary({
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 12 }}>
-          {items.map((item) => (
-            <div
-              key={item.key}
-              onClick={() => setSelected(item)}
-              style={{ borderRadius: 12, overflow: "hidden", border: `2px solid ${selected?.key === item.key ? NAVY : "#ebebeb"}`, cursor: "pointer", background: "#fff", transition: "border-color 0.15s" }}
-            >
-              {/* Thumbnail */}
-              <div style={{ position: "relative", height: 140, background: "#f5f5f3", overflow: "hidden" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.url} alt={item.key} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                {/* Delete overlay */}
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleDelete(item.key); }}
-                  disabled={deleting === item.key}
-                  style={{ position: "absolute", top: 6, right: 6, width: 26, height: 26, borderRadius: 6, background: "rgba(0,0,0,0.5)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", opacity: deleting === item.key ? 0.5 : 1 }}
-                >
-                  <Trash2 size={12} color="#fff" />
-                </button>
+          {items.map((item) => {
+            const pfx = getPrefix(item.key);
+            const meta = PREFIX_META[pfx] ?? { label: pfx, bg: "#f0f0f0", color: "#888" };
+            return (
+              <div
+                key={item.key}
+                onClick={() => setSelected(item)}
+                style={{ borderRadius: 12, overflow: "hidden", border: `2px solid ${selected?.key === item.key ? NAVY : "#ebebeb"}`, cursor: "pointer", background: "#fff", transition: "border-color 0.15s" }}
+              >
+                {/* Thumbnail */}
+                <div style={{ position: "relative", height: 140, background: "#f5f5f3", overflow: "hidden" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={item.url} alt={item.key} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+
+                  {/* Category badge — only shown in All Media (no prefix filter) */}
+                  {!prefix && (
+                    <div style={{ position: "absolute", bottom: 7, left: 7, background: meta.bg, color: meta.color, fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", padding: "3px 7px", borderRadius: 6 }}>
+                      {meta.label}
+                    </div>
+                  )}
+
+                  {/* Delete */}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleDelete(item.key); }}
+                    disabled={deleting === item.key}
+                    style={{ position: "absolute", top: 6, right: 6, width: 26, height: 26, borderRadius: 6, background: "rgba(0,0,0,0.5)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", opacity: deleting === item.key ? 0.5 : 1 }}
+                  >
+                    {deleting === item.key
+                      ? <Loader2 size={12} color="#fff" style={{ animation: "spin 1s linear infinite" }} />
+                      : <Trash2 size={12} color="#fff" />
+                    }
+                  </button>
+                </div>
+
+                {/* Footer */}
+                <div style={{ padding: "8px 10px" }}>
+                  <p style={{ color: "#555", fontSize: 11, margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {item.key.split("/").pop()}
+                  </p>
+                  <p style={{ color: "#bbb", fontSize: 10, margin: 0 }}>{formatBytes(item.size)}</p>
+                </div>
               </div>
-              {/* Footer */}
-              <div style={{ padding: "8px 10px" }}>
-                <p style={{ color: "#555", fontSize: 11, margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {item.key.split("/").pop()}
-                </p>
-                <p style={{ color: "#bbb", fontSize: 10, margin: 0 }}>{formatBytes(item.size)}</p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
-      {/* Detail panel */}
+      {/* Spin keyframes */}
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+
+      {/* Detail modal */}
       {selected && (
         <>
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 40 }} onClick={() => setSelected(null)} />
@@ -187,9 +276,18 @@ export default function MediaLibrary({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={selected.url} alt={selected.key} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
             </div>
-            <div style={{ marginBottom: 14 }}>
-              <p style={{ color: "#aaa", fontSize: 11, margin: "0 0 3px" }}>File key</p>
-              <p style={{ color: "#555", fontSize: 12, margin: 0, wordBreak: "break-all" }}>{selected.key}</p>
+            {(() => {
+              const pfx = getPrefix(selected.key);
+              const meta = PREFIX_META[pfx] ?? { label: pfx, bg: "#f0f0f0", color: "#888" };
+              return (
+                <div style={{ display: "inline-flex", alignItems: "center", background: meta.bg, color: meta.color, fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", padding: "3px 8px", borderRadius: 6, marginBottom: 14 }}>
+                  {meta.label}
+                </div>
+              );
+            })()}
+            <div style={{ marginBottom: 10 }}>
+              <p style={{ color: "#aaa", fontSize: 11, margin: "0 0 3px" }}>Public URL</p>
+              <p style={{ color: "#555", fontSize: 11, margin: 0, wordBreak: "break-all", background: "#f8f8f8", borderRadius: 8, padding: "8px 10px" }}>{selected.url}</p>
             </div>
             <div style={{ marginBottom: 16 }}>
               <p style={{ color: "#aaa", fontSize: 11, margin: "0 0 3px" }}>Size</p>
