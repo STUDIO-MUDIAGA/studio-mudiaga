@@ -2,19 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import AuthSplitLayout from "@/components/auth/AuthSplitLayout";
-
-const HERO = "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=80";
-
-const inputClass =
-  "w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3.5 text-white text-sm placeholder-white/25 focus:outline-none focus:border-amber-400 transition-colors";
 
 function GoogleIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+    <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
       <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
       <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
       <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
@@ -22,6 +16,12 @@ function GoogleIcon() {
     </svg>
   );
 }
+
+const steps = [
+  { n: "1", label: "Sign in to\nyour account" },
+  { n: "2", label: "Manage\nproperties" },
+  { n: "3", label: "Track &\nanalyse" },
+];
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -40,13 +40,22 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-    if (signInError) { setError(signInError.message); setLoading(false); return; }
+    if (signInError) {
+      setError(signInError.message);
+      setLoading(false);
+      return;
+    }
 
     if (data.user) {
-      const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).single();
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", data.user.id)
+        .single();
+
       if (profile?.role !== "admin") {
         await supabase.auth.signOut();
-        setError("Access denied. This area is for admin users only.");
+        setError("Access denied. Admin accounts only.");
         setLoading(false);
         return;
       }
@@ -65,91 +74,277 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <AuthSplitLayout
-      image={HERO}
-      quote="Manage with clarity, lead with vision."
-      tagline="The Studio Mudiaga admin portal — your command centre for shortlets, furniture, and guests."
-      topRight={
-        <p className="text-white/40 text-sm">
-          <Link href="/login" className="hover:text-white/60 transition-colors">← Customer login</Link>
-        </p>
-      }
-    >
-      <div className="flex items-center gap-3 mb-8">
-        <div className="w-10 h-10 bg-amber-400/10 border border-amber-400/20 rounded-xl flex items-center justify-center shrink-0">
-          <ShieldCheck size={18} className="text-amber-400" />
-        </div>
-        <div>
-          <h1 className="text-white text-2xl font-bold leading-tight">Admin Access</h1>
-          <p className="text-white/35 text-xs mt-0.5">Studio Mudiaga management portal</p>
-        </div>
-      </div>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
 
-      <button
-        onClick={handleGoogle}
-        disabled={googleLoading}
-        className="w-full flex items-center justify-center gap-3 border border-zinc-700 rounded-xl py-3.5 text-white text-sm font-medium hover:bg-white/5 transition-colors disabled:opacity-50 mb-5"
+      {/* ── Left panel ── */}
+      <div
+        style={{
+          width: "45%",
+          flexShrink: 0,
+          background: "linear-gradient(135deg, #1a5c42 0%, #0f3d2e 50%, #081f18 100%)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          padding: "40px",
+        }}
+        className="hidden lg:flex"
       >
-        <GoogleIcon />
-        {googleLoading ? "Redirecting…" : "Continue with Google"}
-      </button>
+        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "11px", fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase" }}>
+          Studio Mudiaga
+        </p>
 
-      <div className="flex items-center gap-4 mb-6">
-        <div className="flex-1 h-px bg-zinc-800" />
-        <span className="text-white/30 text-xs">Or sign in with</span>
-        <div className="flex-1 h-px bg-zinc-800" />
-      </div>
-
-      <form onSubmit={handleLogin} className="space-y-5">
         <div>
-          <label className="block text-white/60 text-sm mb-2">Admin email</label>
-          <input
-            type="email"
-            placeholder="admin@studiomudiaga.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="username"
-            className={inputClass}
-          />
+          <h1 style={{ color: "#fff", fontSize: "32px", fontWeight: 700, lineHeight: 1.2, marginBottom: "10px" }}>
+            Manage your<br />Studio.
+          </h1>
+          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px", lineHeight: 1.6, maxWidth: "240px" }}>
+            Complete these steps to access your command centre.
+          </p>
         </div>
 
-        <div>
-          <label className="block text-white/60 text-sm mb-2">Password</label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-              className={`${inputClass} pr-12`}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((p) => !p)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+        {/* Step cards */}
+        <div style={{ display: "flex", gap: "12px" }}>
+          {steps.map(({ n, label }, i) => (
+            <div
+              key={n}
+              style={{
+                flex: 1,
+                borderRadius: "16px",
+                padding: "16px",
+                background: i === 0 ? "#fff" : "rgba(255,255,255,0.1)",
+              }}
             >
-              {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+              <div
+                style={{
+                  width: "26px",
+                  height: "26px",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  marginBottom: "12px",
+                  background: i === 0 ? "#000" : "rgba(255,255,255,0.2)",
+                  color: "#fff",
+                }}
+              >
+                {n}
+              </div>
+              <p
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  lineHeight: 1.4,
+                  color: i === 0 ? "#000" : "rgba(255,255,255,0.5)",
+                  whiteSpace: "pre-line",
+                }}
+              >
+                {label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Right panel ── */}
+      <div
+        style={{
+          flex: 1,
+          background: "#0c0c0c",
+          display: "flex",
+          flexDirection: "column",
+          overflowY: "auto",
+        }}
+      >
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 48px" }}>
+          <div style={{ width: "100%", maxWidth: "380px" }}>
+
+            {/* Heading */}
+            <div style={{ textAlign: "center", marginBottom: "32px" }}>
+              <h2 style={{ color: "#fff", fontSize: "22px", fontWeight: 700, marginBottom: "6px" }}>
+                Admin Sign In
+              </h2>
+              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "13px" }}>
+                Enter your credentials to access the portal.
+              </p>
+            </div>
+
+            {/* Google button */}
+            <button
+              onClick={handleGoogle}
+              disabled={googleLoading}
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                background: "#1a1a1a",
+                border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: "12px",
+                padding: "12px 20px",
+                color: "rgba(255,255,255,0.75)",
+                fontSize: "14px",
+                fontWeight: 500,
+                cursor: "pointer",
+                marginBottom: "20px",
+                opacity: googleLoading ? 0.5 : 1,
+                transition: "background 0.15s",
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.background = "#222")}
+              onMouseOut={(e) => (e.currentTarget.style.background = "#1a1a1a")}
+            >
+              <GoogleIcon />
+              {googleLoading ? "Redirecting…" : "Continue with Google"}
             </button>
+
+            {/* Divider */}
+            <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px" }}>
+              <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.07)" }} />
+              <span style={{ color: "rgba(255,255,255,0.2)", fontSize: "12px" }}>Or</span>
+              <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.07)" }} />
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleLogin}>
+              {/* Email */}
+              <div style={{ marginBottom: "16px" }}>
+                <label style={{ display: "block", color: "rgba(255,255,255,0.45)", fontSize: "12px", marginBottom: "6px" }}>
+                  Email
+                </label>
+                <input
+                  type="email"
+                  placeholder="eg. admin@studiomudiaga.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="username"
+                  style={{
+                    width: "100%",
+                    background: "#111",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    borderRadius: "12px",
+                    padding: "12px 16px",
+                    color: "#fff",
+                    fontSize: "14px",
+                    outline: "none",
+                    boxSizing: "border-box",
+                  }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
+                />
+              </div>
+
+              {/* Password */}
+              <div style={{ marginBottom: "6px" }}>
+                <label style={{ display: "block", color: "rgba(255,255,255,0.45)", fontSize: "12px", marginBottom: "6px" }}>
+                  Password
+                </label>
+                <div style={{ position: "relative" }}>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    autoComplete="current-password"
+                    style={{
+                      width: "100%",
+                      background: "#111",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      borderRadius: "12px",
+                      padding: "12px 44px 12px 16px",
+                      color: "#fff",
+                      fontSize: "14px",
+                      outline: "none",
+                      boxSizing: "border-box",
+                    }}
+                    onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)")}
+                    onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)")}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((p) => !p)}
+                    style={{
+                      position: "absolute",
+                      right: "14px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "rgba(255,255,255,0.25)",
+                      display: "flex",
+                      alignItems: "center",
+                      padding: 0,
+                    }}
+                  >
+                    {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                  </button>
+                </div>
+              </div>
+
+              <p style={{ color: "rgba(255,255,255,0.2)", fontSize: "11px", marginBottom: "20px" }}>
+                Must be at least 8 characters.
+              </p>
+
+              {/* Error */}
+              {error && (
+                <div
+                  style={{
+                    color: "#f87171",
+                    fontSize: "12px",
+                    background: "rgba(239,68,68,0.08)",
+                    border: "1px solid rgba(239,68,68,0.15)",
+                    borderRadius: "10px",
+                    padding: "10px 14px",
+                    marginBottom: "16px",
+                  }}
+                >
+                  {error}
+                </div>
+              )}
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  width: "100%",
+                  background: "#fff",
+                  color: "#000",
+                  border: "none",
+                  borderRadius: "12px",
+                  padding: "13px 20px",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  cursor: loading ? "not-allowed" : "pointer",
+                  opacity: loading ? 0.6 : 1,
+                  transition: "opacity 0.15s",
+                }}
+              >
+                {loading ? "Verifying…" : "Sign In"}
+              </button>
+            </form>
+
+            <p style={{ textAlign: "center", color: "rgba(255,255,255,0.25)", fontSize: "13px", marginTop: "24px" }}>
+              Back to{" "}
+              <Link href="/" style={{ color: "rgba(255,255,255,0.6)", fontWeight: 500, textDecoration: "none" }}>
+                Website
+              </Link>
+            </p>
           </div>
         </div>
 
-        {error && (
-          <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3">
-            {error}
-          </p>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-amber-400 text-black font-semibold rounded-xl py-3.5 text-sm hover:bg-amber-300 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-        >
-          {loading ? "Verifying…" : <>Sign in to Admin <span className="text-base leading-none">→</span></>}
-        </button>
-      </form>
-    </AuthSplitLayout>
+        {/* Footer */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 48px" }}>
+          <p style={{ color: "rgba(255,255,255,0.12)", fontSize: "11px" }}>© 2025 Studio Mudiaga</p>
+          <Link href="/privacy-policy" style={{ color: "rgba(255,255,255,0.12)", fontSize: "11px", textDecoration: "none" }}>
+            Privacy
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }
