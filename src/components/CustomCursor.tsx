@@ -6,7 +6,13 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export default function CustomCursor() {
   const pathname = usePathname();
-  const isAdmin = pathname.startsWith("/admin");
+  const isAdmin =
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/account") ||
+    pathname.startsWith("/abode") ||
+    pathname.startsWith("/mudres") ||
+    pathname === "/login" ||
+    pathname === "/signup";
 
   const [label, setLabel] = useState<string | null>(null);
   const [visible, setVisible] = useState(false);
