@@ -63,12 +63,18 @@ export default function PropertyDetailPage() {
   const [requesting, setRequesting] = useState(false);
   const [requested, setRequested] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [reviews, setReviews] = useState<{ id: string; reviewer: string; rating: number; comment: string; stay_date: string }[]>([]);
+  const [showAllReviews, setShowAllReviews] = useState(false);
 
   useEffect(() => {
     fetch(`/api/admin/shortlets/${id}`)
       .then((r) => r.json())
       .then((d) => { setShortlet(d); setGuests(Math.min(2, d.guests)); setLoading(false); })
       .catch(() => setLoading(false));
+    fetch(`/api/shortlets/${id}/reviews`)
+      .then((r) => r.json())
+      .then((d) => Array.isArray(d) && setReviews(d))
+      .catch(() => {});
   }, [id]);
 
   // Load saved state from localStorage
@@ -303,6 +309,72 @@ export default function PropertyDetailPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Reviews */}
+          {reviews.length > 0 && (
+            <div style={{ marginBottom: 28, paddingBottom: 28, borderBottom: "1px solid #ebebeb" }}>
+              {/* Header */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+                <Star size={18} fill={ORANGE} color={ORANGE} />
+                <h2 style={{ color: "#0a0a0a", fontSize: 16, fontWeight: 700, margin: 0 }}>
+                  {shortlet.rating > 0 ? shortlet.rating : (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)} · {reviews.length} review{reviews.length !== 1 ? "s" : ""}
+                </h2>
+              </div>
+
+              {/* Rating bar breakdown */}
+              <div style={{ display: "flex", gap: 6, marginBottom: 22, background: "#fafaf9", borderRadius: 14, padding: "14px 18px", flexWrap: "wrap" }}>
+                {[5, 4, 3, 2, 1].map((star) => {
+                  const count = reviews.filter((r) => r.rating === star).length;
+                  const pct = reviews.length ? Math.round((count / reviews.length) * 100) : 0;
+                  return (
+                    <div key={star} style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 120 }}>
+                      <span style={{ color: "#888", fontSize: 11, width: 8, textAlign: "right" }}>{star}</span>
+                      <Star size={10} fill={ORANGE} color={ORANGE} />
+                      <div style={{ flex: 1, height: 4, background: "#e8e8e4", borderRadius: 4, overflow: "hidden" }}>
+                        <div style={{ width: `${pct}%`, height: "100%", background: ORANGE, borderRadius: 4, transition: "width 0.5s" }} />
+                      </div>
+                      <span style={{ color: "#bbb", fontSize: 11, width: 28 }}>{count}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Review cards */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
+                {(showAllReviews ? reviews : reviews.slice(0, 4)).map((r) => (
+                  <div key={r.id} style={{ background: "#fff", border: "1px solid #e8e8e4", borderRadius: 14, padding: "16px 18px" }}>
+                    {/* Reviewer */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#fdf0eb", border: `1px solid ${ORANGE}22`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <span style={{ color: ORANGE, fontSize: 13, fontWeight: 700 }}>{r.reviewer[0].toUpperCase()}</span>
+                      </div>
+                      <div>
+                        <p style={{ color: "#0a0a0a", fontSize: 13, fontWeight: 600, margin: 0 }}>{r.reviewer}</p>
+                        <p style={{ color: "#bbb", fontSize: 11, margin: "2px 0 0" }}>{r.stay_date}</p>
+                      </div>
+                      {/* Stars */}
+                      <div style={{ marginLeft: "auto", display: "flex", gap: 2 }}>
+                        {[1,2,3,4,5].map((s) => (
+                          <Star key={s} size={10} fill={s <= r.rating ? ORANGE : "#e8e8e4"} color={s <= r.rating ? ORANGE : "#e8e8e4"} />
+                        ))}
+                      </div>
+                    </div>
+                    <p style={{ color: "#555", fontSize: 12, lineHeight: 1.65, margin: 0 }}>{r.comment}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Show more */}
+              {reviews.length > 4 && (
+                <button
+                  onClick={() => setShowAllReviews((s) => !s)}
+                  style={{ marginTop: 14, background: "#fff", border: "1px solid #e8e8e4", borderRadius: 10, padding: "9px 20px", fontSize: 12, fontWeight: 600, color: "#555", cursor: "pointer" }}
+                >
+                  {showAllReviews ? "Show less" : `Show all ${reviews.length} reviews`}
+                </button>
+              )}
             </div>
           )}
 
