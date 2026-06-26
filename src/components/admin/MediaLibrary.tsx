@@ -46,6 +46,7 @@ export default function MediaLibrary({
   const [copied, setCopied] = useState<string | null>(null);
   const [drag, setDrag] = useState(false);
   const [selected, setSelected] = useState<R2Object | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("all");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const getToken = useCallback(async () => {
@@ -123,6 +124,15 @@ export default function MediaLibrary({
   const isUploading = queue.some((q) => q.status === "uploading");
   const doneCount = queue.filter((q) => q.status === "done").length;
 
+  // For All Media, derive available tabs from actual uploaded prefixes
+  const availablePrefixes = !prefix
+    ? Array.from(new Set(items.map((i) => getPrefix(i.key)).filter(Boolean)))
+    : [];
+
+  const visibleItems = !prefix && activeTab !== "all"
+    ? items.filter((i) => getPrefix(i.key) === activeTab)
+    : items;
+
   return (
     <div>
       {/* Header */}
@@ -196,24 +206,61 @@ export default function MediaLibrary({
         <p style={{ color: "#ccc", fontSize: 11, margin: "4px 0 0" }}>JPG, PNG, WebP, AVIF — max 10 MB each</p>
       </div>
 
+      {/* Category filter tabs — All Media only */}
+      {!prefix && !loading && availablePrefixes.length > 0 && (
+        <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+          {["all", ...availablePrefixes].map((tab) => {
+            const isActive = activeTab === tab;
+            const meta = tab === "all"
+              ? { label: "All", bg: NAVY_BG, color: NAVY }
+              : PREFIX_META[tab] ?? { label: tab, bg: "#f0f0f0", color: "#888" };
+            const count = tab === "all"
+              ? items.length
+              : items.filter((i) => getPrefix(i.key) === tab).length;
+            return (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 6,
+                  padding: "7px 14px", borderRadius: 20, border: "1px solid",
+                  fontSize: 12, fontWeight: isActive ? 700 : 500, cursor: "pointer",
+                  background: isActive ? meta.bg : "#fff",
+                  borderColor: isActive ? meta.color : "#e8e8e4",
+                  color: isActive ? meta.color : "#888",
+                  transition: "all 0.15s",
+                }}
+              >
+                {meta.label}
+                <span style={{ background: isActive ? meta.color : "#ebebeb", color: isActive ? "#fff" : "#aaa", fontSize: 10, fontWeight: 700, padding: "1px 6px", borderRadius: 10 }}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* Stats */}
       {!loading && (
         <p style={{ color: "#bbb", fontSize: 12, marginBottom: 16 }}>
-          {items.length} image{items.length !== 1 ? "s" : ""} · {formatBytes(items.reduce((s, i) => s + i.size, 0))} total
+          {visibleItems.length} image{visibleItems.length !== 1 ? "s" : ""}{activeTab !== "all" ? ` in ${PREFIX_META[activeTab]?.label ?? activeTab}` : ""} · {formatBytes(visibleItems.reduce((s, i) => s + i.size, 0))} total
         </p>
       )}
 
       {/* Grid */}
       {loading ? (
         <div style={{ textAlign: "center", padding: "60px 0", color: "#ccc", fontSize: 13 }}>Loading media…</div>
-      ) : items.length === 0 ? (
+      ) : visibleItems.length === 0 ? (
         <div style={{ textAlign: "center", padding: "60px 0" }}>
           <ImageOff size={32} color="#e0e0e0" style={{ margin: "0 auto 12px" }} />
-          <p style={{ color: "#ccc", fontSize: 13 }}>No images yet. Upload your first one above.</p>
+          <p style={{ color: "#ccc", fontSize: 13 }}>
+            {items.length === 0 ? "No images yet. Upload your first one above." : "No images in this category."}
+          </p>
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 12 }}>
-          {items.map((item) => {
+          {visibleItems.map((item) => {
             const pfx = getPrefix(item.key);
             const meta = PREFIX_META[pfx] ?? { label: pfx, bg: "#f0f0f0", color: "#888" };
             return (
