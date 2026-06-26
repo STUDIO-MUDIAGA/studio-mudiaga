@@ -6,8 +6,8 @@ import Link from "next/link";
 import {
   ArrowLeft, Star, MapPin, BedDouble, Bath, Users, Check,
   Wifi, Tv, Car, Dumbbell, Waves, UtensilsCrossed, ShieldCheck,
-  Clock, X, ChevronLeft, ChevronRight, Share2, Heart, Building2,
-  Moon, CalendarDays, Loader2,
+  X, ChevronLeft, ChevronRight, Share2, Heart, Building2,
+  Moon, CalendarDays, Loader2, Mail, Phone, User,
 } from "lucide-react";
 
 const ORANGE = "#c46442";
@@ -65,6 +65,13 @@ export default function PropertyDetailPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [reviews, setReviews] = useState<{ id: string; reviewer: string; rating: number; comment: string; stay_date: string }[]>([]);
   const [showAllReviews, setShowAllReviews] = useState(false);
+  const [bookingModal, setBookingModal] = useState(false);
+  const [bookingDone, setBookingDone] = useState(false);
+  const [guestName, setGuestName] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
+  const [guestPhone, setGuestPhone] = useState("");
+  const [bookingNotes, setBookingNotes] = useState("");
+  const [bookingError, setBookingError] = useState("");
 
   useEffect(() => {
     fetch(`/api/admin/shortlets/${id}`)
@@ -98,6 +105,36 @@ export default function PropertyDetailPage() {
       setSaved(!saved);
       showToast(saved ? "Removed from saved" : "Saved to your favourites");
     } catch { /* ignore */ }
+  }
+
+  async function submitBooking(e: React.FormEvent) {
+    e.preventDefault();
+    setRequesting(true);
+    setBookingError("");
+    try {
+      const res = await fetch("/api/bookings/shortlets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          shortlet_id: id,
+          guest_name: guestName,
+          guest_email: guestEmail,
+          guest_phone: guestPhone,
+          checkin, checkout,
+          guests,
+          notes: bookingNotes,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setBookingError(data.error ?? "Something went wrong"); setRequesting(false); return; }
+      setRequesting(false);
+      setBookingModal(false);
+      setBookingDone(true);
+      showToast("Booking request sent! We'll be in touch shortly.");
+    } catch {
+      setBookingError("Network error. Please try again.");
+      setRequesting(false);
+    }
   }
 
   async function handleShare() {
@@ -465,16 +502,11 @@ export default function PropertyDetailPage() {
 
             {/* CTA */}
             <button
-              onClick={() => { setRequesting(true); setTimeout(() => { setRequesting(false); setRequested(true); }, 1500); }}
-              disabled={requesting || requested}
-              style={{ width: "100%", background: requested ? "#15803d" : ORANGE, color: "#fff", border: "none", borderRadius: 12, padding: "14px 0", fontSize: 14, fontWeight: 700, cursor: requesting || requested ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "background 0.2s", marginBottom: 10 }}
+              onClick={() => { setBookingModal(true); setBookingError(""); }}
+              disabled={bookingDone}
+              style={{ width: "100%", background: bookingDone ? "#15803d" : ORANGE, color: "#fff", border: "none", borderRadius: 12, padding: "14px 0", fontSize: 14, fontWeight: 700, cursor: bookingDone ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "background 0.2s", marginBottom: 10 }}
             >
-              {requesting
-                ? <><Loader2 size={15} style={{ animation: "spin 1s linear infinite" }} /> Sending request…</>
-                : requested
-                  ? <><Check size={15} /> Request sent!</>
-                  : "Request to Book"
-              }
+              {bookingDone ? <><Check size={15} /> Request sent!</> : "Request to Book"}
             </button>
 
             <p style={{ color: "#bbb", fontSize: 11, textAlign: "center", margin: "0 0 16px" }}>You won&apos;t be charged yet</p>
@@ -512,6 +544,132 @@ export default function PropertyDetailPage() {
           )}
         </div>
       </div>
+
+      {/* ── Booking Modal ── */}
+      {bookingModal && (
+        <>
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 200, backdropFilter: "blur(3px)" }} onClick={() => setBookingModal(false)} />
+          <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 201, background: "#fff", borderRadius: 22, width: 500, maxWidth: "92vw", maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.18)" }}>
+            {/* Modal header */}
+            <div style={{ padding: "22px 26px 0", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+              <div>
+                <p style={{ color: ORANGE, fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", margin: "0 0 4px" }}>ABODE</p>
+                <h2 style={{ color: "#0a0a0a", fontSize: 18, fontWeight: 700, margin: 0 }}>Request to Book</h2>
+                <p style={{ color: "#aaa", fontSize: 12, margin: "4px 0 0" }}>{shortlet.title}</p>
+              </div>
+              <button onClick={() => setBookingModal(false)} style={{ background: "#f2f2f4", border: "none", borderRadius: "50%", width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+                <X size={14} color="#666" />
+              </button>
+            </div>
+
+            {/* Stay summary */}
+            <div style={{ margin: "18px 26px", background: "#f8f8f6", borderRadius: 14, padding: "14px 16px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+              <div>
+                <p style={{ color: "#aaa", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 3px" }}>Check-in</p>
+                <p style={{ color: "#0a0a0a", fontSize: 13, fontWeight: 600, margin: 0 }}>{fmt(checkin)}</p>
+              </div>
+              <div>
+                <p style={{ color: "#aaa", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 3px" }}>Check-out</p>
+                <p style={{ color: "#0a0a0a", fontSize: 13, fontWeight: 600, margin: 0 }}>{fmt(checkout)}</p>
+              </div>
+              <div>
+                <p style={{ color: "#aaa", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 3px" }}>Guests</p>
+                <p style={{ color: "#0a0a0a", fontSize: 13, fontWeight: 600, margin: 0 }}>{guests} guest{guests !== 1 ? "s" : ""}</p>
+              </div>
+            </div>
+
+            <div style={{ borderTop: "1px solid #f0f0ee", margin: "0 26px" }} />
+
+            <form onSubmit={submitBooking} style={{ padding: "18px 26px 26px", display: "flex", flexDirection: "column", gap: 14 }}>
+              {/* Guest name */}
+              <div>
+                <label style={{ display: "block", color: "#555", fontSize: 11, fontWeight: 600, marginBottom: 6 }}>Full Name *</label>
+                <div style={{ position: "relative" }}>
+                  <User size={13} color="#ccc" style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)" }} />
+                  <input
+                    required
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                    placeholder="Your full name"
+                    style={{ width: "100%", background: "#fafaf9", border: "1px solid #e8e8e4", borderRadius: 10, padding: "10px 14px 10px 36px", color: "#0a0a0a", fontSize: 13, outline: "none", boxSizing: "border-box" }}
+                  />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div>
+                <label style={{ display: "block", color: "#555", fontSize: 11, fontWeight: 600, marginBottom: 6 }}>Email Address *</label>
+                <div style={{ position: "relative" }}>
+                  <Mail size={13} color="#ccc" style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)" }} />
+                  <input
+                    required
+                    type="email"
+                    value={guestEmail}
+                    onChange={(e) => setGuestEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    style={{ width: "100%", background: "#fafaf9", border: "1px solid #e8e8e4", borderRadius: 10, padding: "10px 14px 10px 36px", color: "#0a0a0a", fontSize: 13, outline: "none", boxSizing: "border-box" }}
+                  />
+                </div>
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label style={{ display: "block", color: "#555", fontSize: 11, fontWeight: 600, marginBottom: 6 }}>Phone Number</label>
+                <div style={{ position: "relative" }}>
+                  <Phone size={13} color="#ccc" style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)" }} />
+                  <input
+                    value={guestPhone}
+                    onChange={(e) => setGuestPhone(e.target.value)}
+                    placeholder="+234 800 000 0000"
+                    style={{ width: "100%", background: "#fafaf9", border: "1px solid #e8e8e4", borderRadius: 10, padding: "10px 14px 10px 36px", color: "#0a0a0a", fontSize: 13, outline: "none", boxSizing: "border-box" }}
+                  />
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div>
+                <label style={{ display: "block", color: "#555", fontSize: 11, fontWeight: 600, marginBottom: 6 }}>Special Requests <span style={{ color: "#bbb", fontWeight: 400 }}>(optional)</span></label>
+                <textarea
+                  value={bookingNotes}
+                  onChange={(e) => setBookingNotes(e.target.value)}
+                  placeholder="Any special requirements, arrival time, dietary needs…"
+                  rows={3}
+                  style={{ width: "100%", background: "#fafaf9", border: "1px solid #e8e8e4", borderRadius: 10, padding: "10px 14px", color: "#0a0a0a", fontSize: 13, outline: "none", resize: "vertical", boxSizing: "border-box", lineHeight: 1.6 }}
+                />
+              </div>
+
+              {/* Price summary */}
+              <div style={{ background: "#f8f8f6", borderRadius: 12, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 7 }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "#555", fontSize: 12 }}>₦{shortlet.price.toLocaleString()} × {Math.max(shortlet.min_nights ?? 1, daysBetween(checkin, checkout))} night{Math.max(shortlet.min_nights ?? 1, daysBetween(checkin, checkout)) !== 1 ? "s" : ""}</span>
+                  <span style={{ color: "#0a0a0a", fontSize: 12, fontWeight: 500 }}>₦{(shortlet.price * Math.max(shortlet.min_nights ?? 1, daysBetween(checkin, checkout))).toLocaleString()}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "#555", fontSize: 12 }}>Service fee (5%)</span>
+                  <span style={{ color: "#0a0a0a", fontSize: 12, fontWeight: 500 }}>₦{Math.round(shortlet.price * Math.max(shortlet.min_nights ?? 1, daysBetween(checkin, checkout)) * 0.05).toLocaleString()}</span>
+                </div>
+                <div style={{ borderTop: "1px solid #e8e8e4", paddingTop: 8, display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "#0a0a0a", fontSize: 13, fontWeight: 700 }}>Total (estimate)</span>
+                  <span style={{ color: ORANGE, fontSize: 13, fontWeight: 800 }}>₦{(shortlet.price * Math.max(shortlet.min_nights ?? 1, daysBetween(checkin, checkout)) + Math.round(shortlet.price * Math.max(shortlet.min_nights ?? 1, daysBetween(checkin, checkout)) * 0.05)).toLocaleString()}</span>
+                </div>
+              </div>
+
+              {bookingError && (
+                <p style={{ color: "#dc2626", fontSize: 12, background: "#fff5f5", border: "1px solid #fecaca", borderRadius: 10, padding: "10px 14px", margin: 0 }}>{bookingError}</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={requesting}
+                style={{ background: ORANGE, color: "#fff", border: "none", borderRadius: 12, padding: "14px 0", fontSize: 14, fontWeight: 700, cursor: requesting ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: requesting ? 0.7 : 1 }}
+              >
+                {requesting ? <><Loader2 size={15} style={{ animation: "spin 1s linear infinite" }} /> Sending…</> : "Confirm Request"}
+              </button>
+              <p style={{ color: "#bbb", fontSize: 11, textAlign: "center", margin: 0 }}>We&apos;ll contact you within 2 hours to confirm availability and payment details.</p>
+            </form>
+          </div>
+        </>
+      )}
 
       {/* ── Lightbox ── */}
       {lightbox !== null && (
