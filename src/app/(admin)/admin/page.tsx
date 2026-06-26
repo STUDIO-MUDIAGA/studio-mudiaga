@@ -58,8 +58,7 @@ function InfoTooltip({ text }: { text: string }) {
         <div style={{
           position: "absolute", bottom: "calc(100% + 8px)", right: 0,
           background: "#1a1a1a", color: "#fff", fontSize: 11, lineHeight: 1.5,
-          padding: "8px 12px", borderRadius: 8, whiteSpace: "nowrap", maxWidth: 220,
-          whiteSpace: "normal" as const,
+          padding: "8px 12px", borderRadius: 8, whiteSpace: "normal" as const, maxWidth: 220,
           boxShadow: "0 4px 16px rgba(0,0,0,0.15)", zIndex: 50, pointerEvents: "none",
         }}>
           {text}
