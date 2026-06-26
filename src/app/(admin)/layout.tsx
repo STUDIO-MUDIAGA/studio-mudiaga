@@ -106,6 +106,107 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
   );
 }
 
+function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
+  const { user, profile, signOut } = useAuth();
+  const router = useRouter();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const displayName = profile?.full_name ?? user?.email?.split("@")[0] ?? "Admin";
+  const initial = displayName[0]?.toUpperCase() ?? "A";
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/admin/login");
+  };
+
+  const dropdownItems = [
+    { label: "Profile",   icon: Users,       href: "/admin/profile" },
+    { label: "Settings",  icon: Settings,    href: "/admin/settings" },
+    { label: "Password",  icon: LogOut,      href: "/admin/password" },
+  ];
+
+  return (
+    <header style={{ height: 64, background: "#fff", borderBottom: "1px solid #ebebeb", display: "flex", alignItems: "center", padding: "0 32px", flexShrink: 0, gap: 20 }}>
+      {/* Mobile menu */}
+      <button onClick={onMenuClick} style={{ background: "none", border: "none", color: "#666", cursor: "pointer", display: "flex", flexShrink: 0 }} className="mobile-menu-btn">
+        <style>{`@media(min-width:1024px){.mobile-menu-btn{display:none!important}}`}</style>
+        <Menu size={18} />
+      </button>
+
+      {/* Greeting */}
+      <div style={{ flexShrink: 0 }}>
+        <p style={{ color: "#0a0a0a", fontSize: 14, fontWeight: 700, margin: 0, lineHeight: 1 }}>Welcome back, {displayName}!</p>
+        <p style={{ color: "#aaa", fontSize: 11, margin: "3px 0 0" }}>Here&apos;s what&apos;s happening today.</p>
+      </div>
+
+      {/* Search — centered */}
+      <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+        <div style={{ width: "100%", maxWidth: 420, display: "flex", alignItems: "center", gap: 8, background: "#f7f7f5", border: "1px solid #ebebeb", borderRadius: 24, padding: "9px 16px" }}>
+          <Search size={13} color="#ccc" />
+          <input placeholder="Search shortlets, orders, users…" style={{ background: "none", border: "none", outline: "none", fontSize: 13, color: "#555", flex: 1 }} />
+        </div>
+      </div>
+
+      {/* Right actions */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+        {/* Bell */}
+        <button style={{ width: 36, height: 36, borderRadius: "50%", background: "none", border: "1px solid #ebebeb", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+          <Bell size={15} color="#888" />
+        </button>
+
+        {/* Avatar + dropdown */}
+        <div style={{ position: "relative" }}>
+          <button
+            onClick={() => setDropdownOpen((p) => !p)}
+            style={{ width: 36, height: 36, borderRadius: "50%", background: NAVY_BG, border: "2px solid #dddcf5", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+          >
+            <span style={{ color: NAVY, fontSize: 13, fontWeight: 700 }}>{initial}</span>
+          </button>
+
+          {dropdownOpen && (
+            <>
+              {/* Backdrop */}
+              <div style={{ position: "fixed", inset: 0, zIndex: 40 }} onClick={() => setDropdownOpen(false)} />
+              {/* Menu */}
+              <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, zIndex: 50, background: "#fff", border: "1px solid #ebebeb", borderRadius: 14, padding: "6px", minWidth: 180, boxShadow: "0 8px 24px rgba(0,0,0,0.08)" }}>
+                {/* User info */}
+                <div style={{ padding: "10px 12px 12px", borderBottom: "1px solid #f0f0f0", marginBottom: 4 }}>
+                  <p style={{ color: "#0a0a0a", fontSize: 13, fontWeight: 600, margin: "0 0 2px" }}>{displayName}</p>
+                  <p style={{ color: "#aaa", fontSize: 11, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</p>
+                </div>
+                {dropdownItems.map(({ label, icon: Icon, href }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setDropdownOpen(false)}
+                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, textDecoration: "none", color: "#555", fontSize: 13 }}
+                    onMouseOver={(e) => { e.currentTarget.style.background = "#f7f7f5"; }}
+                    onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; }}
+                  >
+                    <Icon size={14} color="#bbb" />
+                    {label}
+                  </Link>
+                ))}
+                <div style={{ borderTop: "1px solid #f0f0f0", marginTop: 4, paddingTop: 4 }}>
+                  <button
+                    onClick={handleSignOut}
+                    style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "none", border: "none", color: "#dc2626", fontSize: 13, cursor: "pointer", textAlign: "left" }}
+                    onMouseOver={(e) => { e.currentTarget.style.background = "#fff5f5"; }}
+                    onMouseOut={(e) => { e.currentTarget.style.background = "none"; }}
+                  >
+                    <LogOut size={14} color="#dc2626" />
+                    Sign out
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+}
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -132,31 +233,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Main */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        {/* Topbar */}
-        <header style={{ height: 64, background: "#fff", borderBottom: "1px solid #ebebeb", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px", flexShrink: 0, gap: 16 }}>
-          <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", color: "#666", cursor: "pointer", display: "flex" }} className="mobile-menu-btn">
-            <style>{`@media(min-width:1024px){.mobile-menu-btn{display:none!important}}`}</style>
-            <Menu size={18} />
-          </button>
-
-          {/* Search */}
-          <div style={{ flex: 1, maxWidth: 400, display: "flex", alignItems: "center", gap: 8, background: "#f7f7f5", border: "1px solid #ebebeb", borderRadius: 10, padding: "8px 14px" }}>
-            <Search size={13} color="#ccc" />
-            <input placeholder="Search shortlets, orders, users…" style={{ background: "none", border: "none", outline: "none", fontSize: 13, color: "#555", flex: 1 }} />
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ position: "relative" }}>
-              <button style={{ background: "none", border: "1px solid #ebebeb", borderRadius: 10, padding: "8px 10px", cursor: "pointer", display: "flex" }}>
-                <Bell size={15} color="#888" />
-              </button>
-            </div>
-            <div style={{ width: 32, height: 32, borderRadius: "50%", background: NAVY_BG, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ color: NAVY, fontSize: 12, fontWeight: 700 }}>A</span>
-            </div>
-          </div>
-        </header>
-
+        <Topbar onMenuClick={() => setSidebarOpen(true)} />
         <main style={{ flex: 1, padding: "32px 36px", overflowY: "auto" }}>
           {children}
         </main>
