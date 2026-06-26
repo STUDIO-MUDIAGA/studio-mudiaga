@@ -14,7 +14,7 @@ function getClient() {
   });
 }
 
-const BUCKET = process.env.R2_BUCKET_NAME ?? "studio-mudiaga";
+const BUCKET = process.env.R2_BUCKET_NAME ?? "studio-mudiaga-r2";
 
 /**
  * Build a public R2 delivery URL from a stored key.
