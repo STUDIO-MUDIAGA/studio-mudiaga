@@ -360,15 +360,14 @@ export default function NewShortletPage() {
     const payload = {
       title: form.title, location: form.location, city: form.city,
       price: parseInt(form.price) || 0, currency: "NGN",
-      property_type: form.property_type, description: form.description,
       bedrooms: parseInt(form.bedrooms), bathrooms: parseInt(form.bathrooms),
       guests: parseInt(form.guests), amenities: form.amenities,
-      images: form.images, host: { name: form.host_name || "Studio Mudiaga", avatar: "", superhost: form.superhost },
-      checkin: form.checkin, checkout: form.checkout,
-      min_nights: parseInt(form.min_nights) || 1,
-      rules: form.rules,
+      images: form.images,
+      host: { name: form.host_name || "Studio Mudiaga", avatar: "", superhost: form.superhost },
       tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
       available: form.available, rating: 0, review_count: 0,
+      // Extended columns — add via SQL migration before these take effect:
+      // property_type, description, checkin, checkout, min_nights, rules
     };
     const res = await fetch("/api/admin/shortlets", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
     if (!res.ok) { const d = await res.json(); setError(d.error ?? "Failed to save"); setSaving(false); return; }
