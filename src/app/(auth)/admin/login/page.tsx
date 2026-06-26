@@ -56,7 +56,71 @@ export default function AdminLoginPage() {
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
 
-      {/* ── Left panel — form ── */}
+      {/* ── Left panel — image ── */}
+      <div
+        style={{
+          width: "45%",
+          flexShrink: 0,
+          position: "relative",
+          overflow: "hidden",
+        }}
+        className="hidden lg:block"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=80"
+          alt=""
+          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 60%, transparent 100%)" }} />
+        <div style={{ position: "absolute", bottom: 0, left: 0, padding: "40px" }}>
+          <h2 style={{ color: "#fff", fontSize: "24px", fontWeight: 700, lineHeight: 1.3, marginBottom: "8px" }}>
+            Manage your Studio.
+          </h2>
+          <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "13px", maxWidth: "260px", lineHeight: 1.6 }}>
+            Your command centre for shortlets, furniture, and guests.
+          </p>
+        </div>
+        {/* Step cards */}
+        <div style={{ position: "absolute", bottom: "140px", left: "40px", right: "40px", display: "flex", gap: "10px" }}>
+          {steps.map(({ n, label }, i) => (
+            <div
+              key={n}
+              style={{
+                flex: 1,
+                borderRadius: "14px",
+                padding: "14px",
+                background: i === 0 ? "rgba(251,191,36,0.15)" : "rgba(255,255,255,0.07)",
+                border: i === 0 ? "1px solid rgba(251,191,36,0.3)" : "1px solid rgba(255,255,255,0.1)",
+                backdropFilter: "blur(8px)",
+              }}
+            >
+              <div
+                style={{
+                  width: "22px",
+                  height: "22px",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  marginBottom: "10px",
+                  background: i === 0 ? "#fbbf24" : "rgba(255,255,255,0.15)",
+                  color: i === 0 ? "#000" : "rgba(255,255,255,0.5)",
+                }}
+              >
+                {n}
+              </div>
+              <p style={{ fontSize: "11px", fontWeight: 500, lineHeight: 1.4, color: i === 0 ? "#fbbf24" : "rgba(255,255,255,0.4)", whiteSpace: "pre-line" }}>
+                {label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Right panel — form ── */}
       <div
         style={{
           flex: 1,
@@ -219,77 +283,6 @@ export default function AdminLoginPage() {
         </div>
       </div>
 
-      {/* ── Right panel — brand ── */}
-      <div
-        style={{
-          width: "45%",
-          flexShrink: 0,
-          background: "linear-gradient(135deg, #fbbf24 0%, #d97706 45%, #78350f 100%)",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "40px",
-        }}
-        className="hidden lg:flex"
-      >
-        <p style={{ color: "rgba(0,0,0,0.4)", fontSize: "11px", fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-          Studio Mudiaga
-        </p>
-
-        <div>
-          <h1 style={{ color: "#000", fontSize: "32px", fontWeight: 700, lineHeight: 1.2, marginBottom: "10px" }}>
-            Manage your<br />Studio.
-          </h1>
-          <p style={{ color: "rgba(0,0,0,0.45)", fontSize: "13px", lineHeight: 1.6, maxWidth: "240px" }}>
-            Complete these steps to access your command centre.
-          </p>
-        </div>
-
-        {/* Step cards */}
-        <div style={{ display: "flex", gap: "12px" }}>
-          {steps.map(({ n, label }, i) => (
-            <div
-              key={n}
-              style={{
-                flex: 1,
-                borderRadius: "16px",
-                padding: "16px",
-                background: i === 0 ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.08)",
-                border: i === 0 ? "1px solid rgba(0,0,0,0.2)" : "1px solid rgba(0,0,0,0.08)",
-              }}
-            >
-              <div
-                style={{
-                  width: "26px",
-                  height: "26px",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "11px",
-                  fontWeight: 700,
-                  marginBottom: "12px",
-                  background: i === 0 ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.15)",
-                  color: i === 0 ? "#fbbf24" : "rgba(0,0,0,0.5)",
-                }}
-              >
-                {n}
-              </div>
-              <p
-                style={{
-                  fontSize: "12px",
-                  fontWeight: 500,
-                  lineHeight: 1.4,
-                  color: i === 0 ? "rgba(0,0,0,0.75)" : "rgba(0,0,0,0.4)",
-                  whiteSpace: "pre-line",
-                }}
-              >
-                {label}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
