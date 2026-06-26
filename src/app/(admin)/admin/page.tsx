@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Building2, Sofa, CalendarDays, Users, TrendingUp, ArrowRight, TrendingDown, Info } from "lucide-react";
+
 import Link from "next/link";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -39,11 +40,36 @@ const STATUS: Record<string, { bg: string; color: string }> = {
 type Stats = { shortlets: number; furniture: number; bookings: number; users: number };
 
 const CARDS = [
-  { label: "Active Shortlets", key: "shortlets" as const, icon: Building2,    accent: NAVY,      bg: NAVY_BG,   trend: "+12%", sub: "vs last month" },
-  { label: "Furniture Items",  key: "furniture"  as const, icon: Sofa,         accent: "#c46442", bg: "#fdf0eb", trend: "+5%",  sub: "vs last month" },
-  { label: "Total Bookings",   key: "bookings"   as const, icon: CalendarDays, accent: "#1e56d6", bg: "#e9f0fd", trend: "+8%",  sub: "vs last month" },
-  { label: "Registered Users", key: "users"      as const, icon: Users,        accent: "#15803d", bg: "#e9fdf0", trend: "+6%",  sub: "vs last month" },
+  { label: "Active Shortlets", key: "shortlets" as const, icon: Building2,    accent: NAVY,      bg: NAVY_BG,   trend: "+12%", sub: "vs last month", tip: "Total shortlet properties currently listed as available on ABODE." },
+  { label: "Furniture Items",  key: "furniture"  as const, icon: Sofa,         accent: "#c46442", bg: "#fdf0eb", trend: "+5%",  sub: "vs last month", tip: "Total furniture pieces in the MUDRES catalogue, including out-of-stock items." },
+  { label: "Total Bookings",   key: "bookings"   as const, icon: CalendarDays, accent: "#1e56d6", bg: "#e9f0fd", trend: "+8%",  sub: "vs last month", tip: "All shortlet booking requests received, across all statuses." },
+  { label: "Registered Users", key: "users"      as const, icon: Users,        accent: "#15803d", bg: "#e9fdf0", trend: "+6%",  sub: "vs last month", tip: "Total customer accounts created via signup or Google OAuth." },
 ];
+
+function InfoTooltip({ text }: { text: string }) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div style={{ position: "relative", display: "flex" }}
+      onMouseEnter={() => setVisible(true)}
+      onMouseLeave={() => setVisible(false)}
+    >
+      <Info size={13} color={visible ? "#888" : "#ddd"} style={{ cursor: "default", transition: "color 0.15s" }} />
+      {visible && (
+        <div style={{
+          position: "absolute", bottom: "calc(100% + 8px)", right: 0,
+          background: "#1a1a1a", color: "#fff", fontSize: 11, lineHeight: 1.5,
+          padding: "8px 12px", borderRadius: 8, whiteSpace: "nowrap", maxWidth: 220,
+          whiteSpace: "normal" as const,
+          boxShadow: "0 4px 16px rgba(0,0,0,0.15)", zIndex: 50, pointerEvents: "none",
+        }}>
+          {text}
+          {/* Arrow */}
+          <div style={{ position: "absolute", bottom: -5, right: 10, width: 10, height: 10, background: "#1a1a1a", transform: "rotate(45deg)", borderRadius: 2 }} />
+        </div>
+      )}
+    </div>
+  );
+}
 
 function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) {
   if (!active || !payload?.length) return null;
@@ -84,7 +110,7 @@ export default function AdminDashboard() {
 
       {/* Stat cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 24 }}>
-        {CARDS.map(({ label, key, icon: Icon, accent, bg, trend, sub }) => {
+        {CARDS.map(({ label, key, icon: Icon, accent, bg, trend, sub, tip }) => {
           const val = loading ? null : stats[key];
           const isPositive = trend.startsWith("+");
           return (
@@ -97,7 +123,7 @@ export default function AdminDashboard() {
                   </div>
                   <span style={{ color: "#888", fontSize: 12, fontWeight: 500 }}>{label}</span>
                 </div>
-                <Info size={13} color="#ddd" />
+                <InfoTooltip text={tip} />
               </div>
 
               {/* Big number */}
