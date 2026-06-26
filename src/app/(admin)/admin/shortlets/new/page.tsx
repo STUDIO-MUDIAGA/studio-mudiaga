@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
   ArrowLeft, Plus, X, Star, MapPin, BedDouble, Bath, Users,
-  ChevronDown, Image as ImageIcon, Check, Loader2,
+  ChevronDown, Image as ImageIcon, Check, Loader2, Upload,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -308,14 +308,52 @@ function useFormState() {
 
 const RULES = ["No smoking", "No pets", "No parties", "No events", "No loud music after 10pm"];
 
+type UploadingImg = { id: string; name: string; status: "uploading" | "done" | "error" };
+
 // ── Page ──────────────────────────────────────────────────────────
 export default function NewShortletPage() {
   const router = useRouter();
+  const supabase = createClient();
   const form = useFormState();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [mediaPicker, setMediaPicker] = useState(false);
   const [urlInput, setUrlInput] = useState("");
+  const [uploadingImgs, setUploadingImgs] = useState<UploadingImg[]>([]);
+  const [drag, setDrag] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const getToken = useCallback(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token ?? "";
+  }, [supabase]);
+
+  const handleFiles = useCallback(async (files: FileList | File[]) => {
+    const arr = Array.from(files).filter((f) => f.type.startsWith("image/"));
+    if (!arr.length) return;
+
+    const ids = arr.map(() => Math.random().toString(36).slice(2));
+    setUploadingImgs((p) => [...p, ...arr.map((f, i) => ({ id: ids[i], name: f.name, status: "uploading" as const }))]);
+
+    const token = await getToken();
+
+    await Promise.all(arr.map(async (file, i) => {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("prefix", "abode");
+      try {
+        const res = await fetch("/api/upload-image", { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: fd });
+        if (!res.ok) throw new Error("Upload failed");
+        const { url } = await res.json();
+        form.addImage(url);
+        setUploadingImgs((p) => p.map((u) => u.id === ids[i] ? { ...u, status: "done" } : u));
+      } catch {
+        setUploadingImgs((p) => p.map((u) => u.id === ids[i] ? { ...u, status: "error" } : u));
+      }
+    }));
+
+    setTimeout(() => setUploadingImgs((p) => p.filter((u) => u.status !== "done")), 2500);
+  }, [getToken, form]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true); setError("");
@@ -406,25 +444,35 @@ export default function NewShortletPage() {
 
           {/* IMAGES */}
           <Section title="Images">
-            <div style={{ display: "flex", gap: 8 }}>
-              <input
-                style={{ ...inp, flex: 1 }}
-                value={urlInput}
-                onChange={(e) => setUrlInput(e.target.value)}
-                placeholder="Paste image URL…"
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); if (urlInput.trim()) { form.addImage(urlInput.trim()); setUrlInput(""); } } }}
-              />
-              <button type="button" onClick={() => { if (urlInput.trim()) { form.addImage(urlInput.trim()); setUrlInput(""); } }}
-                style={{ padding: "10px 14px", background: "#f5f5f3", border: "1px solid #e8e8e4", borderRadius: 10, cursor: "pointer", color: "#555", fontSize: 12, whiteSpace: "nowrap" }}>
-                Add URL
-              </button>
-              <button type="button" onClick={() => setMediaPicker(true)}
-                style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 14px", background: NAVY_BG, border: `1px solid #d0cef0`, borderRadius: 10, cursor: "pointer", color: NAVY, fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" }}>
-                <ImageIcon size={13} /> Media Library
-              </button>
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              style={{ display: "none" }}
+              onChange={(e) => e.target.files && handleFiles(e.target.files)}
+            />
+
+            {/* Drag-and-drop zone */}
+            <div
+              onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
+              onDragLeave={() => setDrag(false)}
+              onDrop={(e) => { e.preventDefault(); setDrag(false); handleFiles(e.dataTransfer.files); }}
+              onClick={() => fileInputRef.current?.click()}
+              style={{ border: `2px dashed ${drag ? NAVY : "#e0e0e0"}`, borderRadius: 12, padding: "28px 20px", textAlign: "center", background: drag ? NAVY_BG : "#fafaf9", transition: "all 0.15s", cursor: "pointer" }}
+            >
+              <Upload size={22} color={drag ? NAVY : "#ccc"} style={{ margin: "0 auto 8px", display: "block" }} />
+              <p style={{ color: drag ? NAVY : "#888", fontSize: 13, fontWeight: 500, margin: "0 0 3px" }}>
+                {drag ? "Drop to upload" : "Drag & drop images here"}
+              </p>
+              <p style={{ color: "#bbb", fontSize: 11, margin: 0 }}>or <span style={{ color: NAVY, fontWeight: 600, textDecoration: "underline" }}>click to browse</span> — JPG, PNG, WebP · max 10 MB · multiple allowed</p>
             </div>
-            {form.images.length > 0 && (
+
+            {/* Thumbnail strip — uploaded + uploading */}
+            {(form.images.length > 0 || uploadingImgs.length > 0) && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {/* Uploaded */}
                 {form.images.map((url, i) => (
                   <div key={url} style={{ position: "relative", width: 90, height: 70, borderRadius: 10, overflow: "hidden", border: "1px solid #e8e8e4" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -435,12 +483,50 @@ export default function NewShortletPage() {
                     </button>
                   </div>
                 ))}
-                <button type="button" onClick={() => setMediaPicker(true)} style={{ width: 90, height: 70, borderRadius: 10, border: "2px dashed #e0e0e0", background: "#fafaf9", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, color: "#ccc", fontSize: 10 }}>
-                  <Plus size={14} /> Add
+
+                {/* Uploading placeholders */}
+                {uploadingImgs.map((u) => (
+                  <div key={u.id} style={{ width: 90, height: 70, borderRadius: 10, border: `1px solid ${u.status === "error" ? "#fecaca" : "#e8e8e4"}`, background: u.status === "error" ? "#fff5f5" : "#f8f8f8", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4 }}>
+                    {u.status === "uploading"
+                      ? <Loader2 size={16} color={NAVY} style={{ animation: "spin 1s linear infinite" }} />
+                      : <X size={14} color="#dc2626" />
+                    }
+                    <span style={{ color: u.status === "error" ? "#dc2626" : "#bbb", fontSize: 9, textAlign: "center", padding: "0 4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 80 }}>
+                      {u.status === "error" ? "Failed" : "Uploading…"}
+                    </span>
+                  </div>
+                ))}
+
+                {/* + Add more button */}
+                <button type="button" onClick={() => fileInputRef.current?.click()} style={{ width: 90, height: 70, borderRadius: 10, border: "2px dashed #e0e0e0", background: "#fafaf9", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, color: "#ccc", fontSize: 10 }}>
+                  <Plus size={14} /> Add more
                 </button>
               </div>
             )}
-            <p style={{ color: "#bbb", fontSize: 11, margin: 0 }}>First image is used as the cover photo.</p>
+
+            {/* Toolbar: Media Library + Paste URL */}
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <button type="button" onClick={() => setMediaPicker(true)}
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 14px", background: NAVY_BG, border: `1px solid #d0cef0`, borderRadius: 10, cursor: "pointer", color: NAVY, fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" }}>
+                <ImageIcon size={13} /> Pick from Media Library
+              </button>
+              <div style={{ display: "flex", flex: 1, gap: 6 }}>
+                <input
+                  style={{ ...inp, flex: 1 }}
+                  value={urlInput}
+                  onChange={(e) => setUrlInput(e.target.value)}
+                  placeholder="Or paste an image URL…"
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); if (urlInput.trim()) { form.addImage(urlInput.trim()); setUrlInput(""); } } }}
+                />
+                {urlInput.trim() && (
+                  <button type="button" onClick={() => { form.addImage(urlInput.trim()); setUrlInput(""); }}
+                    style={{ padding: "9px 14px", background: "#f5f5f3", border: "1px solid #e8e8e4", borderRadius: 10, cursor: "pointer", color: "#555", fontSize: 12, whiteSpace: "nowrap" }}>
+                    Add
+                  </button>
+                )}
+              </div>
+            </div>
+            <p style={{ color: "#bbb", fontSize: 11, margin: 0 }}>First image is the cover photo. Uploaded images are saved to ABODE Media.</p>
           </Section>
 
           {/* AMENITIES */}
