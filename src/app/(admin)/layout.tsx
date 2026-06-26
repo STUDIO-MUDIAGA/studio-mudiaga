@@ -141,9 +141,9 @@ function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 
       {/* Search — centered */}
       <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
-        <div style={{ width: "100%", maxWidth: 420, display: "flex", alignItems: "center", gap: 8, background: "#f7f7f5", border: "1px solid #ebebeb", borderRadius: 24, padding: "9px 16px" }}>
-          <Search size={13} color="#ccc" />
-          <input placeholder="Search shortlets, orders, users…" style={{ background: "none", border: "none", outline: "none", fontSize: 13, color: "#555", flex: 1 }} />
+        <div style={{ width: "100%", maxWidth: 320, display: "flex", alignItems: "center", gap: 8, background: "#f7f7f5", border: "1px solid #ebebeb", borderRadius: 10, padding: "7px 12px" }}>
+          <Search size={12} color="#ccc" />
+          <input placeholder="Search…" style={{ background: "none", border: "none", outline: "none", fontSize: 12, color: "#555", flex: 1 }} />
         </div>
       </div>
 
