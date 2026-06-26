@@ -62,6 +62,7 @@ export default function PropertyDetailPage() {
   const [saved, setSaved] = useState(false);
   const [requesting, setRequesting] = useState(false);
   const [requested, setRequested] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`/api/admin/shortlets/${id}`)
@@ -69,6 +70,44 @@ export default function PropertyDetailPage() {
       .then((d) => { setShortlet(d); setGuests(Math.min(2, d.guests)); setLoading(false); })
       .catch(() => setLoading(false));
   }, [id]);
+
+  // Load saved state from localStorage
+  useEffect(() => {
+    try {
+      const favs: string[] = JSON.parse(localStorage.getItem("abode_favourites") ?? "[]");
+      setSaved(favs.includes(id));
+    } catch { /* ignore */ }
+  }, [id]);
+
+  function showToast(msg: string) {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2800);
+  }
+
+  function toggleSaved() {
+    try {
+      const favs: string[] = JSON.parse(localStorage.getItem("abode_favourites") ?? "[]");
+      const next = saved ? favs.filter((f) => f !== id) : [...favs, id];
+      localStorage.setItem("abode_favourites", JSON.stringify(next));
+      setSaved(!saved);
+      showToast(saved ? "Removed from saved" : "Saved to your favourites");
+    } catch { /* ignore */ }
+  }
+
+  async function handleShare() {
+    const url = window.location.href;
+    const title = shortlet?.title ?? "ABODE Property";
+    const text = `Check out ${title} on Studio Mudiaga ABODE`;
+    if (navigator.share) {
+      try { await navigator.share({ title, text, url }); return; } catch { /* user cancelled */ return; }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast("Link copied to clipboard");
+    } catch {
+      showToast("Copy this link: " + url);
+    }
+  }
 
   if (loading) {
     return (
@@ -184,10 +223,10 @@ export default function PropertyDetailPage() {
             </div>
             {/* Save + Share */}
             <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-              <button onClick={() => setSaved((s) => !s)} style={{ width: 38, height: 38, borderRadius: "50%", background: "#fff", border: "1px solid #e8e8e4", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+              <button onClick={toggleSaved} title={saved ? "Remove from saved" : "Save property"} style={{ width: 38, height: 38, borderRadius: "50%", background: saved ? "#fdf0eb" : "#fff", border: `1px solid ${saved ? ORANGE + "44" : "#e8e8e4"}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.15s" }}>
                 <Heart size={15} fill={saved ? ORANGE : "none"} color={saved ? ORANGE : "#aaa"} />
               </button>
-              <button style={{ width: 38, height: 38, borderRadius: "50%", background: "#fff", border: "1px solid #e8e8e4", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+              <button onClick={handleShare} title="Share this property" style={{ width: 38, height: 38, borderRadius: "50%", background: "#fff", border: "1px solid #e8e8e4", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                 <Share2 size={15} color="#aaa" />
               </button>
             </div>
@@ -466,6 +505,17 @@ export default function PropertyDetailPage() {
           </div>
         </>
       )}
+
+      {/* Toast */}
+      <div style={{
+        position: "fixed", bottom: 28, left: "50%", transform: `translateX(-50%) translateY(${toast ? "0" : "12px"})`,
+        background: "#0a0a0a", color: "#fff", borderRadius: 12, padding: "11px 20px",
+        fontSize: 13, fontWeight: 500, whiteSpace: "nowrap", zIndex: 300,
+        opacity: toast ? 1 : 0, transition: "opacity 0.2s, transform 0.2s",
+        pointerEvents: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.25)",
+      }}>
+        {toast}
+      </div>
 
       <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
     </div>
