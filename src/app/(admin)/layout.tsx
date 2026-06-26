@@ -89,7 +89,7 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
                 <button
                   onClick={() => toggleExpand(href)}
                   style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: active ? NAVY_BG : "transparent", color: active ? NAVY : "#888", fontSize: 13, fontWeight: active ? 600 : 400, border: "none", cursor: "pointer", textAlign: "left" }}
-                  onMouseOver={(e) => { if (!active) { e.currentTarget.style.background = "#f8f8f8"; e.currentTarget.style.color = "#333"; } }}
+                  onMouseOver={(e) => { if (!active) { e.currentTarget.style.background = "#f0f0f2"; e.currentTarget.style.color = "#333"; } }}
                   onMouseOut={(e) => { if (!active) { e.currentTarget.style.background = active ? NAVY_BG : "transparent"; e.currentTarget.style.color = active ? NAVY : "#888"; } }}
                 >
                   <Icon size={15} style={{ flexShrink: 0, color: active ? NAVY : "#bbb" }} />
@@ -106,7 +106,7 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
                           href={ch}
                           onClick={onNav}
                           style={{ display: "flex", alignItems: "center", gap: 9, padding: "8px 10px", borderRadius: 8, textDecoration: "none", fontSize: 12, fontWeight: childActive ? 600 : 400, marginBottom: 1, background: childActive ? NAVY_BG : "transparent", color: childActive ? NAVY : "#999" }}
-                          onMouseOver={(e) => { if (!childActive) { e.currentTarget.style.background = "#f8f8f8"; e.currentTarget.style.color = "#333"; } }}
+                          onMouseOver={(e) => { if (!childActive) { e.currentTarget.style.background = "#f0f0f2"; e.currentTarget.style.color = "#333"; } }}
                           onMouseOut={(e) => { if (!childActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#999"; } }}
                         >
                           <CIcon size={13} style={{ flexShrink: 0, color: childActive ? NAVY : "#ccc" }} />
@@ -126,7 +126,7 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
               href={href}
               onClick={onNav}
               style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, textDecoration: "none", fontSize: 13, fontWeight: active ? 600 : 400, marginBottom: 2, background: active ? NAVY_BG : "transparent", color: active ? NAVY : "#888" }}
-              onMouseOver={(e) => { if (!active) { e.currentTarget.style.background = "#f8f8f8"; e.currentTarget.style.color = "#333"; } }}
+              onMouseOver={(e) => { if (!active) { e.currentTarget.style.background = "#f0f0f2"; e.currentTarget.style.color = "#333"; } }}
               onMouseOut={(e) => { if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#888"; } }}
             >
               <Icon size={15} style={{ flexShrink: 0, color: active ? NAVY : "#bbb" }} />
@@ -139,14 +139,14 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
       {/* Bottom section */}
       <div style={{ padding: "12px", borderTop: "1px solid #f0f0f0", flexShrink: 0 }}>
         <Link href="/admin/settings" style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, textDecoration: "none", fontSize: 13, color: "#888", marginBottom: 2 }}
-          onMouseOver={(e) => { e.currentTarget.style.background = "#f8f8f8"; }}
+          onMouseOver={(e) => { e.currentTarget.style.background = "#f0f0f2"; }}
           onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; }}
         >
           <Settings size={15} color="#bbb" />
           Settings
         </Link>
         <button onClick={handleSignOut} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "none", border: "none", color: "#888", fontSize: 13, cursor: "pointer", textAlign: "left", marginBottom: 8 }}
-          onMouseOver={(e) => { e.currentTarget.style.background = "#f8f8f8"; }}
+          onMouseOver={(e) => { e.currentTarget.style.background = "#f0f0f2"; }}
           onMouseOut={(e) => { e.currentTarget.style.background = "none"; }}
         >
           <LogOut size={15} color="#bbb" />
@@ -154,7 +154,7 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
         </button>
 
         {/* User profile */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 12, background: "#fafaf9", border: "1px solid #f0f0f0" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 12, background: "#f2f2f4", border: "1px solid #f0f0f0" }}>
           <div style={{ width: 32, height: 32, borderRadius: "50%", background: NAVY_BG, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <span style={{ color: NAVY, fontSize: 12, fontWeight: 700 }}>{user?.email?.[0]?.toUpperCase()}</span>
           </div>
@@ -203,7 +203,7 @@ function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 
       {/* Search — centered */}
       <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
-        <div style={{ width: "100%", maxWidth: 320, display: "flex", alignItems: "center", gap: 8, background: "#f7f7f5", border: "1px solid #ebebeb", borderRadius: 10, padding: "7px 12px" }}>
+        <div style={{ width: "100%", maxWidth: 320, display: "flex", alignItems: "center", gap: 8, background: "#f2f2f4", border: "1px solid #ebebeb", borderRadius: 10, padding: "7px 12px" }}>
           <Search size={12} color="#ccc" />
           <input placeholder="Search…" style={{ background: "none", border: "none", outline: "none", fontSize: 12, color: "#555", flex: 1 }} />
         </div>
@@ -245,7 +245,7 @@ function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
                     href={href}
                     onClick={() => setDropdownOpen(false)}
                     style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, textDecoration: "none", color: "#555", fontSize: 13 }}
-                    onMouseOver={(e) => { e.currentTarget.style.background = "#f7f7f5"; }}
+                    onMouseOver={(e) => { e.currentTarget.style.background = "#f2f2f4"; }}
                     onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; }}
                   >
                     <Icon size={14} color="#bbb" />
@@ -276,7 +276,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f7f7f5", fontFamily: "var(--font-dm-sans), system-ui, sans-serif" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#f2f2f4", fontFamily: "var(--font-dm-sans), system-ui, sans-serif" }}>
       {/* Desktop sidebar */}
       <div style={{ display: "none" }} className="lg-sidebar">
         <style>{`@media(min-width:1024px){.lg-sidebar{display:flex!important}}`}</style>
