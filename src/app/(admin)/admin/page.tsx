@@ -40,10 +40,10 @@ const STATUS: Record<string, { bg: string; color: string }> = {
 type Stats = { shortlets: number; furniture: number; bookings: number; users: number };
 
 const CARDS = [
-  { label: "Active Shortlets", key: "shortlets" as const, icon: Building2,    accent: NAVY,      bg: NAVY_BG,   trend: "+12%", sub: "vs last month", tip: "Total shortlet properties currently listed as available on ABODE." },
-  { label: "Furniture Items",  key: "furniture"  as const, icon: Sofa,         accent: "#c46442", bg: "#fdf0eb", trend: "+5%",  sub: "vs last month", tip: "Total furniture pieces in the MUDRES catalogue, including out-of-stock items." },
-  { label: "Total Bookings",   key: "bookings"   as const, icon: CalendarDays, accent: "#1e56d6", bg: "#e9f0fd", trend: "+8%",  sub: "vs last month", tip: "All shortlet booking requests received, across all statuses." },
-  { label: "Registered Users", key: "users"      as const, icon: Users,        accent: "#15803d", bg: "#e9fdf0", trend: "+6%",  sub: "vs last month", tip: "Total customer accounts created via signup or Google OAuth." },
+  { label: "Active Shortlets", key: "shortlets" as const, icon: Building2,    accent: NAVY,      bg: NAVY_BG,   trend: "+12%", sub: "vs last month", tip: "Live ABODE listings" },
+  { label: "Furniture Items",  key: "furniture"  as const, icon: Sofa,         accent: "#c46442", bg: "#fdf0eb", trend: "+5%",  sub: "vs last month", tip: "MUDRES catalogue total" },
+  { label: "Total Bookings",   key: "bookings"   as const, icon: CalendarDays, accent: "#1e56d6", bg: "#e9f0fd", trend: "+8%",  sub: "vs last month", tip: "All booking requests" },
+  { label: "Registered Users", key: "users"      as const, icon: Users,        accent: "#15803d", bg: "#e9fdf0", trend: "+6%",  sub: "vs last month", tip: "Customer accounts" },
 ];
 
 
