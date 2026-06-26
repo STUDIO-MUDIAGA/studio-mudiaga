@@ -21,6 +21,15 @@ type NavItem = { label: string; href: string; exact?: boolean; icon: React.Eleme
 const navItems: NavItem[] = [
   { label: "Dashboard", href: "/admin", exact: true, icon: LayoutDashboard },
   {
+    label: "Media", href: "/admin/media", icon: Images,
+    children: [
+      { label: "All Media",      href: "/admin/media",          icon: Images },
+      { label: "Homepage Media", href: "/admin/media/homepage", icon: Home },
+      { label: "MUDRES Media",   href: "/admin/media/mudres",   icon: Armchair },
+      { label: "ABODE Media",    href: "/admin/media/abode",    icon: Building2 },
+    ],
+  },
+  {
     label: "Shortlets", href: "/admin/shortlets", icon: Building2,
     children: [
       { label: "All Apartments",      href: "/admin/shortlets",             icon: List },
@@ -34,15 +43,6 @@ const navItems: NavItem[] = [
   { label: "Bookings",   href: "/admin/bookings",  icon: CalendarDays },
   { label: "Orders",     href: "/admin/orders",    icon: ShoppingBag },
   { label: "Users",      href: "/admin/users",     icon: Users },
-  {
-    label: "Media", href: "/admin/media", icon: Images,
-    children: [
-      { label: "All Media",      href: "/admin/media",          icon: Images },
-      { label: "Homepage Media", href: "/admin/media/homepage", icon: Home },
-      { label: "MUDRES Media",   href: "/admin/media/mudres",   icon: Armchair },
-      { label: "ABODE Media",    href: "/admin/media/abode",    icon: Building2 },
-    ],
-  },
   { label: "Analytics",  href: "/admin/analytics", icon: TrendingUp },
 ];
 
