@@ -164,7 +164,7 @@ export default function CategoriesPage() {
   );
 
   return (
-    <div style={{ maxWidth: 1100, display: "flex", gap: 24, alignItems: "flex-start" }}>
+    <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
       {/* ── Left: categories list ── */}
       <div style={{ flex: 1, minWidth: 0 }}>
         {/* Header */}
