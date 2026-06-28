@@ -7,6 +7,9 @@ import {
   ArrowLeft, TrendingUp, Star, Building2, MapPin,
   BedDouble, Users, BarChart2, Loader2, AlertCircle,
 } from "lucide-react";
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+} from "recharts";
 
 const NAVY = "#1e156d";
 const NAVY_BG = "#eeedf8";
@@ -111,7 +114,6 @@ export default function ShortletMetricsPage() {
   const { overview, byCity, byType, byPriceTier, byBedrooms, topRated, topAmenities, reviewsByMonth } = metrics;
   const maxCity = Math.max(...byCity.map((c) => c.count), 1);
   const maxType = Math.max(...byType.map((t) => t.count), 1);
-  const maxReviewMonth = Math.max(...reviewsByMonth.map((r) => r.count), 1);
 
   return (
     <div>
@@ -165,22 +167,36 @@ export default function ShortletMetricsPage() {
         {/* Review activity */}
         <Card title="Review Activity by Month">
           {reviewsByMonth.length > 0 ? (
-            <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 120 }}>
-              {reviewsByMonth.map((r) => {
-                const h = Math.max(Math.round((r.count / maxReviewMonth) * 100), 4);
-                return (
-                  <div key={r.month} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, minWidth: 0 }}>
-                    <span style={{ color: "#888", fontSize: 10, fontWeight: 600 }}>{r.count || ""}</span>
-                    <div style={{ width: "100%", height: `${h}%`, background: NAVY, borderRadius: "4px 4px 0 0", transition: "height 0.5s ease", minHeight: 4 }} />
-                    <span style={{ color: "#bbb", fontSize: 9, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", width: "100%", textAlign: "center" }}>
-                      {r.month.slice(0, 3)}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+            <>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 16 }}>
+                <span style={{ color: "#0a0a0a", fontSize: 28, fontWeight: 800, letterSpacing: "-1px", lineHeight: 1 }}>
+                  {reviewsByMonth.reduce((s, r) => s + r.count, 0)}
+                </span>
+                <span style={{ color: "#bbb", fontSize: 12 }}>total reviews</span>
+              </div>
+              <ResponsiveContainer width="100%" height={110}>
+                <AreaChart data={reviewsByMonth.map((r) => ({ month: r.month.slice(0, 3), count: r.count }))} margin={{ top: 4, right: 0, left: -28, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="reviewGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%"  stopColor={NAVY} stopOpacity={0.15} />
+                      <stop offset="100%" stopColor={NAVY} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} stroke="#f0f0ee" strokeDasharray="0" />
+                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#bbb" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: "#ccc" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip
+                    contentStyle={{ background: "#fff", border: "1px solid #ebebeb", borderRadius: 10, fontSize: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.07)" }}
+                    labelStyle={{ color: "#888", marginBottom: 2 }}
+                    itemStyle={{ color: NAVY, fontWeight: 700 }}
+                    formatter={(v) => [v, "reviews"]}
+                  />
+                  <Area type="monotone" dataKey="count" stroke={NAVY} strokeWidth={2} fill="url(#reviewGrad)" dot={{ fill: NAVY, r: 3, strokeWidth: 0 }} activeDot={{ r: 5, fill: NAVY }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </>
           ) : (
-            <p style={{ color: "#ccc", fontSize: 13, textAlign: "center", padding: "30px 0", margin: 0 }}>No review data yet</p>
+            <p style={{ color: "#ccc", fontSize: 13, textAlign: "center", padding: "40px 0", margin: 0 }}>No review data yet</p>
           )}
         </Card>
       </div>
