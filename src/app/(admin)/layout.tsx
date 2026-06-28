@@ -39,7 +39,16 @@ const navItems: NavItem[] = [
       { label: "Categories",          href: "/admin/shortlets/categories",  icon: Tag },
     ],
   },
-  { label: "Furniture",  href: "/admin/furniture", icon: Sofa },
+  {
+    label: "Furniture", href: "/admin/furniture", icon: Sofa,
+    children: [
+      { label: "All Items",    href: "/admin/furniture",             icon: List },
+      { label: "Add Item",     href: "/admin/furniture/new",         icon: Plus },
+      { label: "Orders",       href: "/admin/furniture/orders",      icon: ShoppingBag },
+      { label: "Metrics",      href: "/admin/furniture/metrics",     icon: BarChart2 },
+      { label: "Collections",  href: "/admin/furniture/collections", icon: Tag },
+    ],
+  },
   { label: "Bookings",   href: "/admin/bookings",  icon: CalendarDays },
   { label: "Orders",     href: "/admin/orders",    icon: ShoppingBag },
   { label: "Users",      href: "/admin/users",     icon: Users },
