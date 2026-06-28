@@ -143,7 +143,7 @@ export default function AboutSection() {
                 }}
               >
                 Studiomudiaga is a contemporary African design brand that
-                transforms both personal and professional spaces — blending
+                transforms both personal and professional spaces, blending
                 minimalism, culture, and soul into environments that function
                 beautifully and feel unforgettable.
               </p>
