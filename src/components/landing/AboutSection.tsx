@@ -90,8 +90,7 @@ export default function AboutSection() {
             }}
           >
             Defined by warmth,
-            <br />simplicity and
-            <br />intentional craft.
+            <br />simplicity and intentionality.
           </h2>
 
           {/* ── Divider ───────────────────────────────────────────── */}
