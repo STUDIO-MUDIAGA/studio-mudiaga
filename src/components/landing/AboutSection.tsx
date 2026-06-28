@@ -182,14 +182,16 @@ export default function AboutSection() {
             }}
           >
             {/* Left image — inset from left edge */}
-            <div style={{ paddingLeft: 28, position: "relative", overflow: "hidden" }}>
-              <Image
-                src="/IMG_1609.JPG"
-                alt="Studio Mudiaga interior"
-                fill
-                className="object-cover"
-                sizes="25vw"
-              />
+            <div style={{ paddingLeft: 28, height: "100%" }}>
+              <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
+                <Image
+                  src="/IMG_1609.JPG"
+                  alt="Studio Mudiaga interior"
+                  fill
+                  className="object-cover"
+                  sizes="25vw"
+                />
+              </div>
             </div>
 
             {/* Center text — aligned to bottom */}
