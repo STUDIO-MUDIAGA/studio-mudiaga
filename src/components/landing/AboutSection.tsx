@@ -41,124 +41,84 @@ export default function AboutSection() {
           overflow: "hidden",
         }}
       >
-        {/* ── Top: label + heading + learn more ────────────────── */}
-        <div
-          style={{
-            paddingLeft: 28,
-            paddingRight: 28,
-            paddingTop: "clamp(36px, 4vw, 56px)",
-            paddingBottom: "clamp(28px, 3vw, 48px)",
-          }}
-        >
-          <p
-            style={{
-              fontFamily: "var(--font-dm-sans)",
-              fontSize: 11,
-              letterSpacing: "0.25em",
-              textTransform: "uppercase",
-              color: "#0a0a0a",
-              marginBottom: "clamp(12px, 1.4vw, 20px)",
-            }}
-          >
-            Meet the Studio
-          </p>
-
-          <h2
-            style={{
-              fontFamily: "var(--font-playfair)",
-              fontSize: "clamp(28px, 3.8vw, 62px)",
-              fontWeight: 300,
-              lineHeight: 1.1,
-              color: "#0a0a0a",
-              maxWidth: 640,
-              marginBottom: "clamp(18px, 2vw, 30px)",
-            }}
-          >
-            Together, we shape homes rooted in
-            <br />simplicity and crafted with care.
-          </h2>
-
-          <a
-            href="#"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              fontFamily: "var(--font-dm-sans)",
-              fontSize: 13,
-              color: "#0a0a0a",
-              textDecoration: "underline",
-              textUnderlineOffset: 4,
-            }}
-          >
-            Learn more
-            <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
-              <path d="M1 5h12M8 1l5 4-5 4" stroke="#0a0a0a" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </a>
-        </div>
-
-        {/* ── Bottom: left photo | center text | right photo ───── */}
-        {/* Left image has paddingLeft to not touch screen edge.   */}
-        {/* Right image bleeds to right edge — no right padding.  */}
+        {/*
+          Outer grid: 2 columns
+            col 1 (60%): top text row + bottom [left-img + center-text] row
+            col 2 (40%): right image spanning BOTH rows — full section height
+        */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1.5fr 1.4fr",
-            minHeight: "60vh",
+            gridTemplateColumns: "3fr 2fr",
+            gridTemplateRows: "auto minmax(52vh, 1fr)",
+            minHeight: "100vh",
           }}
         >
-          {/* Left image — inset from left edge */}
-          <div style={{ paddingLeft: 28, paddingBottom: 0 }}>
-            <div style={{ position: "relative", width: "100%", height: "100%" }}>
-              <Image
-                src="/IMG_1609.JPG"
-                alt="Studio Mudiaga interior"
-                fill
-                className="object-cover"
-                sizes="25vw"
-              />
-            </div>
-          </div>
-
-          {/* Center — body copy, aligned to bottom */}
+          {/* ── Row 1 Col 1: label + heading + learn more ──────── */}
           <div
             style={{
-              padding: "clamp(28px, 3vw, 48px) clamp(28px, 3vw, 52px)",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "flex-end",
-              gap: 24,
+              gridColumn: 1,
+              gridRow: 1,
+              padding: "clamp(36px, 4vw, 56px) clamp(28px, 3vw, 48px)",
             }}
           >
             <p
               style={{
                 fontFamily: "var(--font-dm-sans)",
-                fontSize: "clamp(12px, 1vw, 15px)",
-                lineHeight: 1.85,
-                color: "rgba(10,10,10,0.65)",
+                fontSize: 11,
+                letterSpacing: "0.25em",
+                textTransform: "uppercase",
+                color: "#0a0a0a",
+                marginBottom: "clamp(12px, 1.4vw, 20px)",
               }}
             >
-              Studiomudiaga is a contemporary African design brand that
-              transforms both personal and professional spaces, blending
-              minimalism, culture, and soul into environments that function
-              beautifully and feel unforgettable.
+              Meet the Studio
             </p>
-            <p
+
+            <h2
               style={{
-                fontFamily: "var(--font-dm-sans)",
-                fontSize: "clamp(12px, 1vw, 15px)",
-                lineHeight: 1.85,
-                color: "rgba(10,10,10,0.65)",
+                fontFamily: "var(--font-playfair)",
+                fontSize: "clamp(28px, 3.8vw, 62px)",
+                fontWeight: 300,
+                lineHeight: 1.1,
+                color: "#0a0a0a",
+                maxWidth: 640,
+                marginBottom: "clamp(18px, 2vw, 30px)",
               }}
             >
-              Founded by Mudiaga, the brand emerged from a personal journey
-              of longing for spaces that reflect clarity, identity, and intention.
-            </p>
+              Together, we shape homes rooted in
+              <br />simplicity and crafted with care.
+            </h2>
+
+            <a
+              href="#"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                fontFamily: "var(--font-dm-sans)",
+                fontSize: 13,
+                color: "#0a0a0a",
+                textDecoration: "underline",
+                textUnderlineOffset: 4,
+              }}
+            >
+              Learn more
+              <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+                <path d="M1 5h12M8 1l5 4-5 4" stroke="#0a0a0a" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </a>
           </div>
 
-          {/* Right — tall image, full bleed to right edge */}
-          <div style={{ position: "relative", overflow: "hidden" }}>
+          {/* ── Col 2: right image spanning both rows ───────────── */}
+          <div
+            style={{
+              gridColumn: 2,
+              gridRow: "1 / 3",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
             <Image
               src="/IMG_1672.JPG"
               alt="Mudiaga — Founder"
@@ -207,6 +167,63 @@ export default function AboutSection() {
               >
                 Mudiaga | Founder
               </span>
+            </div>
+          </div>
+
+          {/* ── Row 2 Col 1: left image + center text ───────────── */}
+          <div
+            style={{
+              gridColumn: 1,
+              gridRow: 2,
+              display: "grid",
+              gridTemplateColumns: "1fr 1.5fr",
+            }}
+          >
+            {/* Left image — inset from left edge */}
+            <div style={{ paddingLeft: 28, position: "relative", overflow: "hidden" }}>
+              <Image
+                src="/IMG_1609.JPG"
+                alt="Studio Mudiaga interior"
+                fill
+                className="object-cover"
+                sizes="25vw"
+              />
+            </div>
+
+            {/* Center text — aligned to bottom */}
+            <div
+              style={{
+                padding: "clamp(28px, 3vw, 48px) clamp(28px, 3vw, 52px)",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "flex-end",
+                gap: 24,
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: "var(--font-dm-sans)",
+                  fontSize: "clamp(12px, 1vw, 15px)",
+                  lineHeight: 1.85,
+                  color: "rgba(10,10,10,0.65)",
+                }}
+              >
+                Studiomudiaga is a contemporary African design brand that
+                transforms both personal and professional spaces, blending
+                minimalism, culture, and soul into environments that function
+                beautifully and feel unforgettable.
+              </p>
+              <p
+                style={{
+                  fontFamily: "var(--font-dm-sans)",
+                  fontSize: "clamp(12px, 1vw, 15px)",
+                  lineHeight: 1.85,
+                  color: "rgba(10,10,10,0.65)",
+                }}
+              >
+                Founded by Mudiaga, the brand emerged from a personal journey
+                of longing for spaces that reflect clarity, identity, and intention.
+              </p>
             </div>
           </div>
         </div>
