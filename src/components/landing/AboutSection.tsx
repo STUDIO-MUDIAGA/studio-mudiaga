@@ -116,7 +116,7 @@ export default function AboutSection() {
             style={{
               gridColumn: 2,
               gridRow: "1 / 3",
-              padding: "28px 28px 0 0",
+              padding: "100px 28px 0 0",
             }}
           >
             <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
