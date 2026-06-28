@@ -10,7 +10,7 @@ import {
   Settings, Bell, Search, ChevronDown, Tag, BarChart2, Plus, List,
   Images, Home, Armchair,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const NAVY = "#1e156d";
 const NAVY_BG = "#eeedf8";
@@ -272,62 +272,37 @@ function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   );
 }
 
-function AdminGuard({ children }: { children: React.ReactNode }) {
-  const { user, profile, loading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (loading) return;
-    if (!user || profile?.role !== "admin") {
-      router.replace("/admin/login");
-    }
-  }, [user, profile, loading, router]);
-
-  if (loading || !user || profile?.role !== "admin") {
-    return (
-      <div style={{ minHeight: "100vh", background: "#0c0c0c", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ width: 28, height: 28, border: "2px solid #fbbf2444", borderTopColor: "#fbbf24", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-        <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
-      </div>
-    );
-  }
-
-  return <>{children}</>;
-}
-
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <AdminGuard>
-      <div style={{ display: "flex", minHeight: "100vh", background: "#f2f2f4", fontFamily: "var(--font-dm-sans), system-ui, sans-serif" }}>
-        {/* Desktop sidebar */}
-        <div style={{ display: "none" }} className="lg-sidebar">
-          <style>{`@media(min-width:1024px){.lg-sidebar{display:flex!important}}`}</style>
-          <Sidebar />
-        </div>
-
-        {/* Mobile overlay */}
-        {sidebarOpen && (
-          <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex" }}>
-            <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.3)" }} onClick={() => setSidebarOpen(false)} />
-            <div style={{ position: "relative", zIndex: 10 }}>
-              <Sidebar onNav={() => setSidebarOpen(false)} />
-            </div>
-            <button onClick={() => setSidebarOpen(false)} style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", color: "#333", cursor: "pointer" }}>
-              <X size={20} />
-            </button>
-          </div>
-        )}
-
-        {/* Main */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-          <Topbar onMenuClick={() => setSidebarOpen(true)} />
-          <main style={{ flex: 1, padding: "32px 36px", overflowY: "auto" }}>
-            {children}
-          </main>
-        </div>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#f2f2f4", fontFamily: "var(--font-dm-sans), system-ui, sans-serif" }}>
+      {/* Desktop sidebar */}
+      <div style={{ display: "none" }} className="lg-sidebar">
+        <style>{`@media(min-width:1024px){.lg-sidebar{display:flex!important}}`}</style>
+        <Sidebar />
       </div>
-    </AdminGuard>
+
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex" }}>
+          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.3)" }} onClick={() => setSidebarOpen(false)} />
+          <div style={{ position: "relative", zIndex: 10 }}>
+            <Sidebar onNav={() => setSidebarOpen(false)} />
+          </div>
+          <button onClick={() => setSidebarOpen(false)} style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", color: "#333", cursor: "pointer" }}>
+            <X size={20} />
+          </button>
+        </div>
+      )}
+
+      {/* Main */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+        <Topbar onMenuClick={() => setSidebarOpen(true)} />
+        <main style={{ flex: 1, padding: "32px 36px", overflowY: "auto" }}>
+          {children}
+        </main>
+      </div>
+    </div>
   );
 }
