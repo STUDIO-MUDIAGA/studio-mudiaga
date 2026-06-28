@@ -6,16 +6,16 @@ import Image from "next/image";
 import { useNavTheme } from "@/context/NavTheme";
 
 const CAROUSEL = [
-  { src: "/IMG_1611.JPG", w: 260, h: 380 },
-  { src: "/IMG_1613.JPG", w: 380, h: 260 },
-  { src: "/IMG_1615.JPG", w: 240, h: 420 },
-  { src: "/IMG_1617.JPG", w: 400, h: 300 },
-  { src: "/IMG_1620.JPG", w: 260, h: 380 },
-  { src: "/IMG_1623.JPG", w: 360, h: 260 },
-  { src: "/IMG_1624.JPG", w: 240, h: 400 },
-  { src: "/IMG_1627.JPG", w: 380, h: 280 },
-  { src: "/IMG_1628.JPG", w: 260, h: 360 },
-  { src: "/IMG_1629.JPG", w: 420, h: 300 },
+  { src: "/IMG_1611.JPG", w: 360, h: 420 },
+  { src: "/IMG_1613.JPG", w: 520, h: 300 },
+  { src: "/IMG_1615.JPG", w: 340, h: 460 },
+  { src: "/IMG_1617.JPG", w: 560, h: 340 },
+  { src: "/IMG_1620.JPG", w: 360, h: 420 },
+  { src: "/IMG_1623.JPG", w: 500, h: 300 },
+  { src: "/IMG_1624.JPG", w: 340, h: 440 },
+  { src: "/IMG_1627.JPG", w: 520, h: 320 },
+  { src: "/IMG_1628.JPG", w: 360, h: 400 },
+  { src: "/IMG_1629.JPG", w: 560, h: 340 },
 ];
 const CAROUSEL_REPEATED = [...CAROUSEL, ...CAROUSEL];
 
@@ -262,7 +262,7 @@ export default function AboutSection() {
             className="about-carousel-track"
             style={{
               display: "flex",
-              gap: 0,
+              gap: 8,
               width: "max-content",
               alignItems: "flex-start",
             }}
