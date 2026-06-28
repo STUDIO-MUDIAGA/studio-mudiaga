@@ -106,7 +106,7 @@ export default function ShortletBookingsPage() {
   };
 
   return (
-    <div style={{ maxWidth: 1100 }}>
+    <div>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
         <Link href="/admin/shortlets" style={{ display: "flex", alignItems: "center", gap: 5, color: "#aaa", fontSize: 12, textDecoration: "none" }}>
