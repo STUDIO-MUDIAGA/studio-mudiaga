@@ -41,15 +41,13 @@ export default function AboutSection() {
           overflow: "hidden",
         }}
       >
-        {/* ── Top: label + heading + learn more ──────────────── */}
+        {/* ── Top: label + heading + learn more ────────────────── */}
         <div
           style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            paddingLeft: 48,
-            paddingRight: 64,
-            paddingTop: "clamp(48px, 5vw, 80px)",
-            paddingBottom: "clamp(32px, 3.5vw, 56px)",
+            paddingLeft: 28,
+            paddingRight: 28,
+            paddingTop: "clamp(36px, 4vw, 56px)",
+            paddingBottom: "clamp(28px, 3vw, 48px)",
           }}
         >
           <p
@@ -59,7 +57,7 @@ export default function AboutSection() {
               letterSpacing: "0.25em",
               textTransform: "uppercase",
               color: "#0a0a0a",
-              marginBottom: "clamp(14px, 1.6vw, 24px)",
+              marginBottom: "clamp(12px, 1.4vw, 20px)",
             }}
           >
             Meet the Studio
@@ -68,16 +66,16 @@ export default function AboutSection() {
           <h2
             style={{
               fontFamily: "var(--font-playfair)",
-              fontSize: "clamp(32px, 4.2vw, 70px)",
+              fontSize: "clamp(28px, 3.8vw, 62px)",
               fontWeight: 300,
-              lineHeight: 1.08,
+              lineHeight: 1.1,
               color: "#0a0a0a",
-              maxWidth: 700,
-              marginBottom: "clamp(20px, 2.2vw, 36px)",
+              maxWidth: 640,
+              marginBottom: "clamp(18px, 2vw, 30px)",
             }}
           >
-            Defined by warmth,
-            <br />simplicity and intentionality.
+            Together, we shape homes rooted in
+            <br />simplicity and crafted with care.
           </h2>
 
           <a
@@ -100,29 +98,33 @@ export default function AboutSection() {
           </a>
         </div>
 
-        {/* ── Bottom: left photo | center text | right photo ──── */}
+        {/* ── Bottom: left photo | center text | right photo ───── */}
+        {/* Left image has paddingLeft to not touch screen edge.   */}
+        {/* Right image bleeds to right edge — no right padding.  */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1.4fr 1.6fr",
-            minHeight: "58vh",
+            gridTemplateColumns: "1fr 1.5fr 1.4fr",
+            minHeight: "60vh",
           }}
         >
-          {/* Left — portrait room photo */}
-          <div style={{ position: "relative", overflow: "hidden" }}>
-            <Image
-              src="/IMG_1609.JPG"
-              alt="Studio Mudiaga interior"
-              fill
-              className="object-cover"
-              sizes="25vw"
-            />
+          {/* Left image — inset from left edge */}
+          <div style={{ paddingLeft: 28, paddingBottom: 0 }}>
+            <div style={{ position: "relative", width: "100%", height: "100%" }}>
+              <Image
+                src="/IMG_1609.JPG"
+                alt="Studio Mudiaga interior"
+                fill
+                className="object-cover"
+                sizes="25vw"
+              />
+            </div>
           </div>
 
           {/* Center — body copy, aligned to bottom */}
           <div
             style={{
-              padding: "clamp(32px, 3.5vw, 56px) clamp(28px, 3vw, 52px)",
+              padding: "clamp(28px, 3vw, 48px) clamp(28px, 3vw, 52px)",
               display: "flex",
               flexDirection: "column",
               justifyContent: "flex-end",
@@ -155,7 +157,7 @@ export default function AboutSection() {
             </p>
           </div>
 
-          {/* Right — tall image with founder tag */}
+          {/* Right — tall image, full bleed to right edge */}
           <div style={{ position: "relative", overflow: "hidden" }}>
             <Image
               src="/IMG_1672.JPG"
