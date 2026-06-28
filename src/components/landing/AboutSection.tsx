@@ -5,38 +5,6 @@ import { motion, useScroll, useTransform, useSpring, useMotionValueEvent, useInV
 import { useEffect } from "react";
 import { useNavTheme } from "@/context/NavTheme";
 
-const PILLARS = [
-  {
-    icon: (
-      <svg width="72" height="44" viewBox="0 0 72 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M4 34 C10 18 20 38 30 26 C38 16 44 32 54 22 C60 16 64 24 68 20" stroke="#0a0a0a" strokeWidth="1.1" strokeLinecap="round" fill="none"/>
-        <path d="M4 34 C6 30 4 28 7 26" stroke="#0a0a0a" strokeWidth="1.1" strokeLinecap="round" fill="none"/>
-      </svg>
-    ),
-    title: "Culturally Grounded",
-    body: "Great design draws from history, identity, and the rhythms of African life. Every space we create is an act of cultural expression, not just decoration.",
-  },
-  {
-    icon: (
-      <svg width="72" height="44" viewBox="0 0 72 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M14 36 Q14 10 36 10 Q58 10 58 36" stroke="#0a0a0a" strokeWidth="1.1" strokeLinecap="round" fill="none"/>
-        <line x1="8" y1="36" x2="64" y2="36" stroke="#0a0a0a" strokeWidth="1.1" strokeLinecap="round"/>
-      </svg>
-    ),
-    title: "Artistic & Intentional",
-    body: "Every room has a story waiting to be told. We design with purpose and precision, layering meaning into every material, every form, and every finish until the space speaks for itself.",
-  },
-  {
-    icon: (
-      <svg width="72" height="44" viewBox="0 0 72 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M6 30 C16 30 26 12 44 20 C54 24 62 18 66 14" stroke="#0a0a0a" strokeWidth="1.1" strokeLinecap="round" fill="none"/>
-        <path d="M58 10 L66 14 L60 20" stroke="#0a0a0a" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-      </svg>
-    ),
-    title: "Client-Centered",
-    body: "Your vision is our starting point. We listen deeply, collaborate closely, and translate who you are into environments that feel personal, elevated, and unmistakably yours.",
-  },
-];
 
 export default function AboutSection() {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -162,47 +130,6 @@ export default function AboutSection() {
             </div>
           </div>
 
-          {/* ── Divider ───────────────────────────────────────────── */}
-          <div style={{ borderTop: "1px solid rgba(10,10,10,0.12)", marginBottom: "clamp(28px, 3vw, 48px)" }} />
-
-          {/* ── Three pillars ─────────────────────────────────────── */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "clamp(24px, 3vw, 48px)",
-              paddingBottom: "clamp(48px, 5vw, 80px)",
-            }}
-          >
-            {PILLARS.map((p) => (
-              <div key={p.title} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                <div style={{ height: 40 }}>{p.icon}</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  <h3
-                    style={{
-                      fontFamily: "var(--font-dm-sans)",
-                      fontSize: "clamp(12px, 0.9vw, 15px)",
-                      fontWeight: 500,
-                      letterSpacing: "0.01em",
-                      color: "#0a0a0a",
-                    }}
-                  >
-                    {p.title}
-                  </h3>
-                  <p
-                    style={{
-                      fontFamily: "var(--font-dm-sans)",
-                      fontSize: "clamp(11px, 0.8vw, 13px)",
-                      lineHeight: 1.8,
-                      color: "rgba(10,10,10,0.55)",
-                    }}
-                  >
-                    {p.body}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </motion.section>
     </div>
