@@ -169,17 +169,17 @@ export default function CategoriesPage() {
       <div style={{ flex: 1, minWidth: 0 }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
-          <Link href="/admin/shortlets" style={{ display: "flex", alignItems: "center", gap: 5, color: "#aaa", fontSize: 12, textDecoration: "none" }}>
+          <Link href="/admin/shortlets" style={{ display: "flex", alignItems: "center", gap: 5, color: "#aaa", fontSize: 12, textDecoration: "none", flexShrink: 0 }}>
             <ArrowLeft size={12} /> Shortlets
           </Link>
-          <div style={{ width: 1, height: 16, background: "#e8e8e4" }} />
-          <div style={{ flex: 1 }}>
-            <h1 style={{ color: "#0a0a0a", fontSize: 20, fontWeight: 700, margin: 0 }}>Categories</h1>
-            <p style={{ color: "#aaa", fontSize: 12, margin: "2px 0 0" }}>{categories.length} categories · organise properties for guests</p>
+          <div style={{ width: 1, height: 16, background: "#e8e8e4", flexShrink: 0 }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ color: "#0a0a0a", fontSize: 20, fontWeight: 700, margin: 0, lineHeight: 1.2 }}>Categories</p>
+            <p style={{ color: "#bbb", fontSize: 12, margin: "3px 0 0" }}>{categories.length} categories · organise properties for guests</p>
           </div>
           <button
             onClick={openCreate}
-            style={{ display: "flex", alignItems: "center", gap: 7, background: NAVY, color: "#fff", border: "none", borderRadius: 10, padding: "9px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+            style={{ display: "flex", alignItems: "center", gap: 7, background: NAVY, color: "#fff", border: "none", borderRadius: 10, padding: "9px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}
           >
             <Plus size={14} /> New Category
           </button>
