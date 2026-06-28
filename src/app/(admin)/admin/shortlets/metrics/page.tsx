@@ -36,22 +36,22 @@ type Metrics = {
   reviewsByMonth: { month: string; count: number }[];
 };
 
-function StatCard({ icon: Icon, label, value, sub, accent, large }: {
+function StatCard({ icon: Icon, label, value, sub, accent }: {
   icon: React.ComponentType<{ size?: number; color?: string }>;
-  label: string; value: string | number; sub?: string; accent?: string; large?: boolean;
+  label: string; value: string | number; sub?: string; accent?: string;
 }) {
   const color = accent ?? NAVY;
   return (
-    <div style={{ background: "#fff", border: "1px solid #ebebeb", borderRadius: 18, padding: "22px 26px", display: "flex", flexDirection: "column", gap: 12 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span style={{ color: "#aaa", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>{label}</span>
-        <div style={{ width: 36, height: 36, borderRadius: 10, background: `${color}14`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Icon size={16} color={color} />
+    <div style={{ background: "#fff", border: "1px solid #ebebeb", borderRadius: 18, padding: "20px 20px 18px", display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+        <span style={{ color: "#aaa", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", lineHeight: 1.4 }}>{label}</span>
+        <div style={{ width: 30, height: 30, borderRadius: 8, background: `${color}12`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <Icon size={14} color={color} />
         </div>
       </div>
       <div>
-        <p style={{ color: "#0a0a0a", fontSize: large ? 36 : 30, fontWeight: 800, margin: "0 0 5px", lineHeight: 1, letterSpacing: "-1px" }}>{value}</p>
-        {sub && <p style={{ color: "#bbb", fontSize: 12, margin: 0 }}>{sub}</p>}
+        <p style={{ color: "#0a0a0a", fontSize: 26, fontWeight: 800, margin: "0 0 4px", lineHeight: 1, letterSpacing: "-0.5px" }}>{value}</p>
+        {sub && <p style={{ color: "#bbb", fontSize: 11, margin: 0, lineHeight: 1.4 }}>{sub}</p>}
       </div>
     </div>
   );
@@ -131,12 +131,12 @@ export default function ShortletMetricsPage() {
 
       {/* ── Row 1: 6 stat cards ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 14, marginBottom: 18 }}>
-        <StatCard icon={Building2} label="Total Listings" value={overview.total} sub={`${overview.available} live · ${overview.hidden} hidden`} large />
-        <StatCard icon={Star} label="Avg. Rating" value={overview.avgRating} sub={`${overview.totalReviews} reviews`} accent={ORANGE} large />
-        <StatCard icon={TrendingUp} label="Avg. Price / Night" value={`₦${overview.avgPrice.toLocaleString()}`} sub="Active listings" large />
-        <StatCard icon={Users} label="Total Reviews" value={overview.totalReviews} sub="Verified guests" accent={ORANGE} large />
-        <StatCard icon={BarChart2} label="Active Listings" value={overview.available} sub={`${Math.round((overview.available / overview.total) * 100)}% of portfolio`} large />
-        <StatCard icon={MapPin} label="Cities" value={byCity.length} sub={byCity.map((c) => c.city).join(" · ")} large />
+        <StatCard icon={Building2} label="Total Listings" value={overview.total} sub={`${overview.available} live · ${overview.hidden} hidden`} />
+        <StatCard icon={Star} label="Avg. Rating" value={overview.avgRating} sub={`${overview.totalReviews} reviews`} accent={ORANGE} />
+        <StatCard icon={TrendingUp} label="Avg. Price / Night" value={`₦${overview.avgPrice.toLocaleString()}`} sub="Active listings" />
+        <StatCard icon={Users} label="Total Reviews" value={overview.totalReviews} sub="Verified guests" accent={ORANGE} />
+        <StatCard icon={BarChart2} label="Active Listings" value={overview.available} sub={`${Math.round((overview.available / overview.total) * 100)}% of portfolio`} />
+        <StatCard icon={MapPin} label="Cities" value={byCity.length} sub={byCity.map((c) => c.city).join(" · ")} />
       </div>
 
       {/* ── Row 2: City + Type + Reviews by month ── */}
