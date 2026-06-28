@@ -5,6 +5,20 @@ import { motion, useScroll, useTransform, useSpring, useMotionValueEvent, useInV
 import Image from "next/image";
 import { useNavTheme } from "@/context/NavTheme";
 
+const CAROUSEL = [
+  { src: "/IMG_1611.JPG", w: 260, h: 380 },
+  { src: "/IMG_1613.JPG", w: 380, h: 260 },
+  { src: "/IMG_1615.JPG", w: 240, h: 420 },
+  { src: "/IMG_1617.JPG", w: 400, h: 300 },
+  { src: "/IMG_1620.JPG", w: 260, h: 380 },
+  { src: "/IMG_1623.JPG", w: 360, h: 260 },
+  { src: "/IMG_1624.JPG", w: 240, h: 400 },
+  { src: "/IMG_1627.JPG", w: 380, h: 280 },
+  { src: "/IMG_1628.JPG", w: 260, h: 360 },
+  { src: "/IMG_1629.JPG", w: 420, h: 300 },
+];
+const CAROUSEL_REPEATED = [...CAROUSEL, ...CAROUSEL];
+
 export default function AboutSection() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { setTheme } = useNavTheme();
@@ -229,6 +243,50 @@ export default function AboutSection() {
                 of longing for spaces that reflect clarity, identity, and intention.
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* ── Image carousel strip ─────────────────────────────── */}
+        <div style={{ overflow: "hidden", paddingTop: 48, paddingBottom: 48 }}>
+          <style>{`
+            @keyframes about-scroll {
+              from { transform: translateX(0); }
+              to   { transform: translateX(-50%); }
+            }
+            .about-carousel-track {
+              animation: about-scroll 36s linear infinite;
+              will-change: transform;
+            }
+          `}</style>
+          <div
+            className="about-carousel-track"
+            style={{
+              display: "flex",
+              gap: 14,
+              width: "max-content",
+              alignItems: "center",
+            }}
+          >
+            {CAROUSEL_REPEATED.map((img, i) => (
+              <div
+                key={i}
+                style={{
+                  flexShrink: 0,
+                  position: "relative",
+                  width: img.w,
+                  height: img.h,
+                  overflow: "hidden",
+                }}
+              >
+                <Image
+                  src={img.src}
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes="30vw"
+                />
+              </div>
+            ))}
           </div>
         </div>
       </motion.section>
