@@ -201,7 +201,7 @@ export default function AdminLoginPage() {
                 <div style={{ textAlign: "center", marginBottom: "32px" }}>
                   <h2 style={{ color: "#fff", fontSize: "22px", fontWeight: 700, marginBottom: "6px" }}>Admin Sign In</h2>
                   <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "13px" }}>
-                    Enter your email and we'll send you a sign-in code.
+                    Authorised admin accounts only.
                   </p>
                 </div>
 
