@@ -115,58 +115,59 @@ export default function AboutSection() {
             style={{
               gridColumn: 2,
               gridRow: "1 / 3",
-              position: "relative",
-              overflow: "hidden",
+              padding: "28px 28px 0 0",
             }}
           >
-            <Image
-              src="/IMG_1672.JPG"
-              alt="Mudiaga — Founder"
-              fill
-              className="object-cover"
-              sizes="40vw"
-            />
-            {/* + marker */}
-            <div
-              style={{
-                position: "absolute",
-                top: 20,
-                left: 20,
-                color: "white",
-                fontSize: 26,
-                fontWeight: 200,
-                lineHeight: 1,
-                fontFamily: "var(--font-dm-sans)",
-              }}
-            >
-              +
-            </div>
-            {/* MUDIAGA | FOUNDER — vertical right edge */}
-            <div
-              style={{
-                position: "absolute",
-                right: 0,
-                top: 0,
-                bottom: 0,
-                width: 28,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <span
+            <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
+              <Image
+                src="/IMG_1672.JPG"
+                alt="Mudiaga — Founder"
+                fill
+                className="object-cover"
+                sizes="40vw"
+              />
+              {/* + marker */}
+              <div
                 style={{
+                  position: "absolute",
+                  top: 20,
+                  left: 20,
+                  color: "white",
+                  fontSize: 26,
+                  fontWeight: 200,
+                  lineHeight: 1,
                   fontFamily: "var(--font-dm-sans)",
-                  fontSize: 9,
-                  letterSpacing: "0.22em",
-                  textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.75)",
-                  transform: "rotate(90deg)",
-                  whiteSpace: "nowrap",
                 }}
               >
-                Mudiaga | Founder
-              </span>
+                +
+              </div>
+              {/* MUDIAGA | FOUNDER — vertical right edge */}
+              <div
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: 28,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "var(--font-dm-sans)",
+                    fontSize: 9,
+                    letterSpacing: "0.22em",
+                    textTransform: "uppercase",
+                    color: "rgba(255,255,255,0.75)",
+                    transform: "rotate(90deg)",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Mudiaga | Founder
+                </span>
+              </div>
             </div>
           </div>
 
