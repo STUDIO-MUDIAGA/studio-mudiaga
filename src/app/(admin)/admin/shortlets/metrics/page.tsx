@@ -190,15 +190,40 @@ export default function ShortletMetricsPage() {
 
         {/* Price Tiers */}
         <Card title="Price Tiers">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-            {byPriceTier.map((t, i) => (
-              <div key={t.label} style={{ background: "#f8f8f6", borderRadius: 12, padding: "16px 18px", borderLeft: `3px solid ${TIER_COLORS[i]}` }}>
-                <p style={{ color: "#0a0a0a", fontSize: 24, fontWeight: 800, margin: "0 0 4px", lineHeight: 1 }}>{t.count}</p>
-                <p style={{ color: "#555", fontSize: 12, fontWeight: 600, margin: "0 0 2px" }}>{t.label}</p>
-                <p style={{ color: "#bbb", fontSize: 10, margin: 0 }}>{t.range}</p>
+          {(() => {
+            const total = byPriceTier.reduce((s, t) => s + t.count, 0) || 1;
+            const TIER_CFG = [
+              { color: "#94a3b8", bg: "#f1f5f9", label_color: "#64748b" },
+              { color: ORANGE,    bg: "#fdf0eb", label_color: ORANGE },
+              { color: NAVY,      bg: NAVY_BG,   label_color: NAVY },
+              { color: "#0a0a0a", bg: "#f0f0f0", label_color: "#0a0a0a" },
+            ];
+            return (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {byPriceTier.map((t, i) => {
+                  const cfg = TIER_CFG[i] ?? TIER_CFG[0];
+                  const pct = Math.round((t.count / total) * 100);
+                  return (
+                    <div key={t.label} style={{ background: cfg.bg, borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14 }}>
+                      {/* Big count */}
+                      <span style={{ color: cfg.color, fontSize: 30, fontWeight: 900, lineHeight: 1, letterSpacing: "-1px", flexShrink: 0, minWidth: 36 }}>{t.count}</span>
+                      {/* Label + range */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ color: cfg.label_color, fontSize: 12, fontWeight: 700, margin: "0 0 1px" }}>{t.label}</p>
+                        <p style={{ color: "#aaa", fontSize: 10, margin: "0 0 6px" }}>{t.range}</p>
+                        {/* Share bar */}
+                        <div style={{ height: 3, background: `${cfg.color}22`, borderRadius: 3, overflow: "hidden" }}>
+                          <div style={{ width: `${pct}%`, height: "100%", background: cfg.color, borderRadius: 3, transition: "width 0.6s ease" }} />
+                        </div>
+                      </div>
+                      {/* Percentage */}
+                      <span style={{ color: cfg.color, fontSize: 13, fontWeight: 700, flexShrink: 0 }}>{pct}%</span>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
-          </div>
+            );
+          })()}
         </Card>
 
         {/* Bedroom Distribution */}
