@@ -262,9 +262,9 @@ export default function AboutSection() {
             className="about-carousel-track"
             style={{
               display: "flex",
-              gap: 14,
+              gap: 0,
               width: "max-content",
-              alignItems: "center",
+              alignItems: "flex-start",
             }}
           >
             {CAROUSEL_REPEATED.map((img, i) => (
