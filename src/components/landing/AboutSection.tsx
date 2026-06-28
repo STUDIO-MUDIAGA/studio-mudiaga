@@ -60,6 +60,7 @@ export default function AboutSection() {
               gridColumn: 1,
               gridRow: 1,
               padding: "clamp(36px, 4vw, 56px) clamp(28px, 3vw, 48px)",
+              minHeight: "52vh",
             }}
           >
             <p
