@@ -72,10 +72,10 @@ function BarRow({ label, count, max, color, pct }: { label: string; count: numbe
   );
 }
 
-function Card({ title, children, span2 }: { title: string; children: React.ReactNode; span2?: boolean }) {
+function Card({ title, children, span2, fill }: { title: string; children: React.ReactNode; span2?: boolean; fill?: boolean }) {
   return (
-    <div style={{ background: "#fff", border: "1px solid #ebebeb", borderRadius: 18, padding: "22px 26px", gridColumn: span2 ? "span 2" : undefined }}>
-      <p style={{ color: "#bbb", fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", margin: "0 0 20px" }}>{title}</p>
+    <div style={{ background: "#fff", border: "1px solid #ebebeb", borderRadius: 18, padding: "22px 26px", gridColumn: span2 ? "span 2" : undefined, display: fill ? "flex" : undefined, flexDirection: fill ? "column" : undefined }}>
+      <p style={{ color: "#bbb", fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", margin: "0 0 20px", flexShrink: 0 }}>{title}</p>
       {children}
     </div>
   );
@@ -165,35 +165,37 @@ export default function ShortletMetricsPage() {
         </Card>
 
         {/* Review activity */}
-        <Card title="Review Activity by Month">
+        <Card title="Review Activity by Month" fill>
           {reviewsByMonth.length > 0 ? (
             <>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 16 }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 16, flexShrink: 0 }}>
                 <span style={{ color: "#0a0a0a", fontSize: 28, fontWeight: 800, letterSpacing: "-1px", lineHeight: 1 }}>
                   {reviewsByMonth.reduce((s, r) => s + r.count, 0)}
                 </span>
                 <span style={{ color: "#bbb", fontSize: 12 }}>total reviews</span>
               </div>
-              <ResponsiveContainer width="100%" height={110}>
-                <AreaChart data={reviewsByMonth.map((r) => ({ month: r.month.slice(0, 3), count: r.count }))} margin={{ top: 4, right: 0, left: -28, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="reviewGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%"  stopColor={NAVY} stopOpacity={0.15} />
-                      <stop offset="100%" stopColor={NAVY} stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid vertical={false} stroke="#f0f0ee" strokeDasharray="0" />
-                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#bbb" }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: "#ccc" }} axisLine={false} tickLine={false} allowDecimals={false} />
-                  <Tooltip
-                    contentStyle={{ background: "#fff", border: "1px solid #ebebeb", borderRadius: 10, fontSize: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.07)" }}
-                    labelStyle={{ color: "#888", marginBottom: 2 }}
-                    itemStyle={{ color: NAVY, fontWeight: 700 }}
-                    formatter={(v) => [v, "reviews"]}
-                  />
-                  <Area type="monotone" dataKey="count" stroke={NAVY} strokeWidth={2} fill="url(#reviewGrad)" dot={{ fill: NAVY, r: 3, strokeWidth: 0 }} activeDot={{ r: 5, fill: NAVY }} />
-                </AreaChart>
-              </ResponsiveContainer>
+              <div style={{ flex: 1, minHeight: 0 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={reviewsByMonth.map((r) => ({ month: r.month.slice(0, 3), count: r.count }))} margin={{ top: 4, right: 0, left: -28, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="reviewGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%"  stopColor={NAVY} stopOpacity={0.15} />
+                        <stop offset="100%" stopColor={NAVY} stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid vertical={false} stroke="#f0f0ee" strokeDasharray="0" />
+                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#bbb" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: "#ccc" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                    <Tooltip
+                      contentStyle={{ background: "#fff", border: "1px solid #ebebeb", borderRadius: 10, fontSize: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.07)" }}
+                      labelStyle={{ color: "#888", marginBottom: 2 }}
+                      itemStyle={{ color: NAVY, fontWeight: 700 }}
+                      formatter={(v) => [v, "reviews"]}
+                    />
+                    <Area type="monotone" dataKey="count" stroke={NAVY} strokeWidth={2} fill="url(#reviewGrad)" dot={{ fill: NAVY, r: 3, strokeWidth: 0 }} activeDot={{ r: 5, fill: NAVY }} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
             </>
           ) : (
             <p style={{ color: "#ccc", fontSize: 13, textAlign: "center", padding: "40px 0", margin: 0 }}>No review data yet</p>
