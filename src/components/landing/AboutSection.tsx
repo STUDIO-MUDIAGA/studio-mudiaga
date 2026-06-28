@@ -17,16 +17,21 @@ const CAROUSEL = [
   { src: "/IMG_1628.JPG", w: 360, h: 400 },
   { src: "/IMG_1629.JPG", w: 560, h: 340 },
 ];
-const CAROUSEL_REPEATED = [...CAROUSEL, ...CAROUSEL];
-
 export default function AboutSection() {
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
   const { setTheme } = useNavTheme();
 
   const { scrollYProgress } = useScroll({
     target: wrapperRef,
     offset: ["start end", "start 0.25"],
   });
+
+  const { scrollYProgress: carouselProg } = useScroll({
+    target: carouselRef,
+    offset: ["start end", "end start"],
+  });
+  const carouselX = useTransform(carouselProg, [0, 1], ["0px", "-3000px"]);
 
   const smoothProg = useSpring(scrollYProgress, { stiffness: 60, damping: 20, mass: 0.8 });
 
@@ -246,28 +251,18 @@ export default function AboutSection() {
           </div>
         </div>
 
-        {/* ── Image carousel strip ─────────────────────────────── */}
-        <div style={{ overflow: "hidden", paddingTop: 48, paddingBottom: 48 }}>
-          <style>{`
-            @keyframes about-scroll {
-              from { transform: translateX(0); }
-              to   { transform: translateX(-50%); }
-            }
-            .about-carousel-track {
-              animation: about-scroll 36s linear infinite;
-              will-change: transform;
-            }
-          `}</style>
-          <div
-            className="about-carousel-track"
+        {/* ── Image carousel strip — scroll driven ─────────────── */}
+        <div ref={carouselRef} style={{ overflow: "hidden", paddingTop: 48, paddingBottom: 48 }}>
+          <motion.div
             style={{
+              x: carouselX,
               display: "flex",
               gap: 8,
               width: "max-content",
               alignItems: "flex-start",
             }}
           >
-            {CAROUSEL_REPEATED.map((img, i) => (
+            {CAROUSEL.map((img, i) => (
               <div
                 key={i}
                 style={{
@@ -287,7 +282,7 @@ export default function AboutSection() {
                 />
               </div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </motion.section>
     </div>
