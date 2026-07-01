@@ -29,17 +29,20 @@ const BUDGETS = [
   "I prefer to discuss this directly",
 ];
 
-const STEP_NAMES = ["About you", "Your project", "Your vision", "Your budget", "Your expectations"];
+// Each form step (index 0) is the cover screen — the remaining 17 are one
+// tight cluster of fields (or a single roomy textarea) so it fits one
+// viewport with no scrolling, mobile included.
+const TOTAL_STEPS = 17;
 
 type UploadedImage = { url: string; uploading: boolean };
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label style={{ display: "block", color: "rgba(255,255,255,0.7)", fontSize: 14, fontWeight: 500, marginBottom: hint ? 4 : 10, lineHeight: 1.5 }}>
+      <label style={{ display: "block", color: "rgba(255,255,255,0.7)", fontSize: 14, fontWeight: 500, marginBottom: hint ? 3 : 8, lineHeight: 1.5 }}>
         {label}
       </label>
-      {hint && <p style={{ color: "rgba(255,255,255,0.32)", fontSize: 12, margin: "0 0 10px" }}>{hint}</p>}
+      {hint && <p style={{ color: "rgba(255,255,255,0.32)", fontSize: 12, margin: "0 0 8px" }}>{hint}</p>}
       {children}
     </div>
   );
@@ -47,7 +50,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 
 const inputStyle: React.CSSProperties = {
   width: "100%", background: "#111", border: "1px solid rgba(255,255,255,0.1)",
-  borderRadius: 12, padding: "13px 16px", color: "#fff", fontSize: 14,
+  borderRadius: 12, padding: "12px 16px", color: "#fff", fontSize: 14,
   outline: "none", boxSizing: "border-box", fontFamily: "var(--font-inter)",
 };
 
@@ -62,12 +65,12 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   );
 }
 
-function TextArea({ rows = 5, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+function TextArea({ rows = 6, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       {...props}
       rows={rows}
-      style={{ ...inputStyle, resize: "vertical", lineHeight: 1.7, minHeight: rows * 26 }}
+      style={{ ...inputStyle, resize: "none", lineHeight: 1.7, minHeight: rows * 24 }}
       onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(251,191,36,0.4)")}
       onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")}
     />
@@ -76,7 +79,7 @@ function TextArea({ rows = 5, ...props }: React.TextareaHTMLAttributes<HTMLTextA
 
 function RadioRow({ options, value, onChange }: { options: string[]; value: string; onChange: (v: string) => void }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
       {options.map((opt) => {
         const active = value === opt;
         return (
@@ -88,7 +91,7 @@ function RadioRow({ options, value, onChange }: { options: string[]; value: stri
               display: "flex", alignItems: "center", gap: 12, textAlign: "left",
               background: active ? "rgba(251,191,36,0.08)" : "#111",
               border: `1px solid ${active ? "rgba(251,191,36,0.4)" : "rgba(255,255,255,0.1)"}`,
-              borderRadius: 12, padding: "13px 16px", cursor: "pointer", transition: "all 0.15s",
+              borderRadius: 12, padding: "12px 16px", cursor: "pointer", transition: "all 0.15s",
             }}
           >
             <span style={{
@@ -108,7 +111,7 @@ function RadioRow({ options, value, onChange }: { options: string[]; value: stri
 
 function CheckboxGrid({ options, values, onToggle }: { options: string[]; values: string[]; onToggle: (v: string) => void }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 8 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 7 }}>
       {options.map((opt) => {
         const active = values.includes(opt);
         return (
@@ -117,10 +120,10 @@ function CheckboxGrid({ options, values, onToggle }: { options: string[]; values
             type="button"
             onClick={() => onToggle(opt)}
             style={{
-              display: "flex", alignItems: "center", gap: 10, textAlign: "left",
+              display: "flex", alignItems: "center", gap: 9, textAlign: "left",
               background: active ? "rgba(251,191,36,0.08)" : "#111",
               border: `1px solid ${active ? "rgba(251,191,36,0.4)" : "rgba(255,255,255,0.1)"}`,
-              borderRadius: 12, padding: "12px 14px", cursor: "pointer", transition: "all 0.15s",
+              borderRadius: 12, padding: "10px 12px", cursor: "pointer", transition: "all 0.15s",
             }}
           >
             <span style={{
@@ -141,7 +144,7 @@ function CheckboxGrid({ options, values, onToggle }: { options: string[]; values
 
 export default function StartProjectPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(0); // 0 = cover, 1..TOTAL_STEPS = form
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
@@ -204,9 +207,9 @@ export default function StartProjectPage() {
   }
 
   const stillUploading = images.some((i) => i.uploading);
-  const isFirstStep = step === 0;
-  const isLastStep = step === STEP_NAMES.length - 1;
-  const canContinue = isFirstStep ? fullName.trim() !== "" && email.trim() !== "" : true;
+  const isCover = step === 0;
+  const isLastStep = step === TOTAL_STEPS;
+  const canContinue = step === 1 ? fullName.trim() !== "" && email.trim() !== "" : true;
 
   function goNext() {
     if (!canContinue) {
@@ -214,13 +217,11 @@ export default function StartProjectPage() {
       return;
     }
     setError("");
-    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-    setStep((s) => Math.min(s + 1, STEP_NAMES.length - 1));
+    setStep((s) => Math.min(s + 1, TOTAL_STEPS));
   }
 
   function goBack() {
     setError("");
-    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
     setStep((s) => Math.max(s - 1, 0));
   }
 
@@ -259,7 +260,7 @@ export default function StartProjectPage() {
 
   if (submitted) {
     return (
-      <div style={{ background: "#0a0a0a", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 32px" }}>
+      <div style={{ background: "#0a0a0a", height: "100dvh", boxSizing: "border-box", paddingTop: 96, paddingLeft: 32, paddingRight: 32, display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ maxWidth: 480, textAlign: "center" }}>
           <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: 11, letterSpacing: "0.25em", textTransform: "uppercase", color: AMBER, marginBottom: 18 }}>
             Start a Project
@@ -272,215 +273,318 @@ export default function StartProjectPage() {
     );
   }
 
+  // ── Cover screen ──────────────────────────────────────────────
+  if (isCover) {
+    return (
+      <div style={{ background: "#0a0a0a", height: "100dvh", boxSizing: "border-box", paddingTop: 96, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", paddingLeft: 24, paddingRight: 24 }}>
+        <div style={{ maxWidth: 560, textAlign: "center" }}>
+          <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: 11, letterSpacing: "0.25em", textTransform: "uppercase", color: AMBER, marginBottom: 18 }}>
+            Start a Project
+          </p>
+          <h1 style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(28px, 5vw, 44px)", fontWeight: 400, color: "#fff", lineHeight: 1.2, marginBottom: 18 }}>
+            Tell us about the space you&apos;re dreaming of.
+          </h1>
+          <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, lineHeight: 1.7, marginBottom: 36 }}>
+            No forms that feel like paperwork — just a conversation. Take your time, share as much as feels useful, and we&apos;ll take it from there.
+          </p>
+          <button
+            type="button"
+            onClick={() => setStep(1)}
+            style={{
+              background: AMBER, color: "#000", border: "none", borderRadius: 14,
+              padding: "16px 36px", fontSize: 15, fontWeight: 700, cursor: "pointer",
+              display: "inline-flex", alignItems: "center", gap: 8,
+            }}
+          >
+            Let&apos;s begin <ArrowRight size={15} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ background: "#0a0a0a", minHeight: "100vh", paddingTop: 140, paddingBottom: 60, display: "flex", flexDirection: "column" }}>
-      <div style={{ maxWidth: 640, width: "100%", margin: "0 auto", padding: "0 24px", flex: 1, display: "flex", flexDirection: "column" }}>
+    <div style={{ background: "#0a0a0a", height: "100dvh", boxSizing: "border-box", paddingTop: 96, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ maxWidth: 600, width: "100%", margin: "0 auto", padding: "0 24px", flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
 
         {/* Progress */}
-        <div style={{ marginBottom: 40 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
+        <div style={{ marginBottom: 0, flexShrink: 0 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
             <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: 11, letterSpacing: "0.25em", textTransform: "uppercase", color: AMBER }}>
               Start a Project
             </p>
             <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}>
-              {step + 1} of {STEP_NAMES.length}
+              {step} of {TOTAL_STEPS}
             </p>
           </div>
-          <div style={{ display: "flex", gap: 6 }}>
-            {STEP_NAMES.map((_, i) => (
-              <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= step ? AMBER : "rgba(255,255,255,0.1)", transition: "background 0.3s" }} />
-            ))}
+          <div style={{ height: 3, borderRadius: 2, background: "rgba(255,255,255,0.1)", overflow: "hidden" }}>
+            <div style={{ height: "100%", width: `${(step / TOTAL_STEPS) * 100}%`, background: AMBER, transition: "width 0.3s" }} />
           </div>
         </div>
 
-        {isFirstStep && (
-          <div style={{ marginBottom: 40 }}>
-            <h1 style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(28px, 5vw, 42px)", fontWeight: 400, color: "#fff", lineHeight: 1.2, marginBottom: 16 }}>
-              Tell us about the space you&apos;re dreaming of.
-            </h1>
-            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, lineHeight: 1.7, maxWidth: 480 }}>
-              No forms that feel like paperwork — just a conversation. Take your time, share as much as feels useful, and we&apos;ll take it from there.
-            </p>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          <div style={{ flex: 1 }}>
+        <form onSubmit={handleSubmit} style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", minHeight: 0, overflowY: "auto" }}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={step}
                 initial={{ opacity: 0, x: 16 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -16 }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
+                transition={{ duration: 0.22, ease: "easeOut" }}
+                style={{ display: "flex", flexDirection: "column", gap: 16 }}
               >
-                <h2 style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(22px, 3vw, 30px)", fontWeight: 400, color: "#fff", marginBottom: 28, lineHeight: 1.25 }}>
-                  {STEP_NAMES[step]}
-                </h2>
+                {/* Step 1 — name + email */}
+                {step === 1 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>About you</p>
+                    <Field label="Full name">
+                      <Input required value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your full name" autoFocus />
+                    </Field>
+                    <Field label="Email address">
+                      <Input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
+                    </Field>
+                  </>
+                )}
 
-                <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
-                  {step === 0 && (
-                    <>
-                      <Field label="Full name">
-                        <Input required value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your full name" />
-                      </Field>
-                      <Field label="Email address">
-                        <Input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
-                      </Field>
-                      <Field label="Phone number">
-                        <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+234 800 000 0000" />
-                      </Field>
-                      <Field label="Location — city and state">
-                        <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Lekki, Lagos" />
-                      </Field>
-                      <Field label="How did you find STUDIOMUDIAGA?">
-                        <Input value={source} onChange={(e) => setSource(e.target.value)} placeholder="Instagram, referral, Google…" />
-                      </Field>
-                    </>
-                  )}
+                {/* Step 2 — phone, location, source */}
+                {step === 2 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>About you</p>
+                    <Field label="Phone number">
+                      <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+234 800 000 0000" autoFocus />
+                    </Field>
+                    <Field label="Location — city and state">
+                      <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Lekki, Lagos" />
+                    </Field>
+                    <Field label="How did you find STUDIOMUDIAGA?">
+                      <Input value={source} onChange={(e) => setSource(e.target.value)} placeholder="Instagram, referral, Google…" />
+                    </Field>
+                  </>
+                )}
 
-                  {step === 1 && (
-                    <>
-                      <Field label="What type of project is this?">
-                        <RadioRow options={PROJECT_TYPES} value={projectType} onChange={setProjectType} />
-                        {projectType === "Other" && (
-                          <div style={{ marginTop: 10 }}>
-                            <Input value={projectTypeOther} onChange={(e) => setProjectTypeOther(e.target.value)} placeholder="Tell us more" />
-                          </div>
-                        )}
-                      </Field>
-                      <Field label="Where is the property located?">
-                        <Input value={propertyLocation} onChange={(e) => setPropertyLocation(e.target.value)} placeholder="Address, estate, or area" />
-                      </Field>
-                      <Field label="What is the approximate size of the space in square metres or rooms?">
-                        <Input value={spaceSize} onChange={(e) => setSpaceSize(e.target.value)} placeholder="e.g. 250 sqm, or 4 bedrooms" />
-                      </Field>
-                      <Field label="Which specific areas are you looking to work on?">
-                        <CheckboxGrid options={AREAS} values={areas} onToggle={toggleArea} />
-                        {areas.includes("Other") && (
-                          <div style={{ marginTop: 10 }}>
-                            <Input value={areasOther} onChange={(e) => setAreasOther(e.target.value)} placeholder="Which other areas?" />
-                          </div>
-                        )}
-                      </Field>
-                      <Field label="Is the property currently occupied or vacant?">
-                        <Input value={occupancy} onChange={(e) => setOccupancy(e.target.value)} placeholder="Occupied or vacant" />
-                      </Field>
-                      <Field label="What is your target move-in or completion date?">
-                        <Input value={targetDate} onChange={(e) => setTargetDate(e.target.value)} placeholder="e.g. Q3 2026, or a specific date" />
-                      </Field>
-                    </>
-                  )}
-
-                  {step === 2 && (
-                    <>
-                      <Field label="How would you describe the feeling you want your space to have when it is complete?" hint="Do not think about style — think about feeling.">
-                        <TextArea rows={5} value={feeling} onChange={(e) => setFeeling(e.target.value)} placeholder="Take your time here…" />
-                      </Field>
-                      <Field label="Are there any spaces — hotels, restaurants, homes, or images — that have made you feel the way you want your space to feel?" hint="Share links or images if you have them.">
-                        <TextArea rows={3} value={inspiration} onChange={(e) => setInspiration(e.target.value)} placeholder="Links, names of places, or a short description…" />
-                      </Field>
-
-                      {/* File upload */}
-                      <div>
-                        <label style={{ display: "block", color: "rgba(255,255,255,0.7)", fontSize: 14, fontWeight: 500, marginBottom: 10 }}>
-                          Attach inspiration images <span style={{ color: "rgba(255,255,255,0.32)", fontWeight: 400 }}>(optional)</span>
-                        </label>
-                        <input ref={fileInputRef} type="file" accept="image/*" multiple hidden onChange={handleFiles} />
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                          {images.map((img, i) => (
-                            <div key={i} style={{ position: "relative", width: 72, height: 72, borderRadius: 10, overflow: "hidden", background: "#111", border: "1px solid rgba(255,255,255,0.1)" }}>
-                              {img.uploading ? (
-                                <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                  <Loader2 size={16} color={AMBER} style={{ animation: "spin 1s linear infinite" }} />
-                                </div>
-                              ) : (
-                                <>
-                                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                                  <img src={img.url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                                  <button type="button" onClick={() => removeImage(i)} style={{ position: "absolute", top: 3, right: 3, width: 18, height: 18, borderRadius: "50%", background: "rgba(0,0,0,0.65)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                    <X size={10} color="#fff" />
-                                  </button>
-                                </>
-                              )}
-                            </div>
-                          ))}
-                          {images.length < 8 && (
-                            <button
-                              type="button"
-                              onClick={() => fileInputRef.current?.click()}
-                              style={{ width: 72, height: 72, borderRadius: 10, background: "#111", border: "1px dashed rgba(255,255,255,0.2)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, cursor: "pointer" }}
-                            >
-                              <Upload size={14} color="rgba(255,255,255,0.4)" />
-                              <span style={{ fontSize: 9, color: "rgba(255,255,255,0.4)" }}>Add</span>
-                            </button>
-                          )}
+                {/* Step 3 — project type */}
+                {step === 3 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>Your project</p>
+                    <Field label="What type of project is this?">
+                      <RadioRow options={PROJECT_TYPES} value={projectType} onChange={setProjectType} />
+                      {projectType === "Other" && (
+                        <div style={{ marginTop: 8 }}>
+                          <Input value={projectTypeOther} onChange={(e) => setProjectTypeOther(e.target.value)} placeholder="Tell us more" />
                         </div>
+                      )}
+                    </Field>
+                  </>
+                )}
+
+                {/* Step 4 — property location + size */}
+                {step === 4 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>Your project</p>
+                    <Field label="Where is the property located?">
+                      <Input value={propertyLocation} onChange={(e) => setPropertyLocation(e.target.value)} placeholder="Address, estate, or area" autoFocus />
+                    </Field>
+                    <Field label="What is the approximate size of the space in square metres or rooms?">
+                      <Input value={spaceSize} onChange={(e) => setSpaceSize(e.target.value)} placeholder="e.g. 250 sqm, or 4 bedrooms" />
+                    </Field>
+                  </>
+                )}
+
+                {/* Step 5 — areas */}
+                {step === 5 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>Your project</p>
+                    <Field label="Which specific areas are you looking to work on?">
+                      <CheckboxGrid options={AREAS} values={areas} onToggle={toggleArea} />
+                      {areas.includes("Other") && (
+                        <div style={{ marginTop: 8 }}>
+                          <Input value={areasOther} onChange={(e) => setAreasOther(e.target.value)} placeholder="Which other areas?" />
+                        </div>
+                      )}
+                    </Field>
+                  </>
+                )}
+
+                {/* Step 6 — occupancy + target date */}
+                {step === 6 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>Your project</p>
+                    <Field label="Is the property currently occupied or vacant?">
+                      <Input value={occupancy} onChange={(e) => setOccupancy(e.target.value)} placeholder="Occupied or vacant" autoFocus />
+                    </Field>
+                    <Field label="What is your target move-in or completion date?">
+                      <Input value={targetDate} onChange={(e) => setTargetDate(e.target.value)} placeholder="e.g. Q3 2026, or a specific date" />
+                    </Field>
+                  </>
+                )}
+
+                {/* Step 7 — feeling */}
+                {step === 7 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>Your vision</p>
+                    <Field label="How would you describe the feeling you want your space to have when it is complete?" hint="Do not think about style — think about feeling.">
+                      <TextArea rows={6} value={feeling} onChange={(e) => setFeeling(e.target.value)} placeholder="Take your time here…" autoFocus />
+                    </Field>
+                  </>
+                )}
+
+                {/* Step 8 — inspiration + upload */}
+                {step === 8 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>Your vision</p>
+                    <Field label="Are there any spaces — hotels, restaurants, homes, or images — that have made you feel the way you want your space to feel?" hint="Share links or images if you have them.">
+                      <TextArea rows={3} value={inspiration} onChange={(e) => setInspiration(e.target.value)} placeholder="Links, names of places, or a short description…" autoFocus />
+                    </Field>
+                    <div>
+                      <label style={{ display: "block", color: "rgba(255,255,255,0.7)", fontSize: 14, fontWeight: 500, marginBottom: 8 }}>
+                        Attach inspiration images <span style={{ color: "rgba(255,255,255,0.32)", fontWeight: 400 }}>(optional)</span>
+                      </label>
+                      <input ref={fileInputRef} type="file" accept="image/*" multiple hidden onChange={handleFiles} />
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                        {images.map((img, i) => (
+                          <div key={i} style={{ position: "relative", width: 64, height: 64, borderRadius: 10, overflow: "hidden", background: "#111", border: "1px solid rgba(255,255,255,0.1)" }}>
+                            {img.uploading ? (
+                              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <Loader2 size={16} color={AMBER} style={{ animation: "spin 1s linear infinite" }} />
+                              </div>
+                            ) : (
+                              <>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={img.url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                <button type="button" onClick={() => removeImage(i)} style={{ position: "absolute", top: 3, right: 3, width: 18, height: 18, borderRadius: "50%", background: "rgba(0,0,0,0.65)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                  <X size={10} color="#fff" />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        ))}
+                        {images.length < 8 && (
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            style={{ width: 64, height: 64, borderRadius: 10, background: "#111", border: "1px dashed rgba(255,255,255,0.2)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, cursor: "pointer" }}
+                          >
+                            <Upload size={13} color="rgba(255,255,255,0.4)" />
+                            <span style={{ fontSize: 9, color: "rgba(255,255,255,0.4)" }}>Add</span>
+                          </button>
+                        )}
                       </div>
+                    </div>
+                  </>
+                )}
 
-                      <Field label="Are there any styles, colours, or design directions you strongly dislike or want to avoid?">
-                        <TextArea rows={3} value={dislikes} onChange={(e) => setDislikes(e.target.value)} placeholder="Anything you'd rather we steer clear of…" />
-                      </Field>
-                      <Field label="How do you live in your space day to day?" hint="Describe a typical morning, evening, or weekend at home.">
-                        <TextArea rows={5} value={dailyLife} onChange={(e) => setDailyLife(e.target.value)} placeholder="Walk us through a normal day…" />
-                      </Field>
-                      <Field label="Who else lives in or uses the space regularly?">
-                        <TextArea rows={3} value={household} onChange={(e) => setHousehold(e.target.value)} placeholder="Family, partner, pets, staff, frequent guests…" />
-                      </Field>
-                    </>
-                  )}
+                {/* Step 9 — dislikes */}
+                {step === 9 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>Your vision</p>
+                    <Field label="Are there any styles, colours, or design directions you strongly dislike or want to avoid?">
+                      <TextArea rows={5} value={dislikes} onChange={(e) => setDislikes(e.target.value)} placeholder="Anything you'd rather we steer clear of…" autoFocus />
+                    </Field>
+                  </>
+                )}
 
-                  {step === 3 && (
-                    <>
-                      <Field label="What is your investment budget for this project?">
-                        <RadioRow options={BUDGETS} value={budget} onChange={setBudget} />
-                      </Field>
-                      <Field label="Does your budget include furniture, fixtures, and accessories or is it for construction and finishing only?">
-                        <Input value={budgetScope} onChange={(e) => setBudgetScope(e.target.value)} placeholder="Tell us what's included" />
-                      </Field>
-                      <Field label="Have you worked with an interior designer before? If yes what was the experience like?">
-                        <TextArea rows={3} value={priorExperience} onChange={(e) => setPriorExperience(e.target.value)} placeholder="Optional, but helpful context…" />
-                      </Field>
-                    </>
-                  )}
+                {/* Step 10 — daily life */}
+                {step === 10 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>Your vision</p>
+                    <Field label="How do you live in your space day to day?" hint="Describe a typical morning, evening, or weekend at home.">
+                      <TextArea rows={6} value={dailyLife} onChange={(e) => setDailyLife(e.target.value)} placeholder="Walk us through a normal day…" autoFocus />
+                    </Field>
+                  </>
+                )}
 
-                  {step === 4 && (
-                    <>
-                      <Field label="What does a successful project look like to you?" hint="What would make you look at the finished space and feel that the investment was completely worth it?">
-                        <TextArea rows={5} value={successVision} onChange={(e) => setSuccessVision(e.target.value)} placeholder="Paint us the picture…" />
-                      </Field>
-                      <Field label="How involved do you want to be in the process — hands on at every decision or trusting the studio to lead and presenting you with the outcome?">
-                        <Input value={involvement} onChange={(e) => setInvolvement(e.target.value)} placeholder="Hands on, mostly hands off, or somewhere in between" />
-                      </Field>
-                      <Field label="Is there anything specific about your lifestyle, work, or personality that you think is important for us to understand before we begin?">
-                        <TextArea rows={5} value={importantContext} onChange={(e) => setImportantContext(e.target.value)} placeholder="Whatever feels relevant…" />
-                      </Field>
-                      <Field label="Is there anything else you would like us to know?">
-                        <TextArea rows={5} value={anythingElse} onChange={(e) => setAnythingElse(e.target.value)} placeholder="The floor is yours…" />
-                      </Field>
-                    </>
-                  )}
-                </div>
+                {/* Step 11 — household */}
+                {step === 11 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>Your vision</p>
+                    <Field label="Who else lives in or uses the space regularly?">
+                      <TextArea rows={5} value={household} onChange={(e) => setHousehold(e.target.value)} placeholder="Family, partner, pets, staff, frequent guests…" autoFocus />
+                    </Field>
+                  </>
+                )}
+
+                {/* Step 12 — budget */}
+                {step === 12 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>Your budget</p>
+                    <Field label="What is your investment budget for this project?">
+                      <RadioRow options={BUDGETS} value={budget} onChange={setBudget} />
+                    </Field>
+                  </>
+                )}
+
+                {/* Step 13 — budget scope + prior experience */}
+                {step === 13 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>Your budget</p>
+                    <Field label="Does your budget include furniture, fixtures, and accessories or is it for construction and finishing only?">
+                      <Input value={budgetScope} onChange={(e) => setBudgetScope(e.target.value)} placeholder="Tell us what's included" autoFocus />
+                    </Field>
+                    <Field label="Have you worked with an interior designer before? If yes what was the experience like?">
+                      <TextArea rows={4} value={priorExperience} onChange={(e) => setPriorExperience(e.target.value)} placeholder="Optional, but helpful context…" />
+                    </Field>
+                  </>
+                )}
+
+                {/* Step 14 — success vision */}
+                {step === 14 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>Your expectations</p>
+                    <Field label="What does a successful project look like to you?" hint="What would make you look at the finished space and feel that the investment was completely worth it?">
+                      <TextArea rows={6} value={successVision} onChange={(e) => setSuccessVision(e.target.value)} placeholder="Paint us the picture…" autoFocus />
+                    </Field>
+                  </>
+                )}
+
+                {/* Step 15 — involvement */}
+                {step === 15 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>Your expectations</p>
+                    <Field label="How involved do you want to be in the process — hands on at every decision or trusting the studio to lead and presenting you with the outcome?">
+                      <Input value={involvement} onChange={(e) => setInvolvement(e.target.value)} placeholder="Hands on, mostly hands off, or somewhere in between" autoFocus />
+                    </Field>
+                  </>
+                )}
+
+                {/* Step 16 — important context */}
+                {step === 16 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>Your expectations</p>
+                    <Field label="Is there anything specific about your lifestyle, work, or personality that you think is important for us to understand before we begin?">
+                      <TextArea rows={6} value={importantContext} onChange={(e) => setImportantContext(e.target.value)} placeholder="Whatever feels relevant…" autoFocus />
+                    </Field>
+                  </>
+                )}
+
+                {/* Step 17 — anything else */}
+                {step === 17 && (
+                  <>
+                    <p style={{ color: AMBER, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>Your expectations</p>
+                    <Field label="Is there anything else you would like us to know?">
+                      <TextArea rows={6} value={anythingElse} onChange={(e) => setAnythingElse(e.target.value)} placeholder="The floor is yours…" autoFocus />
+                    </Field>
+                  </>
+                )}
               </motion.div>
             </AnimatePresence>
           </div>
 
           {error && (
-            <div style={{ color: "#f87171", fontSize: 13, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 12, padding: "12px 16px", margin: "24px 0 0" }}>
+            <div style={{ color: "#f87171", fontSize: 12, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 10, padding: "10px 14px", margin: "10px 0 0", flexShrink: 0 }}>
               {error}
             </div>
           )}
 
           {/* Navigation */}
-          <div style={{ display: "flex", gap: 10, marginTop: 32, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-            {!isFirstStep && (
+          <div style={{ display: "flex", gap: 10, padding: "16px 0", flexShrink: 0 }}>
+            {step > 1 && (
               <button
                 type="button"
                 onClick={goBack}
                 style={{
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                   background: "transparent", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.12)",
-                  borderRadius: 14, padding: "16px 22px", fontSize: 14, fontWeight: 600, cursor: "pointer",
+                  borderRadius: 14, padding: "14px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer",
                 }}
               >
                 <ArrowLeft size={15} /> Back
@@ -491,7 +595,7 @@ export default function StartProjectPage() {
               disabled={submitting || (isLastStep && stillUploading)}
               style={{
                 flex: 1, background: AMBER, color: "#000", border: "none", borderRadius: 14,
-                padding: "17px 0", fontSize: 15, fontWeight: 700,
+                padding: "15px 0", fontSize: 15, fontWeight: 700,
                 cursor: submitting || (isLastStep && stillUploading) ? "not-allowed" : "pointer",
                 opacity: submitting || (isLastStep && stillUploading) ? 0.6 : 1, transition: "opacity 0.15s",
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
