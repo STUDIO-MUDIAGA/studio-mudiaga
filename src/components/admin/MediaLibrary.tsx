@@ -353,7 +353,7 @@ export default function MediaLibrary({
               onChange={(e) => setNewCategoryName(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") createCategory(); }}
               placeholder="e.g. UB"
-              style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e0e0e0", fontSize: 13, outline: "none", marginBottom: 8, boxSizing: "border-box" }}
+              style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e0e0e0", color: "#0a0a0a", fontSize: 13, outline: "none", marginBottom: 8, boxSizing: "border-box" }}
             />
             {categoryError && <p style={{ color: "#dc2626", fontSize: 11, margin: "0 0 12px" }}>{categoryError}</p>}
             <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
