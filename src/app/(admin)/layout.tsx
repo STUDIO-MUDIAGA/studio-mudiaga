@@ -9,7 +9,7 @@ import {
   LayoutDashboard, Building2, Sofa, CalendarDays,
   ShoppingBag, Users, TrendingUp, LogOut, Menu, X,
   Settings, Bell, Search, ChevronDown, Tag, BarChart2, Plus, List,
-  Images, Home, Armchair, Folder,
+  Images, Home, Armchair, Folder, MessageSquare,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -21,6 +21,7 @@ type NavItem = { label: string; href: string; exact?: boolean; icon: React.Eleme
 
 const navItems: NavItem[] = [
   { label: "Dashboard", href: "/admin", exact: true, icon: LayoutDashboard },
+  { label: "Enquiries", href: "/admin/enquiries", icon: MessageSquare },
   {
     label: "Media", href: "/admin/media", icon: Images,
     children: [
