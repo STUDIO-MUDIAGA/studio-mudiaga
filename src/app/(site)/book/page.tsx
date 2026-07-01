@@ -38,6 +38,14 @@ const DENSE_STEPS = [2, 3];
 
 type UploadedImage = { url: string; uploading: boolean };
 
+function Row({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20 }}>
+      {children}
+    </div>
+  );
+}
+
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div>
@@ -308,7 +316,7 @@ export default function StartProjectPage() {
 
   return (
     <div style={{ background: "#0a0a0a", height: "100dvh", boxSizing: "border-box", paddingTop: 96, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      <div style={{ maxWidth: 640, width: "100%", margin: "0 auto", padding: "0 24px", flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+      <div style={{ maxWidth: 780, width: "100%", margin: "0 auto", padding: "0 24px", flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
 
         {/* Progress */}
         <div style={{ flexShrink: 0 }}>
@@ -341,18 +349,22 @@ export default function StartProjectPage() {
                 {/* Step 1 — About you */}
                 {step === 1 && (
                   <>
-                    <Field label="Full name">
-                      <Input required value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your full name" autoFocus />
-                    </Field>
-                    <Field label="Email address">
-                      <Input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
-                    </Field>
-                    <Field label="Phone number">
-                      <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+234 800 000 0000" />
-                    </Field>
-                    <Field label="Location — city and state">
-                      <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Lekki, Lagos" />
-                    </Field>
+                    <Row>
+                      <Field label="Full name">
+                        <Input required value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your full name" autoFocus />
+                      </Field>
+                      <Field label="Email address">
+                        <Input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
+                      </Field>
+                    </Row>
+                    <Row>
+                      <Field label="Phone number">
+                        <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+234 800 000 0000" />
+                      </Field>
+                      <Field label="Location — city and state">
+                        <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Lekki, Lagos" />
+                      </Field>
+                    </Row>
                     <Field label="How did you find STUDIOMUDIAGA?">
                       <Input value={source} onChange={(e) => setSource(e.target.value)} placeholder="Instagram, referral, Google…" />
                     </Field>
@@ -370,12 +382,14 @@ export default function StartProjectPage() {
                         </div>
                       )}
                     </Field>
-                    <Field label="Where is the property located?">
-                      <Input value={propertyLocation} onChange={(e) => setPropertyLocation(e.target.value)} placeholder="Address, estate, or area" />
-                    </Field>
-                    <Field label="What is the approximate size of the space in square metres or rooms?">
-                      <Input value={spaceSize} onChange={(e) => setSpaceSize(e.target.value)} placeholder="e.g. 250 sqm, or 4 bedrooms" />
-                    </Field>
+                    <Row>
+                      <Field label="Where is the property located?">
+                        <Input value={propertyLocation} onChange={(e) => setPropertyLocation(e.target.value)} placeholder="Address, estate, or area" />
+                      </Field>
+                      <Field label="What is the approximate size of the space in square metres or rooms?">
+                        <Input value={spaceSize} onChange={(e) => setSpaceSize(e.target.value)} placeholder="e.g. 250 sqm, or 4 bedrooms" />
+                      </Field>
+                    </Row>
                     <Field label="Which specific areas are you looking to work on?">
                       <CheckboxGrid options={AREAS} values={areas} onToggle={toggleArea} />
                       {areas.includes("Other") && (
@@ -384,12 +398,14 @@ export default function StartProjectPage() {
                         </div>
                       )}
                     </Field>
-                    <Field label="Is the property currently occupied or vacant?">
-                      <Input value={occupancy} onChange={(e) => setOccupancy(e.target.value)} placeholder="Occupied or vacant" />
-                    </Field>
-                    <Field label="What is your target move-in or completion date?">
-                      <Input value={targetDate} onChange={(e) => setTargetDate(e.target.value)} placeholder="e.g. Q3 2026, or a specific date" />
-                    </Field>
+                    <Row>
+                      <Field label="Is the property currently occupied or vacant?">
+                        <Input value={occupancy} onChange={(e) => setOccupancy(e.target.value)} placeholder="Occupied or vacant" />
+                      </Field>
+                      <Field label="What is your target move-in or completion date?">
+                        <Input value={targetDate} onChange={(e) => setTargetDate(e.target.value)} placeholder="e.g. Q3 2026, or a specific date" />
+                      </Field>
+                    </Row>
                   </>
                 )}
 
