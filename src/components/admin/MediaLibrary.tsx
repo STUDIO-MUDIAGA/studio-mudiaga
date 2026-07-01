@@ -52,7 +52,7 @@ export default function MediaLibrary({
   const [categories, setCategories] = useState<Category[]>(
     Object.entries(PREFIX_META).map(([slug, meta]) => ({ slug, name: meta.label }))
   );
-  const [addingCategory, setAddingCategory] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [savingCategory, setSavingCategory] = useState(false);
   const [categoryError, setCategoryError] = useState<string | null>(null);
@@ -107,7 +107,7 @@ export default function MediaLibrary({
     setSavingCategory(false);
     if (!res.ok) { setCategoryError(data.error ?? "Failed to create category"); return; }
     setNewCategoryName("");
-    setAddingCategory(false);
+    setShowCategoryModal(false);
     await fetchCategories();
     setActiveTab(data.slug);
     window.dispatchEvent(new Event("media-categories-updated"));
@@ -324,44 +324,56 @@ export default function MediaLibrary({
               );
             })}
 
-            {!addingCategory ? (
-              <button
-                onClick={() => setAddingCategory(true)}
-                style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 20, border: "1px dashed #ccc", background: "#fff", color: "#888", fontSize: 12, fontWeight: 500, cursor: "pointer" }}
-              >
-                <FolderPlus size={12} /> New Category
-              </button>
-            ) : (
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <input
-                  autoFocus
-                  value={newCategoryName}
-                  onChange={(e) => setNewCategoryName(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") createCategory(); if (e.key === "Escape") { setAddingCategory(false); setCategoryError(null); } }}
-                  placeholder="e.g. UB"
-                  style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #e0e0e0", fontSize: 12, outline: "none", width: 120 }}
-                />
-                <button
-                  onClick={createCategory}
-                  disabled={savingCategory}
-                  style={{ display: "flex", alignItems: "center", padding: "6px 10px", borderRadius: 8, border: "none", background: NAVY, color: "#fff", cursor: "pointer" }}
-                >
-                  {savingCategory ? <Loader2 size={12} style={{ animation: "spin 1s linear infinite" }} /> : <Plus size={12} />}
-                </button>
-                <button
-                  onClick={() => { setAddingCategory(false); setNewCategoryName(""); setCategoryError(null); }}
-                  style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #e0e0e0", background: "#fff", color: "#888", cursor: "pointer" }}
-                >
-                  <X size={12} />
-                </button>
-              </div>
-            )}
+            <button
+              onClick={() => { setShowCategoryModal(true); setCategoryError(null); }}
+              style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 20, border: "1px dashed #ccc", background: "#fff", color: "#888", fontSize: 12, fontWeight: 500, cursor: "pointer" }}
+            >
+              <FolderPlus size={12} /> New Category
+            </button>
           </div>
-          {categoryError && <p style={{ color: "#dc2626", fontSize: 11, margin: "6px 0 0" }}>{categoryError}</p>}
           <p style={{ color: "#ccc", fontSize: 11, margin: "8px 0 0" }}>
             Selecting a category filters the images below and sets where new uploads are saved — currently uploading to <strong style={{ color: "#888" }}>{labelFor(activeTab === "all" ? "homepage" : activeTab)}</strong>.
           </p>
         </div>
+      )}
+
+      {/* New category modal */}
+      {showCategoryModal && (
+        <>
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 40 }} onClick={() => setShowCategoryModal(false)} />
+          <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 50, background: "#fff", borderRadius: 20, padding: 28, width: 380, maxWidth: "90vw", boxShadow: "0 16px 48px rgba(0,0,0,0.15)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+              <p style={{ color: "#0a0a0a", fontWeight: 600, fontSize: 14, margin: 0 }}>New Category</p>
+              <button onClick={() => setShowCategoryModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#aaa" }}><X size={16} /></button>
+            </div>
+            <p style={{ color: "#aaa", fontSize: 11, margin: "0 0 6px" }}>Category name</p>
+            <input
+              autoFocus
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") createCategory(); }}
+              placeholder="e.g. UB"
+              style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #e0e0e0", fontSize: 13, outline: "none", marginBottom: 8, boxSizing: "border-box" }}
+            />
+            {categoryError && <p style={{ color: "#dc2626", fontSize: 11, margin: "0 0 12px" }}>{categoryError}</p>}
+            <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+              <button
+                onClick={() => setShowCategoryModal(false)}
+                style={{ flex: 1, padding: "10px 0", borderRadius: 10, background: "#fff", border: "1px solid #e0e0e0", color: "#888", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={createCategory}
+                disabled={savingCategory || !newCategoryName.trim()}
+                style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "10px 0", borderRadius: 10, background: NAVY, border: "none", color: "#fff", fontSize: 13, fontWeight: 600, cursor: savingCategory || !newCategoryName.trim() ? "not-allowed" : "pointer", opacity: savingCategory || !newCategoryName.trim() ? 0.6 : 1 }}
+              >
+                {savingCategory ? <Loader2 size={13} style={{ animation: "spin 1s linear infinite" }} /> : <Plus size={13} />}
+                Create
+              </button>
+            </div>
+          </div>
+        </>
       )}
 
       {/* Stats */}
