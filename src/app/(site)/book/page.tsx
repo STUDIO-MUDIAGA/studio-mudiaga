@@ -31,6 +31,10 @@ const BUDGETS = [
 
 const STEP_NAMES = ["About you", "Your project", "Your vision", "Your budget", "Your expectations"];
 const TOTAL_STEPS = STEP_NAMES.length;
+// These two carry more fields than fit one viewport at readable size, so
+// their Continue button stays pinned below the scroll area instead of
+// travelling with the fields (which would get clipped by the scrollbar).
+const DENSE_STEPS = [2, 3];
 
 type UploadedImage = { url: string; uploading: boolean };
 
@@ -215,6 +219,7 @@ export default function StartProjectPage() {
   const stillUploading = images.some((i) => i.uploading);
   const isCover = step === 0;
   const isLastStep = step === TOTAL_STEPS;
+  const isDense = DENSE_STEPS.includes(step);
   const canContinue = step === 1 ? fullName.trim() !== "" && email.trim() !== "" : true;
 
   function goNext() {
@@ -263,6 +268,45 @@ export default function StartProjectPage() {
       setSubmitting(false);
     }
   }
+
+  const errorBox = error && (
+    <div style={{ color: "#f87171", fontSize: 12, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 10, padding: "10px 14px" }}>
+      {error}
+    </div>
+  );
+
+  const navButtons = (
+    <div style={{ display: "flex", gap: 10 }}>
+      {step > 1 && (
+        <button
+          type="button"
+          onClick={goBack}
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            background: "transparent", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: 14, padding: "14px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer",
+          }}
+        >
+          <ArrowLeft size={15} /> Back
+        </button>
+      )}
+      <button
+        type="submit"
+        disabled={submitting || (isLastStep && stillUploading)}
+        style={{
+          flex: 1, background: AMBER, color: "#000", border: "none", borderRadius: 14,
+          padding: "15px 0", fontSize: 15, fontWeight: 700,
+          cursor: submitting || (isLastStep && stillUploading) ? "not-allowed" : "pointer",
+          opacity: submitting || (isLastStep && stillUploading) ? 0.6 : 1, transition: "opacity 0.15s",
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+        }}
+      >
+        {isLastStep
+          ? (submitting ? <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Sending…</> : "Begin")
+          : <>Continue <ArrowRight size={15} /></>}
+      </button>
+    </div>
+  );
 
   if (submitted) {
     return (
@@ -331,8 +375,8 @@ export default function StartProjectPage() {
         </div>
 
         <form onSubmit={handleSubmit} style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", minHeight: 0, overflowY: "auto", padding: "24px 0" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: isDense ? "flex-start" : "center", minHeight: 0, overflowY: "auto", padding: "24px 0" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: isDense ? 16 : 28 }}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={step}
@@ -498,45 +542,21 @@ export default function StartProjectPage() {
               </motion.div>
             </AnimatePresence>
 
-            {error && (
-              <div style={{ color: "#f87171", fontSize: 12, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 10, padding: "10px 14px" }}>
-                {error}
-              </div>
+            {isDense && errorBox}
+            {!isDense && (
+              <>
+                {errorBox}
+                {navButtons}
+              </>
             )}
+          </div>
+          </div>
 
-            {/* Navigation */}
-            <div style={{ display: "flex", gap: 10 }}>
-              {step > 1 && (
-                <button
-                  type="button"
-                  onClick={goBack}
-                  style={{
-                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                    background: "transparent", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.12)",
-                    borderRadius: 14, padding: "14px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer",
-                  }}
-                >
-                  <ArrowLeft size={15} /> Back
-                </button>
-              )}
-              <button
-                type="submit"
-                disabled={submitting || (isLastStep && stillUploading)}
-                style={{
-                  flex: 1, background: AMBER, color: "#000", border: "none", borderRadius: 14,
-                  padding: "15px 0", fontSize: 15, fontWeight: 700,
-                  cursor: submitting || (isLastStep && stillUploading) ? "not-allowed" : "pointer",
-                  opacity: submitting || (isLastStep && stillUploading) ? 0.6 : 1, transition: "opacity 0.15s",
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                }}
-              >
-                {isLastStep
-                  ? (submitting ? <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Sending…</> : "Begin")
-                  : <>Continue <ArrowRight size={15} /></>}
-              </button>
+          {isDense && (
+            <div style={{ flexShrink: 0, paddingTop: 16 }}>
+              {navButtons}
             </div>
-          </div>
-          </div>
+          )}
         </form>
       </div>
 
