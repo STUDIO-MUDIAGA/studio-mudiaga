@@ -52,7 +52,6 @@ export default function MediaLibrary({
   const [categories, setCategories] = useState<Category[]>(
     Object.entries(PREFIX_META).map(([slug, meta]) => ({ slug, name: meta.label }))
   );
-  const [uploadTarget, setUploadTarget] = useState<string>(prefix ?? "homepage");
   const [addingCategory, setAddingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [savingCategory, setSavingCategory] = useState(false);
@@ -110,7 +109,7 @@ export default function MediaLibrary({
     setNewCategoryName("");
     setAddingCategory(false);
     await fetchCategories();
-    setUploadTarget(data.slug);
+    setActiveTab(data.slug);
     window.dispatchEvent(new Event("media-categories-updated"));
   };
 
@@ -121,7 +120,7 @@ export default function MediaLibrary({
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (uploadTarget === slug) setUploadTarget("homepage");
+    if (activeTab === slug) setActiveTab("all");
     await fetchCategories();
     window.dispatchEvent(new Event("media-categories-updated"));
   };
@@ -147,7 +146,7 @@ export default function MediaLibrary({
       const file = arr[i];
       const form = new FormData();
       form.append("file", file);
-      form.append("prefix", prefix ?? uploadTarget);
+      form.append("prefix", prefix ?? (activeTab === "all" ? "homepage" : activeTab));
 
       try {
         const res = await fetch("/api/upload-image", {
@@ -191,11 +190,6 @@ export default function MediaLibrary({
 
   const isUploading = queue.some((q) => q.status === "uploading");
   const doneCount = queue.filter((q) => q.status === "done").length;
-
-  // For All Media, derive available tabs from actual uploaded prefixes
-  const availablePrefixes = !prefix
-    ? Array.from(new Set(items.map((i) => getPrefix(i.key)).filter(Boolean)))
-    : [];
 
   const visibleItems = !prefix && activeTab !== "all"
     ? items.filter((i) => getPrefix(i.key) === activeTab)
@@ -274,23 +268,41 @@ export default function MediaLibrary({
         <p style={{ color: "#ccc", fontSize: 11, margin: "4px 0 0" }}>JPG, PNG, WebP, AVIF — max 10 MB each</p>
       </div>
 
-      {/* Category picker + creation — All Media only */}
+      {/* Category picker — All Media only. Selecting a chip both filters the grid below and sets where new uploads go. */}
       {!prefix && (
         <div style={{ marginBottom: 20 }}>
           <p style={{ color: "#aaa", fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 8px" }}>
-            Upload to category
+            Category
           </p>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+            <button
+              onClick={() => setActiveTab("all")}
+              style={{
+                display: "flex", alignItems: "center", gap: 6,
+                padding: "7px 14px", borderRadius: 20, border: "1px solid",
+                fontSize: 12, fontWeight: activeTab === "all" ? 700 : 500, cursor: "pointer",
+                background: activeTab === "all" ? NAVY_BG : "#fff",
+                borderColor: activeTab === "all" ? NAVY : "#e8e8e4",
+                color: activeTab === "all" ? NAVY : "#888",
+              }}
+            >
+              All
+              <span style={{ background: activeTab === "all" ? NAVY : "#ebebeb", color: activeTab === "all" ? "#fff" : "#aaa", fontSize: 10, fontWeight: 700, padding: "1px 6px", borderRadius: 10 }}>
+                {items.length}
+              </span>
+            </button>
+
             {categories.map((cat) => {
-              const isActive = uploadTarget === cat.slug;
+              const isActive = activeTab === cat.slug;
               const meta = metaFor(cat.slug);
+              const count = items.filter((i) => getPrefix(i.key) === cat.slug).length;
               return (
                 <button
                   key={cat.slug}
-                  onClick={() => setUploadTarget(cat.slug)}
+                  onClick={() => setActiveTab(cat.slug)}
                   style={{
                     display: "flex", alignItems: "center", gap: 6,
-                    padding: "6px 12px", borderRadius: 20, border: "1px solid",
+                    padding: "7px 14px", borderRadius: 20, border: "1px solid",
                     fontSize: 12, fontWeight: isActive ? 700 : 500, cursor: "pointer",
                     background: isActive ? meta.bg : "#fff",
                     borderColor: isActive ? meta.color : "#e8e8e4",
@@ -298,6 +310,9 @@ export default function MediaLibrary({
                   }}
                 >
                   {cat.name}
+                  <span style={{ background: isActive ? meta.color : "#ebebeb", color: isActive ? "#fff" : "#aaa", fontSize: 10, fontWeight: 700, padding: "1px 6px", borderRadius: 10 }}>
+                    {count}
+                  </span>
                   {cat.id && (
                     <Trash2
                       size={11}
@@ -343,41 +358,9 @@ export default function MediaLibrary({
             )}
           </div>
           {categoryError && <p style={{ color: "#dc2626", fontSize: 11, margin: "6px 0 0" }}>{categoryError}</p>}
-        </div>
-      )}
-
-      {/* Category filter tabs — All Media only */}
-      {!prefix && !loading && availablePrefixes.length > 0 && (
-        <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
-          {["all", ...availablePrefixes].map((tab) => {
-            const isActive = activeTab === tab;
-            const meta = tab === "all"
-              ? { label: "All", bg: NAVY_BG, color: NAVY }
-              : metaFor(tab);
-            const count = tab === "all"
-              ? items.length
-              : items.filter((i) => getPrefix(i.key) === tab).length;
-            return (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                style={{
-                  display: "flex", alignItems: "center", gap: 6,
-                  padding: "7px 14px", borderRadius: 20, border: "1px solid",
-                  fontSize: 12, fontWeight: isActive ? 700 : 500, cursor: "pointer",
-                  background: isActive ? meta.bg : "#fff",
-                  borderColor: isActive ? meta.color : "#e8e8e4",
-                  color: isActive ? meta.color : "#888",
-                  transition: "all 0.15s",
-                }}
-              >
-                {meta.label}
-                <span style={{ background: isActive ? meta.color : "#ebebeb", color: isActive ? "#fff" : "#aaa", fontSize: 10, fontWeight: 700, padding: "1px 6px", borderRadius: 10 }}>
-                  {count}
-                </span>
-              </button>
-            );
-          })}
+          <p style={{ color: "#ccc", fontSize: 11, margin: "8px 0 0" }}>
+            Selecting a category filters the images below and sets where new uploads are saved — currently uploading to <strong style={{ color: "#888" }}>{labelFor(activeTab === "all" ? "homepage" : activeTab)}</strong>.
+          </p>
         </div>
       )}
 
