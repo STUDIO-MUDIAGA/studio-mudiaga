@@ -2,16 +2,18 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Upload, Trash2, Copy, Check, ImageOff, X, Loader2 } from "lucide-react";
+import { Upload, Trash2, Copy, Check, ImageOff, X, Loader2, Plus, FolderPlus } from "lucide-react";
 
 const NAVY = "#1e156d";
 const NAVY_BG = "#eeedf8";
 
-export type MediaPrefix = "shortlets" | "furniture" | "homepage" | "mudres" | "abode";
+export type MediaPrefix = string;
 
 type R2Object = { key: string; url: string; size: number; lastModified: string };
 
 type UploadItem = { name: string; status: "uploading" | "done" | "error"; error?: string };
+
+type Category = { id?: string; name: string; slug: string };
 
 const PREFIX_META: Record<string, { label: string; bg: string; color: string }> = {
   homepage:  { label: "Homepage",  bg: NAVY_BG,    color: NAVY       },
@@ -47,6 +49,14 @@ export default function MediaLibrary({
   const [drag, setDrag] = useState(false);
   const [selected, setSelected] = useState<R2Object | null>(null);
   const [activeTab, setActiveTab] = useState<string>("all");
+  const [categories, setCategories] = useState<Category[]>(
+    Object.entries(PREFIX_META).map(([slug, meta]) => ({ slug, name: meta.label }))
+  );
+  const [uploadTarget, setUploadTarget] = useState<string>(prefix ?? "homepage");
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [savingCategory, setSavingCategory] = useState(false);
+  const [categoryError, setCategoryError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const getToken = useCallback(async () => {
@@ -64,7 +74,65 @@ export default function MediaLibrary({
     setLoading(false);
   }, [prefix, getToken]);
 
+  const fetchCategories = useCallback(async () => {
+    const token = await getToken();
+    const res = await fetch("/api/admin/media-categories", { headers: { Authorization: `Bearer ${token}` } });
+    if (!res.ok) return;
+    const data: Category[] = await res.json();
+    setCategories([
+      ...Object.entries(PREFIX_META).map(([slug, meta]) => ({ slug, name: meta.label })),
+      ...data,
+    ]);
+  }, [getToken]);
+
   useEffect(() => { fetchItems(); }, [fetchItems]);
+  useEffect(() => {
+    if (prefix) return;
+    fetchCategories();
+    window.addEventListener("media-categories-updated", fetchCategories);
+    return () => window.removeEventListener("media-categories-updated", fetchCategories);
+  }, [prefix, fetchCategories]);
+
+  const createCategory = async () => {
+    const name = newCategoryName.trim();
+    if (!name) return;
+    setSavingCategory(true);
+    setCategoryError(null);
+    const token = await getToken();
+    const res = await fetch("/api/admin/media-categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ name }),
+    });
+    const data = await res.json();
+    setSavingCategory(false);
+    if (!res.ok) { setCategoryError(data.error ?? "Failed to create category"); return; }
+    setNewCategoryName("");
+    setAddingCategory(false);
+    await fetchCategories();
+    setUploadTarget(data.slug);
+    window.dispatchEvent(new Event("media-categories-updated"));
+  };
+
+  const deleteCategory = async (id: string, slug: string) => {
+    if (!confirm("Delete this category? Existing images stay in R2 but will lose this label.")) return;
+    const token = await getToken();
+    await fetch(`/api/admin/media-categories?id=${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (uploadTarget === slug) setUploadTarget("homepage");
+    await fetchCategories();
+    window.dispatchEvent(new Event("media-categories-updated"));
+  };
+
+  const labelFor = (slug: string) =>
+    categories.find((c) => c.slug === slug)?.name ?? PREFIX_META[slug]?.label ?? slug;
+
+  const metaFor = (slug: string) => {
+    const built = PREFIX_META[slug];
+    return { ...(built ?? { bg: "#f0f0f0", color: "#888" }), label: labelFor(slug) };
+  };
 
   const uploadFiles = async (files: FileList | File[]) => {
     const arr = Array.from(files);
@@ -79,7 +147,7 @@ export default function MediaLibrary({
       const file = arr[i];
       const form = new FormData();
       form.append("file", file);
-      form.append("prefix", prefix ?? "homepage");
+      form.append("prefix", prefix ?? uploadTarget);
 
       try {
         const res = await fetch("/api/upload-image", {
@@ -206,6 +274,78 @@ export default function MediaLibrary({
         <p style={{ color: "#ccc", fontSize: 11, margin: "4px 0 0" }}>JPG, PNG, WebP, AVIF — max 10 MB each</p>
       </div>
 
+      {/* Category picker + creation — All Media only */}
+      {!prefix && (
+        <div style={{ marginBottom: 20 }}>
+          <p style={{ color: "#aaa", fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 8px" }}>
+            Upload to category
+          </p>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+            {categories.map((cat) => {
+              const isActive = uploadTarget === cat.slug;
+              const meta = metaFor(cat.slug);
+              return (
+                <button
+                  key={cat.slug}
+                  onClick={() => setUploadTarget(cat.slug)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    padding: "6px 12px", borderRadius: 20, border: "1px solid",
+                    fontSize: 12, fontWeight: isActive ? 700 : 500, cursor: "pointer",
+                    background: isActive ? meta.bg : "#fff",
+                    borderColor: isActive ? meta.color : "#e8e8e4",
+                    color: isActive ? meta.color : "#888",
+                  }}
+                >
+                  {cat.name}
+                  {cat.id && (
+                    <Trash2
+                      size={11}
+                      onClick={(e) => { e.stopPropagation(); deleteCategory(cat.id!, cat.slug); }}
+                      style={{ opacity: 0.6 }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+
+            {!addingCategory ? (
+              <button
+                onClick={() => setAddingCategory(true)}
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 20, border: "1px dashed #ccc", background: "#fff", color: "#888", fontSize: 12, fontWeight: 500, cursor: "pointer" }}
+              >
+                <FolderPlus size={12} /> New Category
+              </button>
+            ) : (
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <input
+                  autoFocus
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") createCategory(); if (e.key === "Escape") { setAddingCategory(false); setCategoryError(null); } }}
+                  placeholder="e.g. UB"
+                  style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #e0e0e0", fontSize: 12, outline: "none", width: 120 }}
+                />
+                <button
+                  onClick={createCategory}
+                  disabled={savingCategory}
+                  style={{ display: "flex", alignItems: "center", padding: "6px 10px", borderRadius: 8, border: "none", background: NAVY, color: "#fff", cursor: "pointer" }}
+                >
+                  {savingCategory ? <Loader2 size={12} style={{ animation: "spin 1s linear infinite" }} /> : <Plus size={12} />}
+                </button>
+                <button
+                  onClick={() => { setAddingCategory(false); setNewCategoryName(""); setCategoryError(null); }}
+                  style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #e0e0e0", background: "#fff", color: "#888", cursor: "pointer" }}
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            )}
+          </div>
+          {categoryError && <p style={{ color: "#dc2626", fontSize: 11, margin: "6px 0 0" }}>{categoryError}</p>}
+        </div>
+      )}
+
       {/* Category filter tabs — All Media only */}
       {!prefix && !loading && availablePrefixes.length > 0 && (
         <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
@@ -213,7 +353,7 @@ export default function MediaLibrary({
             const isActive = activeTab === tab;
             const meta = tab === "all"
               ? { label: "All", bg: NAVY_BG, color: NAVY }
-              : PREFIX_META[tab] ?? { label: tab, bg: "#f0f0f0", color: "#888" };
+              : metaFor(tab);
             const count = tab === "all"
               ? items.length
               : items.filter((i) => getPrefix(i.key) === tab).length;
@@ -244,7 +384,7 @@ export default function MediaLibrary({
       {/* Stats */}
       {!loading && (
         <p style={{ color: "#bbb", fontSize: 12, marginBottom: 16 }}>
-          {visibleItems.length} image{visibleItems.length !== 1 ? "s" : ""}{activeTab !== "all" ? ` in ${PREFIX_META[activeTab]?.label ?? activeTab}` : ""} · {formatBytes(visibleItems.reduce((s, i) => s + i.size, 0))} total
+          {visibleItems.length} image{visibleItems.length !== 1 ? "s" : ""}{activeTab !== "all" ? ` in ${labelFor(activeTab)}` : ""} · {formatBytes(visibleItems.reduce((s, i) => s + i.size, 0))} total
         </p>
       )}
 
@@ -262,7 +402,7 @@ export default function MediaLibrary({
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 12 }}>
           {visibleItems.map((item) => {
             const pfx = getPrefix(item.key);
-            const meta = PREFIX_META[pfx] ?? { label: pfx, bg: "#f0f0f0", color: "#888" };
+            const meta = metaFor(pfx);
             return (
               <div
                 key={item.key}
@@ -325,7 +465,7 @@ export default function MediaLibrary({
             </div>
             {(() => {
               const pfx = getPrefix(selected.key);
-              const meta = PREFIX_META[pfx] ?? { label: pfx, bg: "#f0f0f0", color: "#888" };
+              const meta = metaFor(pfx);
               return (
                 <div style={{ display: "inline-flex", alignItems: "center", background: meta.bg, color: meta.color, fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", padding: "3px 8px", borderRadius: 6, marginBottom: 14 }}>
                   {meta.label}

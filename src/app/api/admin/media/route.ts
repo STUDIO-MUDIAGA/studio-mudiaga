@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { listFromCF, deleteFromCF, MediaPrefix } from "@/lib/cf-images";
+import { isValidSlug } from "@/lib/media-categories";
 
 export const runtime = "nodejs";
 
@@ -19,14 +20,12 @@ async function requireAdmin(req: NextRequest) {
   return profile?.role === "admin" ? user : null;
 }
 
-const VALID_PREFIXES: MediaPrefix[] = ["shortlets", "furniture", "homepage", "mudres", "abode"];
-
 // GET /api/admin/media?prefix=homepage
 export async function GET(req: NextRequest) {
   if (!await requireAdmin(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const prefix = req.nextUrl.searchParams.get("prefix") as MediaPrefix | null;
-  const validPrefix = prefix && VALID_PREFIXES.includes(prefix) ? prefix : undefined;
+  const validPrefix = prefix && isValidSlug(prefix) ? prefix : undefined;
 
   const objects = await listFromCF(validPrefix);
   return NextResponse.json(objects);

@@ -54,7 +54,7 @@ export async function uploadToCF(
   return { key, url: cfImageUrl(key) };
 }
 
-export type MediaPrefix = "shortlets" | "furniture" | "homepage" | "mudres" | "abode";
+export type MediaPrefix = string;
 
 export type R2Object = { key: string; url: string; size: number; lastModified: Date };
 

@@ -4,13 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { createClient } from "@/lib/supabase/client";
 import {
   LayoutDashboard, Building2, Sofa, CalendarDays,
   ShoppingBag, Users, TrendingUp, LogOut, Menu, X,
   Settings, Bell, Search, ChevronDown, Tag, BarChart2, Plus, List,
-  Images, Home, Armchair,
+  Images, Home, Armchair, Folder,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const NAVY = "#1e156d";
 const NAVY_BG = "#eeedf8";
@@ -59,6 +60,7 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
   const router = useRouter();
+  const [customMediaCategories, setCustomMediaCategories] = useState<SubItem[]>([]);
 
   const isActive = (href: string, exact?: boolean) =>
     exact ? pathname === href : pathname.startsWith(href);
@@ -74,6 +76,25 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>(initialExpanded);
 
   const toggleExpand = (href: string) => setExpanded((p) => ({ ...p, [href]: !p[href] }));
+
+  useEffect(() => {
+    const supabase = createClient();
+    const loadCategories = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const res = await fetch("/api/admin/media-categories", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (!res.ok) return;
+      const data: { name: string; slug: string }[] = await res.json();
+      setCustomMediaCategories(
+        data.map((c) => ({ label: c.name, href: `/admin/media/${c.slug}`, icon: Folder }))
+      );
+    };
+    loadCategories();
+    window.addEventListener("media-categories-updated", loadCategories);
+    return () => window.removeEventListener("media-categories-updated", loadCategories);
+  }, []);
 
   return (
     <aside style={{ width: 240, flexShrink: 0, background: "#fff", borderRight: "1px solid #ebebeb", display: "flex", flexDirection: "column", height: "100vh", position: "sticky", top: 0 }}>
@@ -91,8 +112,11 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
         {navItems.map(({ label, href, icon: Icon, exact, children }) => {
           const active = isActive(href, exact);
           const isOpen = !!expanded[href];
+          const effectiveChildren = href === "/admin/media" && children
+            ? [...children, ...customMediaCategories]
+            : children;
 
-          if (children) {
+          if (effectiveChildren) {
             return (
               <div key={href} style={{ marginBottom: 2 }}>
                 <button
@@ -107,7 +131,7 @@ function Sidebar({ onNav }: { onNav?: () => void }) {
                 </button>
                 {isOpen && (
                   <div style={{ marginLeft: 14, marginTop: 2, paddingLeft: 14, borderLeft: "1px solid #f0f0f0" }}>
-                    {children.map(({ label: cl, href: ch, icon: CIcon }) => {
+                    {effectiveChildren.map(({ label: cl, href: ch, icon: CIcon }) => {
                       const childActive = pathname === ch;
                       return (
                         <Link
