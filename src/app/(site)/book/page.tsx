@@ -31,10 +31,6 @@ const BUDGETS = [
 
 const STEP_NAMES = ["About you", "Your project", "Your vision", "Your budget", "Your expectations"];
 const TOTAL_STEPS = STEP_NAMES.length;
-// "Your project" and "Your vision" carry more fields than a single viewport can
-// hold at readable size — those two scroll internally; the rest stretch to
-// fill the screen exactly, no scrollbar.
-const DENSE_STEPS = [2, 3];
 
 type UploadedImage = { url: string; uploading: boolean };
 
@@ -219,7 +215,6 @@ export default function StartProjectPage() {
   const stillUploading = images.some((i) => i.uploading);
   const isCover = step === 0;
   const isLastStep = step === TOTAL_STEPS;
-  const isDense = DENSE_STEPS.includes(step);
   const canContinue = step === 1 ? fullName.trim() !== "" && email.trim() !== "" : true;
 
   function goNext() {
@@ -336,7 +331,7 @@ export default function StartProjectPage() {
         </div>
 
         <form onSubmit={handleSubmit} style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: isDense ? "flex-start" : "space-between", minHeight: 0, overflowY: "auto", padding: "24px 0" }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-start", minHeight: 0, overflowY: "auto", padding: "24px 0" }}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={step}
@@ -344,7 +339,7 @@ export default function StartProjectPage() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -16 }}
                 transition={{ duration: 0.22, ease: "easeOut" }}
-                style={{ display: "flex", flexDirection: "column", gap: isDense ? 22 : 0, justifyContent: isDense ? "flex-start" : "space-between", flex: isDense ? "none" : 1 }}
+                style={{ display: "flex", flexDirection: "column", gap: 22 }}
               >
                 {/* Step 1 — About you */}
                 {step === 1 && (
