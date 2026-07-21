@@ -42,25 +42,16 @@ export default function AboutSection() {
         }}
       >
         {/*
-          Outer grid: 2 columns
+          Outer grid: single column on mobile (stacked), 2 columns from md up
             col 1 (60%): top text row + bottom [left-img + center-text] row
             col 2 (40%): right image spanning BOTH rows — full section height
         */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "3fr 2fr",
-            gridTemplateRows: "auto minmax(52vh, 1fr)",
-            minHeight: "100vh",
-          }}
-        >
-          {/* ── Row 1 Col 1: label + heading + learn more ──────── */}
+        <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] md:grid-rows-[auto_minmax(52vh,1fr)] md:min-h-screen">
+          {/* ── Row 1 Col 1: label + heading ──────── */}
           <div
+            className="md:col-start-1 md:row-start-1 md:min-h-[52vh]"
             style={{
-              gridColumn: 1,
-              gridRow: 1,
-              padding: "clamp(36px, 4vw, 56px) clamp(28px, 3vw, 48px)",
-              minHeight: "52vh",
+              padding: "clamp(36px, 4vw, 56px) clamp(20px, 3vw, 48px)",
             }}
           >
             <p
@@ -84,48 +75,26 @@ export default function AboutSection() {
                 lineHeight: 1.1,
                 color: "#0a0a0a",
                 maxWidth: 640,
-                marginBottom: "clamp(18px, 2vw, 30px)",
               }}
             >
-              Together, we shape homes rooted in
-              <br />simplicity and crafted with care.
+              Design, build, furnish, spaces tailored to the way you live.
             </h2>
-
-            <a
-              href="#"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                fontFamily: "var(--font-dm-sans)",
-                fontSize: 13,
-                color: "#0a0a0a",
-                textDecoration: "underline",
-                textUnderlineOffset: 4,
-              }}
-            >
-              Learn more
-              <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
-                <path d="M1 5h12M8 1l5 4-5 4" stroke="#0a0a0a" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </a>
           </div>
 
-          {/* ── Col 2: right image spanning both rows ───────────── */}
+          {/* ── Col 2: right image spanning both rows on desktop ───────────── */}
           <div
+            className="md:col-start-2 md:row-start-1 md:row-span-2"
             style={{
-              gridColumn: 2,
-              gridRow: "1 / 3",
-              padding: "100px 28px 0 0",
+              padding: "clamp(20px, 5vw, 100px) clamp(20px, 4vw, 28px) clamp(48px, 6vw, 80px)",
             }}
           >
-            <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
+            <div className="relative w-full aspect-[3/4] md:aspect-auto md:h-full overflow-hidden">
               <Image
                 src="/IMG_1672.JPG"
                 alt="Mudiaga — Founder"
                 fill
                 className="object-cover"
-                sizes="40vw"
+                sizes="(max-width: 768px) 100vw, 40vw"
               />
               {/* + marker */}
               <div
@@ -173,23 +142,19 @@ export default function AboutSection() {
           </div>
 
           {/* ── Row 2 Col 1: left image + center text ───────────── */}
-          <div
-            style={{
-              gridColumn: 1,
-              gridRow: 2,
-              display: "grid",
-              gridTemplateColumns: "1fr 1.5fr",
-            }}
-          >
-            {/* Left image — inset from left edge */}
-            <div style={{ paddingLeft: 28, height: "100%" }}>
-              <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
+          <div className="md:col-start-1 md:row-start-2 grid grid-cols-1 sm:grid-cols-[1fr_1.5fr]">
+            {/* Left image — inset from left edge on desktop */}
+            <div
+              className="px-5 sm:pl-7 sm:pr-0"
+              style={{ paddingBottom: "clamp(24px, 6vw, 80px)" }}
+            >
+              <div className="relative w-full aspect-[4/5] sm:aspect-auto sm:h-full overflow-hidden">
                 <Image
                   src="/IMG_1609.JPG"
                   alt="Studio Mudiaga interior"
                   fill
                   className="object-cover"
-                  sizes="25vw"
+                  sizes="(max-width: 640px) 100vw, 25vw"
                 />
               </div>
             </div>
@@ -197,7 +162,8 @@ export default function AboutSection() {
             {/* Center text — aligned to bottom */}
             <div
               style={{
-                padding: "clamp(28px, 3vw, 48px) clamp(28px, 3vw, 52px)",
+                padding: "clamp(24px, 3vw, 48px) clamp(20px, 3vw, 52px)",
+                paddingBottom: "clamp(48px, 6vw, 80px)",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "flex-end",
@@ -207,7 +173,7 @@ export default function AboutSection() {
               <p
                 style={{
                   fontFamily: "var(--font-dm-sans)",
-                  fontSize: "clamp(12px, 1vw, 15px)",
+                  fontSize: "clamp(13px, 1vw, 15px)",
                   lineHeight: 1.85,
                   color: "rgba(10,10,10,0.65)",
                 }}
@@ -220,7 +186,7 @@ export default function AboutSection() {
               <p
                 style={{
                   fontFamily: "var(--font-dm-sans)",
-                  fontSize: "clamp(12px, 1vw, 15px)",
+                  fontSize: "clamp(13px, 1vw, 15px)",
                   lineHeight: 1.85,
                   color: "rgba(10,10,10,0.65)",
                 }}

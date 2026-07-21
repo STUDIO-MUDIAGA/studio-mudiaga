@@ -11,6 +11,7 @@ import {
   MotionValue,
 } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import Hero from "./Hero";
 import { useNavTheme } from "@/context/NavTheme";
 
@@ -49,8 +50,8 @@ export default function HorizontalScroll() {
   );
 
   return (
-    <div ref={wrapperRef} style={{ height: `${WRAPPER_VH}vh` }}>
-      <div className="sticky top-0 h-screen overflow-hidden">
+    <div ref={wrapperRef} style={{ height: `${WRAPPER_VH}dvh` }}>
+      <div className="sticky top-0 h-[100dvh] overflow-hidden">
         <motion.div
           className="flex h-full"
           style={{ x, width: "200vw" }}
@@ -173,20 +174,28 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
         Est. 2020
       </motion.p>
 
-      {/* Left word */}
+      {/* Mobile — stacked vertically, centered */}
       <motion.div
-        className="absolute left-14 xl:left-20 z-10 flex"
+        className="sm:hidden absolute inset-x-0 flex flex-col items-center z-10 gap-1"
         style={{ fontFamily: "var(--font-playfair)", opacity: textOpacity }}
       >
-        <ZoomText text="Project" className="text-[4.5vw] text-[#0a0a0a] font-light leading-none" />
+        <ZoomText text="Project" className="text-[clamp(28px,8vw,48px)] text-[#0a0a0a] font-light leading-none" />
+        <ZoomText text="Abode" className="text-[clamp(28px,8vw,48px)] text-[#0a0a0a] font-light leading-none" />
       </motion.div>
 
-      {/* Right word */}
+      {/* Desktop — split left/right */}
       <motion.div
-        className="absolute right-14 xl:right-20 z-10 flex"
+        className="hidden sm:flex absolute left-14 xl:left-20 z-10"
         style={{ fontFamily: "var(--font-playfair)", opacity: textOpacity }}
       >
-        <ZoomText text="Abode" className="text-[4.5vw] text-[#0a0a0a] font-light leading-none" />
+        <ZoomText text="Project" className="text-[clamp(20px,4.5vw,90px)] text-[#0a0a0a] font-light leading-none" />
+      </motion.div>
+
+      <motion.div
+        className="hidden sm:flex absolute right-14 xl:right-20 z-10"
+        style={{ fontFamily: "var(--font-playfair)", opacity: textOpacity }}
+      >
+        <ZoomText text="Abode" className="text-[clamp(20px,4.5vw,90px)] text-[#0a0a0a] font-light leading-none" />
       </motion.div>
 
       {/* Bottom label (white section) */}
@@ -194,7 +203,7 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
         className="absolute bottom-10 left-1/2 -translate-x-1/2 text-[10px] text-[#0a0a0a]/35 tracking-[0.35em] uppercase select-none z-10"
         style={{ opacity: labelOpacity }}
       >
-        Lagos · Abuja
+        Interior Decor
       </motion.p>
 
       {/* Full-screen overlay content */}
@@ -203,23 +212,25 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
         style={{ opacity: contentOpacity }}
       >
         {/* Main content row — vertically centered, left edge matches navbar logo */}
-        <div className="absolute inset-0 flex items-center">
+        <div className="absolute inset-0 flex items-center overflow-y-auto">
           <div
+            className="flex-col items-start md:flex-row md:items-center"
             style={{
               maxWidth: 1200,
               margin: "0 auto",
               width: "100%",
-              paddingLeft: 48,
-              paddingRight: 64,
+              paddingLeft: "clamp(20px, 4vw, 48px)",
+              paddingRight: "clamp(20px, 4vw, 64px)",
+              paddingTop: 24,
+              paddingBottom: 24,
               display: "flex",
-              alignItems: "center",
             }}
           >
             {/* Left — heading with per-word slide-up entrance */}
             <h2
               style={{
                 fontFamily: "var(--font-playfair)",
-                fontSize: "clamp(38px, 5vw, 80px)",
+                fontSize: "clamp(30px, 5vw, 80px)",
                 fontWeight: 300,
                 lineHeight: 1.12,
                 color: "white",
@@ -263,13 +274,12 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
               variants={rightColVariants}
               initial="hidden"
               animate={headingVisible ? "visible" : "hidden"}
+              className="w-full md:w-[240px] mt-5 md:mt-0 ml-0 md:ml-[clamp(24px,3vw,56px)]"
               style={{
-                width: 240,
                 flexShrink: 0,
-                marginLeft: "clamp(24px, 3vw, 56px)",
                 display: "flex",
                 flexDirection: "column",
-                gap: 28,
+                gap: 20,
               }}
             >
               <p
@@ -297,7 +307,8 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
               </p>
 
               {/* Corner-bracket button — corners float outside the white box */}
-              <button
+              <Link
+                href="/about"
                 className="group pointer-events-auto"
                 style={{
                   position: "relative",
@@ -321,8 +332,8 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
                 <svg className="absolute opacity-60 group-hover:opacity-100 transition-opacity duration-300" style={{ bottom: -7, left: -7 }} width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M20 19.5H0.5V0" stroke="white" strokeWidth="1"/></svg>
                 <svg className="absolute opacity-60 group-hover:opacity-100 transition-opacity duration-300" style={{ bottom: -7, right: -7 }} width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M0 19.5H19.5V0" stroke="white" strokeWidth="1"/></svg>
                 <span style={{ width: 7, height: 7, background: "#c85442", flexShrink: 0 }} />
-                View Project
-              </button>
+                About Us
+              </Link>
             </motion.div>
           </div>
         </div>

@@ -16,6 +16,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
+  // Intro loader only plays on the main landing page — every other route opens instantly
+  if (pathname !== "/") {
+    return <>{children}</>;
+  }
+
   return (
     <>
       <IntroLoader onComplete={handleComplete} />

@@ -3,8 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { X } from "lucide-react";
-import MenuOverlay from "./MenuOverlay";
 import { useNavTheme } from "@/context/NavTheme";
 
 // Inline SVG — fill="currentColor" so CSS color controls it
@@ -32,10 +30,15 @@ function LogoSVG({ className, style }: { className?: string; style?: React.CSSPr
   );
 }
 
+const NAV_LINKS = [
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Projects", href: "/projects" },
+  { label: "Contact", href: "/book" },
+];
+
 export default function Navbar() {
   const pathname = usePathname();
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [navVisible, setNavVisible] = useState(true);
   const lastScrollY = useRef(0);
   const { theme } = useNavTheme();
@@ -47,7 +50,6 @@ export default function Navbar() {
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
-      setScrolled(y > 40);
 
       // Show only in the early white-panel zone (before the image zoom goes dark)
       // ~1.5 × vh ≈ midway through the editorial zoom, white bg still visible
@@ -69,66 +71,39 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [menuOpen]);
-
   return (
-    <>
-      <header
-        className="fixed top-0 left-0 right-0 z-50 transition-transform duration-500 ease-in-out"
-        style={{ transform: navVisible || menuOpen ? "translateY(0)" : "translateY(-110%)" }}
+    <header
+      className="fixed top-0 left-0 right-0 z-50 transition-transform duration-500 ease-in-out"
+      style={{ transform: navVisible ? "translateY(0)" : "translateY(-110%)" }}
+    >
+      <div
+        className="absolute inset-0 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/5 transition-opacity duration-500 pointer-events-none"
+        style={{ opacity: !isLanding ? 1 : 0 }}
+      />
+      <div
+        className="relative flex items-center justify-between w-full"
+        style={{ maxWidth: 1200, margin: "0 auto", paddingLeft: 48, paddingRight: 64, paddingTop: 32, paddingBottom: 20 }}
       >
-        <div
-          className="absolute inset-0 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/5 transition-opacity duration-500 pointer-events-none"
-          style={{ opacity: !menuOpen && !isLanding ? 1 : 0 }}
-        />
-        <div
-          className="relative flex items-center justify-between w-full"
-          style={{ maxWidth: 1200, margin: "0 auto", paddingLeft: 48, paddingRight: 64, paddingTop: 32, paddingBottom: 20 }}
-        >
-          <Link href="/" className="flex items-center gap-5 group">
-            <LogoSVG
-              className="transition-colors duration-500"
-              style={{ color: isLight ? "#65483E" : "white" }}
-            />
-            <span
-              className="w-px h-9 hidden sm:block transition-colors duration-500"
-              style={{ backgroundColor: isLight ? "rgba(101,72,62,0.3)" : "rgba(255,255,255,0.2)" }}
-            />
-            <span
-              className="hidden sm:block text-[10px] tracking-[0.2em] uppercase leading-snug transition-colors duration-500"
-              style={{ color: isLight ? "rgba(101,72,62,0.6)" : "rgba(255,255,255,0.4)" }}
+        <Link href="/" className="flex items-center">
+          <LogoSVG
+            className="transition-colors duration-500"
+            style={{ color: isLight ? "#65483E" : "white" }}
+          />
+        </Link>
+
+        <nav className="hidden sm:flex items-center gap-8">
+          {NAV_LINKS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="text-sm font-medium transition-colors duration-500"
+              style={{ color: isLight ? "rgba(101,72,62,0.75)" : "rgba(255,255,255,0.75)" }}
             >
-              Shortlets
-              <br />
-              &amp; Furniture
-            </span>
-          </Link>
-
-          <button
-            onClick={() => setMenuOpen((v) => !v)}
-            style={{
-              paddingLeft: 24, paddingRight: 20, paddingTop: 12, paddingBottom: 12, gap: 10,
-              backgroundColor: isLight ? "transparent" : "#1a1a1a",
-              borderColor: isLight ? "rgba(101,72,62,0.25)" : "rgba(255,255,255,0.1)",
-              color: isLight ? "#65483E" : "rgba(255,255,255,0.8)",
-            }}
-            className="flex items-center border rounded-full transition-colors duration-500 z-[201] relative"
-            aria-label="Toggle menu"
-          >
-            <span className="text-sm font-medium select-none tracking-wide">
-              {menuOpen ? "Close" : "Menu"}
-            </span>
-            <span className="text-[18px] leading-none select-none">
-              {menuOpen ? <X size={14} /> : "≡"}
-            </span>
-          </button>
-        </div>
-      </header>
-
-      <MenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
-    </>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </div>
+    </header>
   );
 }

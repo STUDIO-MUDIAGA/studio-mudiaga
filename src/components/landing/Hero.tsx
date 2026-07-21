@@ -10,39 +10,18 @@ const SLIDE_DURATION = 5; // seconds
 
 const slides = [
   {
-    image: "/IMG_1654.JPG",
-    tag: "Furniture · Handcrafted",
-    title: "Artisan\nTable",
-    subtitle: "Hand-carved solid wood pieces that anchor every room with intention.",
-    cta: { label: "View Collection", href: "/furniture" },
-  },
-  {
-    image: "/IMG_1656.JPG",
-    tag: "Furniture · Dining",
-    title: "The Dining\nExperience",
-    subtitle: "Where craftsmanship meets art — furniture that tells a story.",
-    cta: { label: "Shop Furniture", href: "/furniture" },
-  },
-  {
     image: "/IMG_1666.JPG",
-    tag: "Shortlets · Lagos",
-    title: "The Media\nLounge",
-    subtitle: "Curated interiors, bespoke furniture — a space designed to be lived in.",
-    cta: { label: "Book Now", href: "/shortlets" },
+    tag: "Project · Abode",
+    title: "Project\nAbode",
+    subtitle: "An interior decor project — every room shaped by considered materials and quiet detail.",
+    cta: { label: "View Projects", href: "/projects/abode" },
   },
   {
-    image: "/IMG_1672.JPG",
-    tag: "Shortlets · Reading Nook",
-    title: "Raw &\nRefined",
-    subtitle: "Exposed brick, warm light, handcrafted chairs. Comfort in every detail.",
-    cta: { label: "Explore Stays", href: "/shortlets" },
-  },
-  {
-    image: "/IMG_1675.JPG",
-    tag: "Shortlets · Living",
-    title: "Spaces That\nInspire",
-    subtitle: "Every corner considered. Every material chosen with purpose.",
-    cta: { label: "Book Now", href: "/shortlets" },
+    image: "/IMG_1660.JPG",
+    tag: "Project · UB",
+    title: "Project\nUB",
+    subtitle: "An interior decor project for a private residence — restrained, honest materials, and quiet luxury.",
+    cta: { label: "View Projects", href: "/projects/ub" },
   },
 ];
 
