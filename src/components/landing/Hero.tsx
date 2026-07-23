@@ -17,7 +17,7 @@ const slides = [
     cta: { label: "View Projects", href: "/projects/abode" },
   },
   {
-    image: "/IMG_1660.JPG",
+    image: "https://pub-2ddf02e2e1654b72808b735601463baf.r2.dev/project-ub/318cb696-ce33-4bb7-966e-62d193baaf1d.png",
     tag: "Project · UB",
     title: "Project\nUB",
     subtitle: "An interior decor project for a private residence — restrained, honest materials, and quiet luxury.",

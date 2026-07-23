@@ -11,7 +11,7 @@ const PROJECTS = [
   {
     title: "UB",
     eyebrow: "Interior Decor",
-    image: "/IMG_1660.JPG",
+    image: "https://pub-2ddf02e2e1654b72808b735601463baf.r2.dev/project-ub/318cb696-ce33-4bb7-966e-62d193baaf1d.png",
     href: "/projects/ub",
   },
 ];
