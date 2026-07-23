@@ -9,7 +9,17 @@ const supabaseAdmin = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
+const AUTH_RELEVANT_PREFIXES = ["/account", "/admin", "/login", "/signup"];
+
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Skip the Supabase round-trip entirely on public marketing/content pages —
+  // getUser() is a network call and was adding it to every single page load.
+  if (!AUTH_RELEVANT_PREFIXES.some((p) => pathname.startsWith(p))) {
+    return NextResponse.next();
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -35,7 +45,6 @@ export async function proxy(request: NextRequest) {
 
   // Refresh session — must not call getSession() here, use getUser()
   const { data: { user } } = await supabase.auth.getUser();
-  const { pathname } = request.nextUrl;
 
   // ── Protect /account ──────────────────────────────────────────────
   if (pathname.startsWith("/account")) {

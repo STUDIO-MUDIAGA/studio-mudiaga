@@ -19,7 +19,7 @@ export default function ProjectUBPage() {
           { src: "https://pub-2ddf02e2e1654b72808b735601463baf.r2.dev/project-ub/16f32aab-4d5b-46db-a57b-cf80ecf9f7d9.png", alt: "Project UB interior" },
           { src: "https://pub-2ddf02e2e1654b72808b735601463baf.r2.dev/project-ub/8f871ab5-6666-487c-9d9e-c1774ff9f2ed.png", alt: "Project UB interior" },
         ],
-        cta: { label: "Enquire About a Project Like This", href: "/book" },
+        cta: { label: "Enquire About a Project Like This", href: "/book-a-consultation" },
       }}
     />
   );

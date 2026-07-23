@@ -77,7 +77,7 @@ export default function FinalCTA() {
               transition={{ duration: 0.5, delay: 0.2 }}
             >
               <Link
-                href="/book"
+                href="/book-a-consultation"
                 className="inline-flex items-center bg-white text-black"
                 style={{ fontFamily: "var(--font-dm-sans)", fontSize: 14, padding: "12px 24px" }}
               >
