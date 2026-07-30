@@ -119,29 +119,38 @@ export default function ProjectShowcase({ data }: { data: ProjectShowcaseData })
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-10%" }}
               transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-              className="grid border-t border-black/10"
-              style={{ gridTemplateColumns: `repeat(${data.facts.length}, minmax(0, 1fr))` }}
+              className="grid grid-cols-2 md:flex border-t border-black/10"
             >
-              {data.facts.map((fact, i) => (
-                <div
-                  key={i}
-                  className="py-8"
-                  style={{ borderLeft: i === 0 ? "none" : "1px solid rgba(0,0,0,0.1)", paddingLeft: i === 0 ? 0 : 24 }}
-                >
-                  <p
-                    className="text-black font-light mb-2"
-                    style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(22px, 2.4vw, 32px)" }}
+              {data.facts.map((fact, i) => {
+                const mobileFirstCol = i % 2 === 0;
+                const mobileFirstRow = i < 2;
+                const desktopFirst = i === 0;
+                return (
+                  <div
+                    key={i}
+                    className={[
+                      "py-6 md:py-8 md:flex-1",
+                      mobileFirstCol ? "pl-0 border-l-0" : "pl-5 border-l border-black/10",
+                      mobileFirstRow ? "border-t-0" : "border-t border-black/10",
+                      desktopFirst ? "md:pl-0 md:border-l-0" : "md:pl-6 md:border-l md:border-black/10",
+                      "md:border-t-0",
+                    ].join(" ")}
                   >
-                    {fact.value}
-                  </p>
-                  <p
-                    className="text-black/45 text-xs tracking-[0.15em] uppercase"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
-                  >
-                    {fact.label}
-                  </p>
-                </div>
-              ))}
+                    <p
+                      className="text-black font-light mb-2"
+                      style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(22px, 2.4vw, 32px)" }}
+                    >
+                      {fact.value}
+                    </p>
+                    <p
+                      className="text-black/45 text-xs tracking-[0.15em] uppercase"
+                      style={{ fontFamily: "var(--font-dm-sans)" }}
+                    >
+                      {fact.label}
+                    </p>
+                  </div>
+                );
+              })}
             </motion.div>
           </div>
         )}
