@@ -34,7 +34,7 @@ function Section({ eyebrow, children }: { eyebrow: string; children: React.React
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 28, paddingTop: 56 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: 11, letterSpacing: "0.25em", textTransform: "uppercase", color: AMBER, whiteSpace: "nowrap" }}>
+        <p style={{ fontFamily: "var(--font-inter)", fontSize: 11, letterSpacing: "0.25em", textTransform: "uppercase", color: AMBER, whiteSpace: "nowrap" }}>
           {eyebrow}
         </p>
         <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
@@ -264,10 +264,10 @@ export default function BookAConsultationPage() {
     return (
       <div style={{ background: "#0a0a0a", minHeight: "100dvh", boxSizing: "border-box", paddingTop: 96, display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ maxWidth: 480, textAlign: "center", padding: "0 24px" }}>
-          <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: 11, letterSpacing: "0.25em", textTransform: "uppercase", color: AMBER, marginBottom: 18 }}>
+          <p style={{ fontFamily: "var(--font-inter)", fontSize: 11, letterSpacing: "0.25em", textTransform: "uppercase", color: AMBER, marginBottom: 18 }}>
             Book a Consultation
           </p>
-          <h1 style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(28px, 4vw, 38px)", fontWeight: 400, color: "#fff", lineHeight: 1.35 }}>
+          <h1 style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(28px, 4vw, 38px)", fontWeight: 400, color: "#fff", lineHeight: 1.35 }}>
             Thank you. We read every enquiry personally. If your project is right for us you will hear from us within 48 hours.
           </h1>
         </div>
@@ -280,10 +280,10 @@ export default function BookAConsultationPage() {
       <div style={{ maxWidth: 680, width: "100%", margin: "0 auto", padding: "0 24px 120px" }}>
         {/* Intro */}
         <div style={{ paddingTop: 24, paddingBottom: 8 }}>
-          <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: 11, letterSpacing: "0.25em", textTransform: "uppercase", color: AMBER, marginBottom: 18 }}>
+          <p style={{ fontFamily: "var(--font-inter)", fontSize: 11, letterSpacing: "0.25em", textTransform: "uppercase", color: AMBER, marginBottom: 18 }}>
             Book a Consultation
           </p>
-          <h1 style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(28px, 5vw, 40px)", fontWeight: 400, color: "#fff", lineHeight: 1.25, marginBottom: 16 }}>
+          <h1 style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(28px, 5vw, 40px)", fontWeight: 400, color: "#fff", lineHeight: 1.25, marginBottom: 16 }}>
             Tell us about the space you&apos;re dreaming of.
           </h1>
           <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, lineHeight: 1.7 }}>

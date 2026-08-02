@@ -22,13 +22,13 @@ export default function ProjectsPage() {
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "clamp(140px, 14vw, 200px) 48px clamp(64px, 8vw, 120px)" }}>
         <p
           className="text-[11px] tracking-[0.25em] uppercase text-black/40 mb-5"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
+          style={{ fontFamily: "var(--font-inter)" }}
         >
           Our Work
         </p>
         <h1
           className="font-light text-black"
-          style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(36px, 5vw, 64px)", lineHeight: 1.15 }}
+          style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(36px, 5vw, 64px)", lineHeight: 1.15 }}
         >
           Projects
         </h1>
@@ -50,13 +50,13 @@ export default function ProjectsPage() {
               </div>
               <p
                 className="text-black/40 mt-5 mb-1"
-                style={{ fontFamily: "var(--font-dm-sans)", fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase" }}
+                style={{ fontFamily: "var(--font-inter)", fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase" }}
               >
                 {project.eyebrow}
               </p>
               <h2
                 className="text-black"
-                style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(24px, 2.6vw, 36px)", fontWeight: 400 }}
+                style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(24px, 2.6vw, 36px)", fontWeight: 400 }}
               >
                 {project.title}
               </h2>

@@ -64,7 +64,7 @@ export default function ProjectShowcase({ data }: { data: ProjectShowcaseData })
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-white font-light leading-[1.05] mb-4"
-              style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(48px, 8vw, 120px)" }}
+              style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(48px, 8vw, 120px)" }}
             >
               {data.title}
             </motion.h1>
@@ -89,7 +89,7 @@ export default function ProjectShowcase({ data }: { data: ProjectShowcaseData })
             viewport={{ once: true, margin: "-10%" }}
             transition={{ duration: 0.5 }}
             className="text-[11px] tracking-[0.25em] uppercase text-black/40 whitespace-nowrap"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: "var(--font-inter)" }}
           >
             About the Project
           </motion.p>
@@ -102,7 +102,7 @@ export default function ProjectShowcase({ data }: { data: ProjectShowcaseData })
                 viewport={{ once: true, margin: "-10%" }}
                 transition={{ duration: 0.5, delay: i * 0.08, ease: "easeOut" }}
                 className="text-black/70"
-                style={{ fontFamily: "var(--font-dm-sans)", fontSize: 16, lineHeight: 1.85 }}
+                style={{ fontFamily: "var(--font-inter)", fontSize: 16, lineHeight: 1.85 }}
               >
                 {paragraph}
               </motion.p>
@@ -138,13 +138,13 @@ export default function ProjectShowcase({ data }: { data: ProjectShowcaseData })
                   >
                     <p
                       className="text-black font-light mb-2"
-                      style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(22px, 2.4vw, 32px)" }}
+                      style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(22px, 2.4vw, 32px)" }}
                     >
                       {fact.value}
                     </p>
                     <p
                       className="text-black/45 text-xs tracking-[0.15em] uppercase"
-                      style={{ fontFamily: "var(--font-dm-sans)" }}
+                      style={{ fontFamily: "var(--font-inter)" }}
                     >
                       {fact.label}
                     </p>
@@ -192,13 +192,13 @@ export default function ProjectShowcase({ data }: { data: ProjectShowcaseData })
                   >
                     <p
                       className="text-[11px] tracking-[0.25em] uppercase text-black/40 mb-5"
-                      style={{ fontFamily: "var(--font-dm-sans)" }}
+                      style={{ fontFamily: "var(--font-inter)" }}
                     >
                       {row.eyebrow}
                     </p>
                     <h2
                       className="font-light text-black mb-6"
-                      style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(26px, 3vw, 38px)", lineHeight: 1.25 }}
+                      style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(26px, 3vw, 38px)", lineHeight: 1.25 }}
                     >
                       {row.heading}
                     </h2>
@@ -207,7 +207,7 @@ export default function ProjectShowcase({ data }: { data: ProjectShowcaseData })
                         <p
                           key={j}
                           className="text-black/70"
-                          style={{ fontFamily: "var(--font-dm-sans)", fontSize: 15, lineHeight: 1.85 }}
+                          style={{ fontFamily: "var(--font-inter)", fontSize: 15, lineHeight: 1.85 }}
                         >
                           {paragraph}
                         </p>
@@ -229,7 +229,7 @@ export default function ProjectShowcase({ data }: { data: ProjectShowcaseData })
           viewport={{ once: true, margin: "-10%" }}
           transition={{ duration: 0.5 }}
           className="text-[11px] tracking-[0.25em] uppercase text-black/40 mb-10"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
+          style={{ fontFamily: "var(--font-inter)" }}
         >
           Gallery
         </motion.p>
@@ -271,7 +271,7 @@ export default function ProjectShowcase({ data }: { data: ProjectShowcaseData })
         >
           <h3
             className="font-light text-black"
-            style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(28px, 3.2vw, 44px)", maxWidth: 560 }}
+            style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(28px, 3.2vw, 44px)", maxWidth: 560 }}
           >
             Interested in a project like this?
           </h3>

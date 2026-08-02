@@ -25,13 +25,13 @@ export default function ReviewsSection() {
         <div>
           <p
             className="text-[11px] tracking-[0.25em] uppercase text-black/40 mb-5"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: "var(--font-inter)" }}
           >
             Reviews
           </p>
           <h2
             className="font-medium text-black mb-16"
-            style={{ fontFamily: "var(--font-dm-sans)", fontSize: "clamp(28px, 3vw, 40px)", lineHeight: 1.2 }}
+            style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(28px, 3vw, 40px)", lineHeight: 1.2 }}
           >
             Personal spaces.
             <br />
@@ -47,7 +47,7 @@ export default function ReviewsSection() {
         <div className="flex items-center gap-3">
           <span
             className="text-[11px] tracking-[0.15em] uppercase text-black/40 whitespace-nowrap"
-            style={{ writingMode: "vertical-rl", transform: "rotate(180deg)", fontFamily: "var(--font-dm-sans)" }}
+            style={{ writingMode: "vertical-rl", transform: "rotate(180deg)", fontFamily: "var(--font-inter)" }}
           >
             {review.name}
           </span>
@@ -71,7 +71,7 @@ export default function ReviewsSection() {
         <div>
           <p
             className="text-black font-bold italic mb-6"
-            style={{ fontFamily: "var(--font-playfair)", fontSize: 48, lineHeight: 1 }}
+            style={{ fontFamily: "var(--font-inter)", fontSize: 48, lineHeight: 1 }}
           >
             &rdquo;
           </p>
@@ -85,7 +85,7 @@ export default function ReviewsSection() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
                 className="text-black/70"
-                style={{ fontFamily: "var(--font-dm-sans)", fontSize: 17, lineHeight: 1.7, maxWidth: 480 }}
+                style={{ fontFamily: "var(--font-inter)", fontSize: 17, lineHeight: 1.7, maxWidth: 480 }}
               >
                 {review.quote}
               </motion.p>

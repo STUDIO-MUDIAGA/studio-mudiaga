@@ -1,19 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display, DM_Sans, Geist } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import CustomCursor from "@/components/CustomCursor";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
-const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
-const dmSans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin"] });
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-});
+const inter = Inter({ variable: "--font-inter", subsets: ["latin"], style: ["normal", "italic"] });
 
 export const metadata: Metadata = {
   title: "Studio Mudiaga — Curated Living",
@@ -23,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={cn("h-full", "antialiased", inter.variable, playfair.variable, dmSans.variable, "font-sans", geist.variable)}>
+    <html lang="en" className={cn("h-full", "antialiased", inter.variable, "font-sans")}>
       <body className="min-h-full flex flex-col bg-[#0a0a0a] text-white">
         <CustomCursor />
         <AuthProvider>{children}</AuthProvider>

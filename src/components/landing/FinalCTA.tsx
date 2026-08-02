@@ -51,7 +51,7 @@ export default function FinalCTA() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="text-white font-medium"
-            style={{ fontFamily: "var(--font-dm-sans)", fontSize: "clamp(26px, 2.6vw, 36px)", lineHeight: 1.25 }}
+            style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(26px, 2.6vw, 36px)", lineHeight: 1.25 }}
           >
             Design is personal.
             <br />
@@ -65,7 +65,7 @@ export default function FinalCTA() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-white/85 mb-6"
-              style={{ fontFamily: "var(--font-dm-sans)", fontSize: 15, lineHeight: 1.6 }}
+              style={{ fontFamily: "var(--font-inter)", fontSize: 15, lineHeight: 1.6 }}
             >
               Let&apos;s create something meaningful, together.
             </motion.p>
@@ -79,7 +79,7 @@ export default function FinalCTA() {
               <Link
                 href="/book-a-consultation"
                 className="inline-flex items-center bg-white text-black"
-                style={{ fontFamily: "var(--font-dm-sans)", fontSize: 14, padding: "12px 24px" }}
+                style={{ fontFamily: "var(--font-inter)", fontSize: 14, padding: "12px 24px" }}
               >
                 <span className="underline underline-offset-4">Book a Consultation</span>
               </Link>

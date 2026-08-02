@@ -41,14 +41,14 @@ export default function ProcessSection() {
         <div>
           <p
             className="text-[11px] tracking-[0.25em] uppercase text-black/40 mb-5"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
+            style={{ fontFamily: "var(--font-inter)" }}
           >
             Our Process
           </p>
           <h2
             className="font-light text-black mb-10"
             style={{
-              fontFamily: "var(--font-playfair)",
+              fontFamily: "var(--font-inter)",
               fontSize: "clamp(28px, 3.4vw, 48px)",
               lineHeight: 1.2,
               maxWidth: 480,
@@ -58,7 +58,7 @@ export default function ProcessSection() {
           </h2>
           <p
             className="text-black/60 mb-16"
-            style={{ fontFamily: "var(--font-dm-sans)", fontSize: 15, lineHeight: 1.85, maxWidth: 380 }}
+            style={{ fontFamily: "var(--font-inter)", fontSize: 15, lineHeight: 1.85, maxWidth: 380 }}
           >
             We manage every detail, coordinate every decision, and keep your
             vision at the center of every stage, on time, on budget, and
@@ -77,13 +77,13 @@ export default function ProcessSection() {
                     <span className="flex items-baseline gap-4">
                       <span
                         className="text-black/40 text-xs"
-                        style={{ fontFamily: "var(--font-dm-sans)" }}
+                        style={{ fontFamily: "var(--font-inter)" }}
                       >
                         {step.n}
                       </span>
                       <span
                         className="text-black"
-                        style={{ fontFamily: "var(--font-playfair)", fontSize: 22, fontWeight: 400 }}
+                        style={{ fontFamily: "var(--font-inter)", fontSize: 22, fontWeight: 400 }}
                       >
                         {step.title}
                       </span>
@@ -102,7 +102,7 @@ export default function ProcessSection() {
                   >
                     <p
                       className="text-black/60 pb-6"
-                      style={{ fontFamily: "var(--font-dm-sans)", fontSize: 14, lineHeight: 1.8, maxWidth: 460 }}
+                      style={{ fontFamily: "var(--font-inter)", fontSize: 14, lineHeight: 1.8, maxWidth: 460 }}
                     >
                       {step.body}
                     </p>

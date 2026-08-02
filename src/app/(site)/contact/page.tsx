@@ -52,17 +52,17 @@ export default function ContactPage() {
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "clamp(140px, 14vw, 200px) 48px clamp(64px, 8vw, 120px)" }}>
         <p
           className="text-[11px] tracking-[0.25em] uppercase text-black/40 mb-5"
-          style={{ fontFamily: "var(--font-dm-sans)" }}
+          style={{ fontFamily: "var(--font-inter)" }}
         >
           Contact
         </p>
         <h1
           className="font-light text-black mb-6"
-          style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(36px, 5vw, 64px)", lineHeight: 1.15, maxWidth: 640 }}
+          style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(36px, 5vw, 64px)", lineHeight: 1.15, maxWidth: 640 }}
         >
           Say hello.
         </h1>
-        <p className="text-black/60 max-w-md" style={{ fontFamily: "var(--font-dm-sans)", fontSize: 16, lineHeight: 1.8 }}>
+        <p className="text-black/60 max-w-md" style={{ fontFamily: "var(--font-inter)", fontSize: 16, lineHeight: 1.8 }}>
           Have a question, or just want to talk before committing to anything? Send us a note and we&apos;ll get back to you personally.
         </p>
       </section>
@@ -74,14 +74,14 @@ export default function ContactPage() {
             <div>
               <p
                 className="text-[11px] tracking-[0.25em] uppercase text-black/40 mb-4"
-                style={{ fontFamily: "var(--font-dm-sans)" }}
+                style={{ fontFamily: "var(--font-inter)" }}
               >
                 Email
               </p>
               <a
                 href="mailto:hello@studiomudiaga.com"
                 className="inline-flex items-center gap-2 text-black hover:text-black/60 transition-colors"
-                style={{ fontFamily: "var(--font-playfair)", fontSize: 20 }}
+                style={{ fontFamily: "var(--font-inter)", fontSize: 20 }}
               >
                 <Mail size={16} className="text-black/40" />
                 hello@studiomudiaga.com
@@ -91,7 +91,7 @@ export default function ContactPage() {
             <div>
               <p
                 className="text-[11px] tracking-[0.25em] uppercase text-black/40 mb-4"
-                style={{ fontFamily: "var(--font-dm-sans)" }}
+                style={{ fontFamily: "var(--font-inter)" }}
               >
                 Follow
               </p>
@@ -122,13 +122,13 @@ export default function ContactPage() {
             </div>
 
             <div className="border-t border-black/10 pt-8">
-              <p className="text-black/50" style={{ fontFamily: "var(--font-dm-sans)", fontSize: 14, lineHeight: 1.8 }}>
+              <p className="text-black/50" style={{ fontFamily: "var(--font-inter)", fontSize: 14, lineHeight: 1.8 }}>
                 Already know you want to start a project? Skip ahead to the full brief so we can get straight to the details.
               </p>
               <Link
                 href="/book-a-consultation"
                 className="group inline-flex items-center gap-2 text-black mt-4 text-sm font-medium"
-                style={{ fontFamily: "var(--font-dm-sans)" }}
+                style={{ fontFamily: "var(--font-inter)" }}
               >
                 Book a Consultation
                 <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform duration-200" />
@@ -142,7 +142,7 @@ export default function ContactPage() {
               <div className="border border-black/10 rounded-2xl" style={{ padding: "48px 32px" }}>
                 <p
                   className="text-black font-light"
-                  style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(22px, 2.4vw, 30px)", lineHeight: 1.4 }}
+                  style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(22px, 2.4vw, 30px)", lineHeight: 1.4 }}
                 >
                   Thank you — your message is in. We read every note personally and will reply soon.
                 </p>
@@ -151,7 +151,7 @@ export default function ContactPage() {
               <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                 <div className="grid gap-6 sm:grid-cols-2">
                   <div>
-                    <label className="block text-black/70 text-sm font-medium mb-2" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                    <label className="block text-black/70 text-sm font-medium mb-2" style={{ fontFamily: "var(--font-inter)" }}>
                       Full name
                     </label>
                     <input
@@ -160,11 +160,11 @@ export default function ContactPage() {
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="Your full name"
                       className="w-full bg-white border border-black/15 rounded-xl px-4 py-3 text-sm text-black outline-none focus:border-black/40 transition-colors"
-                      style={{ fontFamily: "var(--font-dm-sans)" }}
+                      style={{ fontFamily: "var(--font-inter)" }}
                     />
                   </div>
                   <div>
-                    <label className="block text-black/70 text-sm font-medium mb-2" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                    <label className="block text-black/70 text-sm font-medium mb-2" style={{ fontFamily: "var(--font-inter)" }}>
                       Email address
                     </label>
                     <input
@@ -174,13 +174,13 @@ export default function ContactPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@example.com"
                       className="w-full bg-white border border-black/15 rounded-xl px-4 py-3 text-sm text-black outline-none focus:border-black/40 transition-colors"
-                      style={{ fontFamily: "var(--font-dm-sans)" }}
+                      style={{ fontFamily: "var(--font-inter)" }}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-black/70 text-sm font-medium mb-2" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                  <label className="block text-black/70 text-sm font-medium mb-2" style={{ fontFamily: "var(--font-inter)" }}>
                     Phone number <span className="text-black/35 font-normal">(optional)</span>
                   </label>
                   <input
@@ -188,12 +188,12 @@ export default function ContactPage() {
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+234 800 000 0000"
                     className="w-full bg-white border border-black/15 rounded-xl px-4 py-3 text-sm text-black outline-none focus:border-black/40 transition-colors"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}
+                    style={{ fontFamily: "var(--font-inter)" }}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-black/70 text-sm font-medium mb-2" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                  <label className="block text-black/70 text-sm font-medium mb-2" style={{ fontFamily: "var(--font-inter)" }}>
                     Message
                   </label>
                   <textarea
@@ -203,12 +203,12 @@ export default function ContactPage() {
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="What's on your mind?"
                     className="w-full bg-white border border-black/15 rounded-xl px-4 py-3 text-sm text-black outline-none focus:border-black/40 transition-colors resize-y"
-                    style={{ fontFamily: "var(--font-dm-sans)", lineHeight: 1.7 }}
+                    style={{ fontFamily: "var(--font-inter)", lineHeight: 1.7 }}
                   />
                 </div>
 
                 {error && (
-                  <p className="text-sm" style={{ color: "#dc2626", fontFamily: "var(--font-dm-sans)" }}>
+                  <p className="text-sm" style={{ color: "#dc2626", fontFamily: "var(--font-inter)" }}>
                     {error}
                   </p>
                 )}
@@ -217,7 +217,7 @@ export default function ContactPage() {
                   type="submit"
                   disabled={submitting}
                   className="inline-flex items-center justify-center gap-2 bg-black text-white text-sm font-medium rounded-full transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
-                  style={{ fontFamily: "var(--font-dm-sans)", padding: "14px 28px", width: "fit-content" }}
+                  style={{ fontFamily: "var(--font-inter)", padding: "14px 28px", width: "fit-content" }}
                 >
                   {submitting ? (
                     <>

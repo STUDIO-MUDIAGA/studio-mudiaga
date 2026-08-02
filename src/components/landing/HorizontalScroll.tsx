@@ -177,7 +177,7 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
       {/* Mobile — stacked vertically, centered */}
       <motion.div
         className="sm:hidden absolute inset-x-0 flex flex-col items-center z-10 gap-1"
-        style={{ fontFamily: "var(--font-playfair)", opacity: textOpacity }}
+        style={{ fontFamily: "var(--font-inter)", opacity: textOpacity }}
       >
         <ZoomText text="Project" className="text-[clamp(28px,8vw,48px)] text-[#0a0a0a] font-light leading-none" />
         <ZoomText text="Abode" className="text-[clamp(28px,8vw,48px)] text-[#0a0a0a] font-light leading-none" />
@@ -186,14 +186,14 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
       {/* Desktop — split left/right */}
       <motion.div
         className="hidden sm:flex absolute left-14 xl:left-20 z-10"
-        style={{ fontFamily: "var(--font-playfair)", opacity: textOpacity }}
+        style={{ fontFamily: "var(--font-inter)", opacity: textOpacity }}
       >
         <ZoomText text="Project" className="text-[clamp(20px,4.5vw,90px)] text-[#0a0a0a] font-light leading-none" />
       </motion.div>
 
       <motion.div
         className="hidden sm:flex absolute right-14 xl:right-20 z-10"
-        style={{ fontFamily: "var(--font-playfair)", opacity: textOpacity }}
+        style={{ fontFamily: "var(--font-inter)", opacity: textOpacity }}
       >
         <ZoomText text="Abode" className="text-[clamp(20px,4.5vw,90px)] text-[#0a0a0a] font-light leading-none" />
       </motion.div>
@@ -229,7 +229,7 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
             {/* Left — heading with per-word slide-up entrance */}
             <h2
               style={{
-                fontFamily: "var(--font-playfair)",
+                fontFamily: "var(--font-inter)",
                 fontSize: "clamp(30px, 5vw, 80px)",
                 fontWeight: 300,
                 lineHeight: 1.12,
@@ -287,7 +287,7 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
                   color: "rgba(255,255,255,0.6)",
                   fontSize: 14,
                   lineHeight: 1.8,
-                  fontFamily: "var(--font-dm-sans)",
+                  fontFamily: "var(--font-inter)",
                 }}
               >
                 Studio Mudiaga brings together bespoke shortlet apartments and
@@ -299,7 +299,7 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
                   color: "rgba(255,255,255,0.6)",
                   fontSize: 14,
                   lineHeight: 1.8,
-                  fontFamily: "var(--font-dm-sans)",
+                  fontFamily: "var(--font-inter)",
                 }}
               >
                 We design for real living, guided by your vision — so every room
@@ -321,7 +321,7 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
                   fontSize: 12,
                   letterSpacing: "0.18em",
                   textTransform: "uppercase",
-                  fontFamily: "var(--font-dm-sans)",
+                  fontFamily: "var(--font-inter)",
                   background: "white",
                   whiteSpace: "nowrap",
                 }}
@@ -358,7 +358,7 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
             <text
               fill="rgba(255,255,255,0.55)"
               fontSize="7"
-              fontFamily="var(--font-dm-sans)"
+              fontFamily="var(--font-inter)"
               letterSpacing="2.6"
             >
               <textPath href="#ks-path">

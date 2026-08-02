@@ -24,7 +24,7 @@ export default function IdentityMarquee() {
         <p
           className="text-black shrink-0"
           style={{
-            fontFamily: "var(--font-playfair)",
+            fontFamily: "var(--font-inter)",
             fontStyle: "italic",
             fontSize: "clamp(22px, 2.4vw, 32px)",
             fontWeight: 400,
@@ -53,7 +53,7 @@ export default function IdentityMarquee() {
                 key={i}
                 className={word === "Studio Mudiaga" ? "text-black" : "text-black/25"}
                 style={{
-                  fontFamily: "var(--font-dm-sans)",
+                  fontFamily: "var(--font-inter)",
                   fontWeight: 500,
                   fontSize: "clamp(24px, 3.4vw, 44px)",
                   lineHeight: 1.5,

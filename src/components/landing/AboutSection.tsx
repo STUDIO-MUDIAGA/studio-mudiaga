@@ -56,7 +56,7 @@ export default function AboutSection() {
           >
             <p
               style={{
-                fontFamily: "var(--font-dm-sans)",
+                fontFamily: "var(--font-inter)",
                 fontSize: 11,
                 letterSpacing: "0.25em",
                 textTransform: "uppercase",
@@ -69,7 +69,7 @@ export default function AboutSection() {
 
             <h2
               style={{
-                fontFamily: "var(--font-playfair)",
+                fontFamily: "var(--font-inter)",
                 fontSize: "clamp(28px, 3.8vw, 62px)",
                 fontWeight: 300,
                 lineHeight: 1.1,
@@ -106,7 +106,7 @@ export default function AboutSection() {
                   fontSize: 26,
                   fontWeight: 200,
                   lineHeight: 1,
-                  fontFamily: "var(--font-dm-sans)",
+                  fontFamily: "var(--font-inter)",
                 }}
               >
                 +
@@ -126,7 +126,7 @@ export default function AboutSection() {
               >
                 <span
                   style={{
-                    fontFamily: "var(--font-dm-sans)",
+                    fontFamily: "var(--font-inter)",
                     fontSize: 9,
                     letterSpacing: "0.22em",
                     textTransform: "uppercase",
@@ -172,7 +172,7 @@ export default function AboutSection() {
             >
               <p
                 style={{
-                  fontFamily: "var(--font-dm-sans)",
+                  fontFamily: "var(--font-inter)",
                   fontSize: "clamp(13px, 1vw, 15px)",
                   lineHeight: 1.85,
                   color: "rgba(10,10,10,0.65)",
@@ -185,7 +185,7 @@ export default function AboutSection() {
               </p>
               <p
                 style={{
-                  fontFamily: "var(--font-dm-sans)",
+                  fontFamily: "var(--font-inter)",
                   fontSize: "clamp(13px, 1vw, 15px)",
                   lineHeight: 1.85,
                   color: "rgba(10,10,10,0.65)",

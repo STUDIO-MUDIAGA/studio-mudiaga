@@ -39,7 +39,7 @@ export default function Footer() {
             </Link>
             <p
               className="text-white/40 mt-5 max-w-xs"
-              style={{ fontFamily: "var(--font-dm-sans)", fontSize: 14, lineHeight: 1.75 }}
+              style={{ fontFamily: "var(--font-inter)", fontSize: 14, lineHeight: 1.75 }}
             >
               Interior design and handcrafted furniture, considered from the
               first sketch to the last detail.
@@ -77,7 +77,7 @@ export default function Footer() {
               <p
                 className="text-white/35 mb-5"
                 style={{
-                  fontFamily: "var(--font-dm-sans)",
+                  fontFamily: "var(--font-inter)",
                   fontSize: 11,
                   letterSpacing: "0.22em",
                   textTransform: "uppercase",
@@ -91,7 +91,7 @@ export default function Footer() {
                     <Link
                       href={link.href}
                       className="text-white/60 hover:text-white transition-colors"
-                      style={{ fontFamily: "var(--font-dm-sans)", fontSize: 14 }}
+                      style={{ fontFamily: "var(--font-inter)", fontSize: 14 }}
                     >
                       {link.label}
                     </Link>
@@ -107,10 +107,10 @@ export default function Footer() {
           className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-white/10"
           style={{ marginTop: "clamp(40px, 5vw, 64px)", paddingTop: 28 }}
         >
-          <p className="text-white/30" style={{ fontFamily: "var(--font-dm-sans)", fontSize: 13 }}>
+          <p className="text-white/30" style={{ fontFamily: "var(--font-inter)", fontSize: 13 }}>
             © {new Date().getFullYear()} Studio Mudiaga. All rights reserved.
           </p>
-          <p className="text-white/30" style={{ fontFamily: "var(--font-dm-sans)", fontSize: 13 }}>
+          <p className="text-white/30" style={{ fontFamily: "var(--font-inter)", fontSize: 13 }}>
             Interior Decor · Furniture Design
           </p>
         </div>

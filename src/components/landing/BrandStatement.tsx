@@ -65,7 +65,7 @@ export default function BrandStatement() {
       <h2
         className="text-white font-light"
         style={{
-          fontFamily: "var(--font-playfair)",
+          fontFamily: "var(--font-inter)",
           fontSize: "clamp(28px, 4vw, 52px)",
           lineHeight: 1.25,
           maxWidth: 920,
@@ -90,7 +90,7 @@ export default function BrandStatement() {
         transition={{ duration: 0.6, delay: 0.15 }}
         className="text-white/60"
         style={{
-          fontFamily: "var(--font-dm-sans)",
+          fontFamily: "var(--font-inter)",
           fontSize: "clamp(14px, 1.1vw, 17px)",
           lineHeight: 1.8,
           maxWidth: 680,

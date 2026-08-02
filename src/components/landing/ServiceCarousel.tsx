@@ -47,7 +47,7 @@ function Card({ item, style, className, sizes }: { item: Item; style?: React.CSS
       <span
         className="absolute top-4 left-4 text-white text-xs tracking-wide opacity-100 translate-y-0 md:opacity-0 md:-translate-y-1 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-400 ease-out"
         style={{
-          fontFamily: "var(--font-dm-sans)",
+          fontFamily: "var(--font-inter)",
           background: "#3c150a",
           padding: "6px 12px",
         }}
@@ -58,7 +58,7 @@ function Card({ item, style, className, sizes }: { item: Item; style?: React.CSS
       {/* Label — bottom-left. Visible by default on mobile (no hover), hover-gated on md+ */}
       <p
         className="absolute bottom-5 left-5 text-white opacity-100 translate-y-0 md:opacity-0 md:translate-y-1 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-400 ease-out"
-        style={{ fontFamily: "var(--font-dm-sans)", fontSize: 17 }}
+        style={{ fontFamily: "var(--font-inter)", fontSize: 17 }}
       >
         {item.label}
       </p>

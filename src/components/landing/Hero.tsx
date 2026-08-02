@@ -106,7 +106,7 @@ export default function Hero() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
                 className="text-5xl md:text-7xl font-bold text-white leading-[1.05] mb-5 whitespace-pre-line"
-                style={{ fontFamily: "var(--font-playfair)" }}
+                style={{ fontFamily: "var(--font-inter)" }}
               >
                 {slide.title}
               </motion.h1>

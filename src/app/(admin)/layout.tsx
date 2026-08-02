@@ -310,7 +310,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f2f2f4", fontFamily: "var(--font-dm-sans), system-ui, sans-serif" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "#f2f2f4", fontFamily: "var(--font-inter), system-ui, sans-serif" }}>
       {/* Desktop sidebar */}
       <div style={{ display: "none" }} className="lg-sidebar">
         <style>{`@media(min-width:1024px){.lg-sidebar{display:flex!important}}`}</style>

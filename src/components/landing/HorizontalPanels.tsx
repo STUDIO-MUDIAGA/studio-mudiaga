@@ -111,7 +111,7 @@ function TextPane({
         </p>
         <h2
           className="text-[#0a0a0a] text-4xl xl:text-5xl font-bold leading-[1.08] mb-6 whitespace-pre-line"
-          style={{ fontFamily: "var(--font-playfair)" }}
+          style={{ fontFamily: "var(--font-inter)" }}
         >
           {panel.heading}
         </h2>

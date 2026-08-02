@@ -15,7 +15,7 @@ export default function HeroV2({ revealed }: { revealed: boolean }) {
         animate={revealed ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.1 }}
         className="text-white text-[12vw] leading-none tracking-tight font-light select-none"
-        style={{ fontFamily: "var(--font-playfair)" }}
+        style={{ fontFamily: "var(--font-inter)" }}
       >
         Studio Mudiaga
       </motion.h1>

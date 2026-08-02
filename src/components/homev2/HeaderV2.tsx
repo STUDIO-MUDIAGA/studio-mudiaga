@@ -91,7 +91,7 @@ function MenuItem({
       href={`#${label.toLowerCase()}`}
       onClick={onClick}
       className="block text-white/80 hover:text-white text-2xl font-bold py-1.5 transition-colors"
-      style={{ fontFamily: "var(--font-dm-sans)", perspective: "10em" }}
+      style={{ fontFamily: "var(--font-inter)", perspective: "10em" }}
       initial={{ opacity: 0, rotateX: 90, y: 16 }}
       animate={{ opacity: 1, rotateX: 0, y: 0 }}
       exit={{ opacity: 0, transition: { duration: 0.15 } }}
