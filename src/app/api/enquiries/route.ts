@@ -9,7 +9,7 @@ const db = createClient(
 );
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
-const NOTIFY_EMAIL = "hello@studiomudiaga.com";
+const NOTIFY_EMAIL = "studiomudiaga@gmail.com";
 
 function row(label: string, value: string | null | undefined) {
   if (!value) return "";
@@ -56,6 +56,7 @@ export async function POST(req: Request) {
   await resend.emails.send({
     from: `Studio Mudiaga <${process.env.RESEND_FROM_EMAIL ?? "hello@studiomudiaga.com"}>`,
     to: NOTIFY_EMAIL,
+    replyTo: `${full_name} <${email}>`,
     subject: `New project enquiry — ${full_name}`,
     html: `
       <div style="font-family:system-ui,sans-serif;max-width:640px;margin:0 auto;padding:40px 24px;background:#0a0a0a;color:#fff">
