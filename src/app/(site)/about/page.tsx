@@ -199,12 +199,15 @@ export default function AboutPage() {
             </h2>
             <div className="flex flex-col gap-6">
               <p className="text-black/70" style={{ fontFamily: "var(--font-inter)", fontSize: 16, lineHeight: 1.85 }}>
-                [Placeholder — replace with the founder&apos;s real bio. A few sentences on
-                background, design perspective, and what led to starting the studio tend to
-                work well here.]
+                Mudiaga founded the studio out of a personal search for spaces that felt
+                truly his own, rooms that carried clarity, identity, and intention rather
+                than trends borrowed from elsewhere.
               </p>
-              <p className="text-black/40 text-sm italic" style={{ fontFamily: "var(--font-inter)" }}>
-                This bio is a placeholder — swap in the real copy before publishing.
+              <p className="text-black/70" style={{ fontFamily: "var(--font-inter)", fontSize: 16, lineHeight: 1.85 }}>
+                That search became a design language: minimalism grounded in African
+                culture, every material and detail chosen with a quiet, deliberate hand.
+                It's the same approach behind Abode's interiors and one-off commissions
+                like Project UB.
               </p>
             </div>
           </div>
