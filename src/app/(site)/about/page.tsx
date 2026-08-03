@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, ImagePlus, Plus, Minus } from "lucide-react";
+import { ArrowRight, Plus, Minus } from "lucide-react";
 import { useNavTheme } from "@/context/NavTheme";
 
 const PROCESS_STEPS = [
@@ -175,11 +175,14 @@ export default function AboutPage() {
       {/* Founder */}
       <section className="border-t border-black/10" style={{ padding: "clamp(64px, 8vw, 120px) 48px" }}>
         <div className="grid gap-14 md:grid-cols-2 items-center" style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <div className="relative w-full aspect-[4/5] overflow-hidden bg-black/5 border border-dashed border-black/15 flex flex-col items-center justify-center gap-3">
-            <ImagePlus size={22} className="text-black/25" />
-            <p className="text-black/35 text-xs text-center px-8" style={{ fontFamily: "var(--font-inter)" }}>
-              Placeholder — add a portrait of Mudiaga here
-            </p>
+          <div className="relative w-full aspect-[4/5] overflow-hidden bg-black/5">
+            <Image
+              src="https://pub-2ddf02e2e1654b72808b735601463baf.r2.dev/project-ub/24066afc-2dcd-4d85-8385-82f076a84021.png"
+              alt="Mudiaga, Founder of Studio Mudiaga"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+            />
           </div>
           <div>
             <p
@@ -201,7 +204,7 @@ export default function AboutPage() {
                 work well here.]
               </p>
               <p className="text-black/40 text-sm italic" style={{ fontFamily: "var(--font-inter)" }}>
-                This section is a placeholder — swap in the real bio and photo before publishing.
+                This bio is a placeholder — swap in the real copy before publishing.
               </p>
             </div>
           </div>
