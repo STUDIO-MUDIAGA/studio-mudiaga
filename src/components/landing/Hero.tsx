@@ -14,14 +14,14 @@ const slides = [
     image: "/IMG_1666.JPG",
     tag: "Project · Abode",
     title: "Project\nAbode",
-    subtitle: "An interior decor project — every room shaped by considered materials and quiet detail.",
+    subtitle: "An interior design project — every room shaped by considered materials and quiet detail.",
     cta: { label: "View Projects", href: "/projects/abode" },
   },
   {
     image: "https://pub-2ddf02e2e1654b72808b735601463baf.r2.dev/project-ub/318cb696-ce33-4bb7-966e-62d193baaf1d.png",
     tag: "Project · UB",
     title: "Project\nUB",
-    subtitle: "An interior decor project for a private residence — restrained, honest materials, and quiet luxury.",
+    subtitle: "An interior design project for a private residence — restrained, honest materials, and quiet luxury.",
     cta: { label: "View Projects", href: "/projects/ub" },
   },
 ];

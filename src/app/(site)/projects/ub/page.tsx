@@ -6,12 +6,12 @@ export default function ProjectUBPage() {
   return (
     <ProjectShowcase
       data={{
-        eyebrow: "Project — Interior Decor",
+        eyebrow: "Project — Interior Design",
         title: "UB",
         location: "Nigeria",
         heroImage: `${R2}/318cb696-ce33-4bb7-966e-62d193baaf1d.png`,
         intro: [
-          "Project UB is an interior decor project for a private residence — a study in restraint, where every material and surface was chosen with intention.",
+          "Project UB is an interior design project for a private residence — a study in restraint, where every material and surface was chosen with intention.",
           "The brief called for quiet luxury: honest textures, considered lighting, and furniture built to anchor the space rather than compete with it. The result carries the same design language as the rest of the Studio Mudiaga portfolio, adapted to the client's own way of living.",
           "It reads as calm from every angle, but rewards a closer look — proportions considered down to the centimeter, and objects chosen as much for how they feel as how they look.",
         ],

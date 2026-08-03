@@ -4,12 +4,12 @@ export default function ProjectAbodePage() {
   return (
     <ProjectShowcase
       data={{
-        eyebrow: "Project — Interior Decor",
+        eyebrow: "Project — Interior Design",
         title: "Abode",
         location: "Nigeria",
         heroImage: "/IMG_1666.JPG",
         intro: [
-          "Abode is an interior decor project spanning a collection of properties — each one approached as its own design brief, built around warm materials, honest craftsmanship, and a considered sense of scale.",
+          "Abode is an interior design project spanning a collection of properties — each one approached as its own design brief, built around warm materials, honest craftsmanship, and a considered sense of scale.",
           "Every room carries the same quiet language that defines Studio Mudiaga's work: natural textures, restrained detailing, and furniture chosen — in many cases handcrafted — specifically for the space it sits in.",
           "What began as a single apartment has grown into a running body of work, each new property giving us room to push the palette further while staying true to the same core sensibility.",
         ],

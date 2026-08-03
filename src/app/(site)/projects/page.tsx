@@ -4,13 +4,13 @@ import Link from "next/link";
 const PROJECTS = [
   {
     title: "Abode",
-    eyebrow: "Interior Decor",
+    eyebrow: "Interior Design",
     image: "/IMG_1666.JPG",
     href: "/projects/abode",
   },
   {
     title: "UB",
-    eyebrow: "Interior Decor",
+    eyebrow: "Interior Design",
     image: "https://pub-2ddf02e2e1654b72808b735601463baf.r2.dev/project-ub/318cb696-ce33-4bb7-966e-62d193baaf1d.png",
     href: "/projects/ub",
   },

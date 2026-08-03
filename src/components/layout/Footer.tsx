@@ -111,7 +111,7 @@ export default function Footer() {
             © {new Date().getFullYear()} Studio Mudiaga. All rights reserved.
           </p>
           <p className="text-white/30" style={{ fontFamily: "var(--font-inter)", fontSize: 13 }}>
-            Interior Decor · Furniture Design
+            Interior Design · Furniture Design
           </p>
         </div>
       </div>

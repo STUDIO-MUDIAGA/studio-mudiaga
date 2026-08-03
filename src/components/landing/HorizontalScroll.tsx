@@ -203,7 +203,7 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
         className="absolute bottom-10 left-1/2 -translate-x-1/2 text-[10px] text-[#0a0a0a]/35 tracking-[0.35em] uppercase select-none z-10"
         style={{ opacity: labelOpacity }}
       >
-        Interior Decor
+        Interior Design
       </motion.p>
 
       {/* Full-screen overlay content */}
