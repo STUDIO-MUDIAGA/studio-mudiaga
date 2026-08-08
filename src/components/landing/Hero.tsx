@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 
 const EASE = [0.76, 0, 0.24, 1] as [number, number, number, number];
@@ -27,6 +28,7 @@ const slides = [
 ];
 
 export default function Hero() {
+  const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
 
@@ -46,8 +48,9 @@ export default function Hero() {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen overflow-hidden"
+      className="relative min-h-screen overflow-hidden cursor-pointer"
       data-cursor="Explore project"
+      onClick={() => router.push(slide.cta.href)}
     >
       {/* Slides — diagonal clip-path wipe. Active slide is always z-index 1 (on top). */}
       <div className="absolute inset-0 z-0">
@@ -129,6 +132,7 @@ export default function Hero() {
             >
               <Link
                 href={slide.cta.href}
+                onClick={(e) => e.stopPropagation()}
                 className="group inline-flex items-center gap-3 text-white text-sm font-medium"
               >
                 <span className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center group-hover:bg-white/10 transition-colors duration-200">
@@ -149,7 +153,10 @@ export default function Hero() {
         {slides.map((_, i) => (
           <button
             key={i}
-            onClick={() => setActive(i)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setActive(i);
+            }}
             aria-label={`Slide ${i + 1}`}
             className="relative overflow-hidden"
             style={{ width: i === active ? 48 : 28, height: 2 }}

@@ -72,12 +72,14 @@ export default function CustomCursor() {
       <div style={{ transform: "translate(-50%, -50%)", position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <motion.div
           className="absolute rounded-full"
-          animate={{ width: expanded ? 148 : 36, height: expanded ? 148 : 36, borderColor: "rgba(255,255,255,0.5)", borderWidth: 1 }}
+          style={{ width: 148, height: 148, border: "1px solid rgba(255,255,255,0.5)" }}
+          animate={{ scale: expanded ? 1 : 36 / 148 }}
           transition={{ type: "spring", stiffness: 300, damping: 28, mass: 0.6 }}
         />
         <motion.div
           className="rounded-full flex items-center justify-center overflow-hidden"
-          animate={{ width: expanded ? 120 : 12, height: expanded ? 120 : 12, backgroundColor: "rgba(0,0,0,1)" }}
+          style={{ width: 120, height: 120, backgroundColor: "#000" }}
+          animate={{ scale: expanded ? 1 : 12 / 120 }}
           transition={{ type: "spring", stiffness: 350, damping: 28, mass: 0.5 }}
         >
           <motion.p
