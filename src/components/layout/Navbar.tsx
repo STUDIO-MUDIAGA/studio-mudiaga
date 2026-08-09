@@ -11,8 +11,6 @@ import { useNavTheme } from "@/context/NavTheme";
 function LogoSVG({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return (
     <svg
-      width="180"
-      height="29"
       viewBox="0 0 651 104"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -96,12 +94,12 @@ export default function Navbar() {
         style={{ opacity: !isLanding ? 1 : 0 }}
       />
       <div
-        className="relative flex items-center justify-between w-full"
-        style={{ maxWidth: 1200, margin: "0 auto", paddingLeft: 48, paddingRight: 64, paddingTop: 32, paddingBottom: 20 }}
+        className="relative flex items-center justify-between w-full px-5 pt-8 pb-5 sm:pl-12 sm:pr-16"
+        style={{ maxWidth: 1200, margin: "0 auto" }}
       >
         <Link href="/" className="flex items-center">
           <LogoSVG
-            className="transition-colors duration-500"
+            className="w-[120px] sm:w-[180px] h-auto transition-colors duration-500"
             style={{ color: isLight ? "#65483E" : "white" }}
           />
         </Link>
@@ -140,7 +138,7 @@ export default function Navbar() {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="sm:hidden relative bg-[#0a0a0a] border-b border-white/5 overflow-hidden"
           >
-            <div className="flex flex-col" style={{ paddingLeft: 48, paddingRight: 48, paddingTop: 8, paddingBottom: 24 }}>
+            <div className="flex flex-col px-5" style={{ paddingTop: 8, paddingBottom: 24 }}>
               {NAV_LINKS.map((item) => (
                 <Link
                   key={item.href}
