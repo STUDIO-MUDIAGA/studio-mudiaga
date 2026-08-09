@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import { useNavTheme } from "@/context/NavTheme";
 
 // Inline SVG — fill="currentColor" so CSS color controls it
@@ -40,9 +42,22 @@ const NAV_LINKS = [
 export default function Navbar() {
   const pathname = usePathname();
   const [navVisible, setNavVisible] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const lastScrollY = useRef(0);
   const { theme } = useNavTheme();
   const isLanding = pathname === "/";
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
 
   // On non-landing pages, always treat as "dark" background (white logo)
   const isLight = isLanding && theme === "light";
@@ -103,7 +118,42 @@ export default function Navbar() {
             </Link>
           ))}
         </nav>
+
+        <button
+          type="button"
+          onClick={() => setMobileOpen((v) => !v)}
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
+          className="sm:hidden flex items-center justify-center transition-colors duration-500"
+          style={{ color: isLight ? "#65483E" : "white", width: 32, height: 32 }}
+        >
+          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
       </div>
+
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.nav
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="sm:hidden relative bg-[#0a0a0a] border-b border-white/5 overflow-hidden"
+          >
+            <div className="flex flex-col" style={{ paddingLeft: 48, paddingRight: 48, paddingTop: 8, paddingBottom: 24 }}>
+              {NAV_LINKS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-white/80 text-base font-medium py-3 border-b border-white/5 last:border-b-0"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
