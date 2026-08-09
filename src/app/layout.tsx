@@ -10,7 +10,14 @@ const inter = Inter({ variable: "--font-inter", subsets: ["latin"], style: ["nor
 export const metadata: Metadata = {
   title: "Studio Mudiaga — Curated Living",
   description: "Premium shortlet apartments and handcrafted furniture in Nigeria.",
-  icons: { icon: "/Group.svg" },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icon-512.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
