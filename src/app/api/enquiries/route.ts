@@ -46,7 +46,7 @@ export async function POST(req: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const projectTypeDisplay = project_type === "Other" && project_type_other ? `Other — ${project_type_other}` : project_type;
+  const projectTypeDisplay = project_type === "Other" && project_type_other ? `Other: ${project_type_other}` : project_type;
   const areasDisplay = [...(areas ?? []), areas_other].filter(Boolean).join(", ");
 
   const imagesHtml = (inspiration_images ?? []).length > 0
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
     from: `Studio Mudiaga <${process.env.RESEND_FROM_EMAIL ?? "hello@studiomudiaga.com"}>`,
     to: NOTIFY_EMAIL,
     replyTo: `${full_name} <${email}>`,
-    subject: `New project enquiry — ${full_name}`,
+    subject: `New project enquiry: ${full_name}`,
     html: `
       <div style="font-family:system-ui,sans-serif;max-width:640px;margin:0 auto;padding:40px 24px;background:#0a0a0a;color:#fff">
         <p style="color:#fbbf24;font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;margin:0 0 8px">

@@ -35,7 +35,7 @@ export default function MudresLanding() {
             Furniture designed<br />for <span style={{ color: "#8b5e3c", fontStyle: "italic" }}>considered</span><br />living.
           </h1>
           <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 15, lineHeight: 1.8, margin: "0 0 40px", maxWidth: 420 }}>
-            Each piece is handcrafted with intention — built to bring character, warmth, and longevity to your space.
+            Each piece is handcrafted with intention, built to bring character, warmth, and longevity to your space.
           </p>
           <div style={{ display: "flex", gap: 12 }}>
             <Link href="/mudres/collection" style={{ background: "#8b5e3c", color: "#fff", fontWeight: 700, fontSize: 13, padding: "14px 28px", borderRadius: 12, textDecoration: "none" }}>
@@ -55,7 +55,7 @@ export default function MudresLanding() {
             <p style={{ color: "#8b5e3c", fontSize: 10, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", margin: "0 0 16px" }}>Our philosophy</p>
             <h2 style={{ color: "#fff", fontSize: 36, fontWeight: 700, lineHeight: 1.2, margin: "0 0 20px" }}>Craft rooted in culture, designed for today</h2>
             <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 14, lineHeight: 1.9, margin: 0 }}>
-              MUDRES draws from the richness of Nigerian craftsmanship — bold textures, warm tones, and forms that ground a space without overwhelming it. Every piece is a collaboration between maker and material.
+              MUDRES draws from the richness of Nigerian craftsmanship: bold textures, warm tones, and forms that ground a space without overwhelming it. Every piece is a collaboration between maker and material.
             </p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>

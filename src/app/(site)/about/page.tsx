@@ -107,8 +107,8 @@ export default function AboutPage() {
               className="text-black/70"
               style={{ fontFamily: "var(--font-inter)", fontSize: 16, lineHeight: 1.85 }}
             >
-              Today, that vision carries through every project we take on — from Abode's
-              considered interiors to bespoke, one-off commissions like Project UB — each
+              Today, that vision carries through every project we take on, from Abode's
+              considered interiors to bespoke, one-off commissions like Project UB, each
               one shaped by the same quiet, deliberate hand.
             </p>
           </div>

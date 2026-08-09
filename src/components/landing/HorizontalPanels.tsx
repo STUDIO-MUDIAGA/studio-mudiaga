@@ -10,7 +10,7 @@ const panels = [
     image: "/IMG_1666.JPG",
     tag: "Shortlets · Lagos",
     heading: "We have never\ncompromised\non comfort.",
-    body: "Every space in our collection is curated with intention — from the texture of the sheets to the grain of the timber.",
+    body: "Every space in our collection is curated with intention, from the texture of the sheets to the grain of the timber.",
     cta: "Explore Stays",
     href: "/shortlets",
     imageRight: false,

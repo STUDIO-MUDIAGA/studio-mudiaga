@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], style: ["normal", "italic"] });
 
 export const metadata: Metadata = {
-  title: "Studio Mudiaga — Curated Living",
+  title: "Studio Mudiaga | Curated Living",
   description: "Premium shortlet apartments and handcrafted furniture in Nigeria.",
   icons: {
     icon: [

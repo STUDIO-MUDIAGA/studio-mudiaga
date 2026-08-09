@@ -91,7 +91,7 @@ export default function AboutSection() {
             <div className="relative w-full aspect-[3/4] md:aspect-auto md:h-full overflow-hidden">
               <Image
                 src="/IMG_1672.JPG"
-                alt="Mudiaga — Founder"
+                alt="Mudiaga, Founder"
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 40vw"

@@ -21,9 +21,9 @@ const AREAS = [
 
 const BUDGETS = [
   "Below ₦5,000,000",
-  "₦5,000,000 — ₦15,000,000",
-  "₦15,000,000 — ₦30,000,000",
-  "₦30,000,000 — ₦60,000,000",
+  "₦5,000,000 to ₦15,000,000",
+  "₦15,000,000 to ₦30,000,000",
+  "₦30,000,000 to ₦60,000,000",
   "Above ₦60,000,000",
   "I prefer to discuss this directly",
 ];
@@ -287,7 +287,7 @@ export default function BookAConsultationPage() {
             Tell us about the space you&apos;re dreaming of.
           </h1>
           <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, lineHeight: 1.7 }}>
-            No forms that feel like paperwork — just a conversation. Take your time, share as much as feels useful, and we&apos;ll take it from there.
+            No forms that feel like paperwork, just a conversation. Take your time, share as much as feels useful, and we&apos;ll take it from there.
           </p>
         </div>
 
@@ -306,7 +306,7 @@ export default function BookAConsultationPage() {
               <Field label="Phone number">
                 <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+234 800 000 0000" />
               </Field>
-              <Field label="Location — city and state">
+              <Field label="Location: city and state">
                 <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Lekki, Lagos" />
               </Field>
             </Row>
@@ -353,10 +353,10 @@ export default function BookAConsultationPage() {
 
           {/* Section 3 — Your vision */}
           <Section eyebrow="Your Vision">
-            <Field label="How would you describe the feeling you want your space to have when it is complete?" hint="Do not think about style — think about feeling.">
+            <Field label="How would you describe the feeling you want your space to have when it is complete?" hint="Do not think about style, think about feeling.">
               <TextArea rows={6} value={feeling} onChange={(e) => setFeeling(e.target.value)} placeholder="Take your time here…" />
             </Field>
-            <Field label="Are there any spaces — hotels, restaurants, homes, or images — that have made you feel the way you want your space to feel?" hint="Share links or images if you have them.">
+            <Field label="Are there any spaces (hotels, restaurants, homes, or images) that have made you feel the way you want your space to feel?" hint="Share links or images if you have them.">
               <TextArea rows={4} value={inspiration} onChange={(e) => setInspiration(e.target.value)} placeholder="Links, names of places, or a short description…" />
             </Field>
 
@@ -425,7 +425,7 @@ export default function BookAConsultationPage() {
             <Field label="What does a successful project look like to you?" hint="What would make you look at the finished space and feel that the investment was completely worth it?">
               <TextArea rows={6} value={successVision} onChange={(e) => setSuccessVision(e.target.value)} placeholder="Paint us the picture…" />
             </Field>
-            <Field label="How involved do you want to be in the process — hands on at every decision or trusting the studio to lead and presenting you with the outcome?">
+            <Field label="How involved do you want to be in the process: hands on at every decision or trusting the studio to lead and presenting you with the outcome?">
               <Input value={involvement} onChange={(e) => setInvolvement(e.target.value)} placeholder="Hands on, mostly hands off, or somewhere in between" />
             </Field>
             <Field label="Is there anything specific about your lifestyle, work, or personality that you think is important for us to understand before we begin?">

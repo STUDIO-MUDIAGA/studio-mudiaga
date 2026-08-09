@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Studio Mudiaga",
+  title: "Privacy Policy | Studio Mudiaga",
 };
 
 export default function PrivacyPolicyPage() {
@@ -19,7 +19,7 @@ export default function PrivacyPolicyPage() {
               Studio Mudiaga is a curated lifestyle brand offering premium shortlet apartments and
               handcrafted furniture in Nigeria. Our platform is accessible at{" "}
               <span className="text-white/80">studiomudiaga.com</span>. When you use our services,
-              you trust us with your information — this policy explains what we collect and how we
+              you trust us with your information, and this policy explains what we collect and how we
               use it.
             </p>
           </section>

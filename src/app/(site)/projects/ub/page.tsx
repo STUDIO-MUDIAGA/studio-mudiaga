@@ -6,14 +6,14 @@ export default function ProjectUBPage() {
   return (
     <ProjectShowcase
       data={{
-        eyebrow: "Project — Interior Design",
+        eyebrow: "Project: Interior Design",
         title: "UB",
         location: "Nigeria",
         heroImage: `${R2}/318cb696-ce33-4bb7-966e-62d193baaf1d.png`,
         intro: [
-          "Project UB is an interior design project for a private residence — a study in restraint, where every material and surface was chosen with intention.",
+          "Project UB is an interior design project for a private residence, a study in restraint, where every material and surface was chosen with intention.",
           "The brief called for quiet luxury: honest textures, considered lighting, and furniture built to anchor the space rather than compete with it. The result carries the same design language as the rest of the Studio Mudiaga portfolio, adapted to the client's own way of living.",
-          "It reads as calm from every angle, but rewards a closer look — proportions considered down to the centimeter, and objects chosen as much for how they feel as how they look.",
+          "It reads as calm from every angle, but rewards a closer look: proportions considered down to the centimeter, and objects chosen as much for how they feel as how they look.",
         ],
         facts: [
           { value: "1", label: "Residence" },
@@ -26,7 +26,7 @@ export default function ProjectUBPage() {
             eyebrow: "The Brief",
             heading: "Quiet luxury, built around restraint.",
             body: [
-              "The client wanted a home that felt considered rather than decorated — every surface earning its place instead of competing for attention.",
+              "The client wanted a home that felt considered rather than decorated, every surface earning its place instead of competing for attention.",
               "Warm ambient light, honest textures, and generous scale give each room a sense of calm the moment you walk in.",
             ],
             image: { src: `${R2}/7240b28d-f140-41de-882e-ff7902d1541d.png`, alt: "Project UB bedroom" },
@@ -35,7 +35,7 @@ export default function ProjectUBPage() {
             eyebrow: "Details & Objects",
             heading: "Small gestures, held to the same standard as the big ones.",
             body: [
-              "Nothing in the space was left as an afterthought — even a bedside object was chosen for its form as much as its function.",
+              "Nothing in the space was left as an afterthought, even a bedside object was chosen for its form as much as its function.",
               "Brass, travertine, and dark timber recur throughout, giving every room a shared material vocabulary.",
             ],
             image: { src: `${R2}/26c710e2-2dd9-47dc-b82e-d0ae72643ada.png`, alt: "Project UB decorative object detail" },
@@ -44,7 +44,7 @@ export default function ProjectUBPage() {
             eyebrow: "Living With It",
             heading: "A space built to be used, not just photographed.",
             body: [
-              "Beyond the finishes, the brief was always about how the home would actually be lived in — daylight, quiet corners, and furniture that holds up to daily life.",
+              "Beyond the finishes, the brief was always about how the home would actually be lived in: daylight, quiet corners, and furniture that holds up to daily life.",
               "That's the real measure of the project: a space that still feels considered long after the shoot.",
             ],
             image: { src: `${R2}/24066afc-2dcd-4d85-8385-82f076a84021.png`, alt: "Project UB resident in the finished space" },

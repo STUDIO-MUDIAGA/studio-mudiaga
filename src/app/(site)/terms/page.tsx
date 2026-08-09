@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — Studio Mudiaga",
+  title: "Terms of Service | Studio Mudiaga",
 };
 
 export default function TermsPage() {
@@ -71,7 +71,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-white font-semibold text-lg mb-3">7. Intellectual Property</h2>
             <p>
-              All content on this platform — including images, text, logos, and designs — is the
+              All content on this platform, including images, text, logos, and designs, is the
               property of Studio Mudiaga and may not be reproduced without written permission.
             </p>
           </section>

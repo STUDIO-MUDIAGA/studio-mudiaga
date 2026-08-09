@@ -127,7 +127,7 @@ export default function AdminDashboard() {
 
               {/* Big number */}
               <p style={{ color: "#0a0a0a", fontSize: 32, fontWeight: 800, margin: "0 0 10px", lineHeight: 1, letterSpacing: "-1px" }}>
-                {val === null ? "—" : String(val).padStart(2, "0")}
+                {val === null ? "…" : String(val).padStart(2, "0")}
               </p>
 
               {/* Trend */}
@@ -192,7 +192,7 @@ export default function AdminDashboard() {
               </PieChart>
               <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
                 <p style={{ color: "#aaa", fontSize: 10, margin: "0 0 2px" }}>Total Items</p>
-                <p style={{ color: "#0a0a0a", fontSize: 22, fontWeight: 700, margin: 0 }}>{loading ? "—" : stats.shortlets + stats.furniture}</p>
+                <p style={{ color: "#0a0a0a", fontSize: 22, fontWeight: 700, margin: 0 }}>{loading ? "…" : stats.shortlets + stats.furniture}</p>
               </div>
             </div>
           </div>

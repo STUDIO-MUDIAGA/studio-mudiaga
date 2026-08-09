@@ -72,10 +72,10 @@ export default function AccountPage() {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {[
-            { label: "Full name", value: profile?.full_name ?? "—" },
-            { label: "Email", value: user?.email ?? "—" },
+            { label: "Full name", value: profile?.full_name ?? "N/A" },
+            { label: "Email", value: user?.email ?? "N/A" },
             { label: "Account type", value: profile?.role ?? "customer" },
-            { label: "Member since", value: user?.created_at ? new Date(user.created_at).toLocaleDateString("en-NG", { month: "long", year: "numeric" }) : "—" },
+            { label: "Member since", value: user?.created_at ? new Date(user.created_at).toLocaleDateString("en-NG", { month: "long", year: "numeric" }) : "N/A" },
           ].map(({ label, value }) => (
             <div key={label}>
               <p style={{ color: "#bbb", fontSize: 11, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.1em" }}>{label}</p>

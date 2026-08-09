@@ -181,10 +181,10 @@ export default function EnquiriesPage() {
                 <p style={{ color: "#bbb", fontSize: 11, margin: 0 }}>{e.email}</p>
               </div>
               <div>
-                <p style={{ color: "#555", fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.project_type || "—"}</p>
+                <p style={{ color: "#555", fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.project_type || "N/A"}</p>
               </div>
               <div>
-                <p style={{ color: "#555", fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.budget || "—"}</p>
+                <p style={{ color: "#555", fontSize: 12, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.budget || "N/A"}</p>
               </div>
               <div>
                 <p style={{ color: "#888", fontSize: 12, margin: 0 }}>{fmt(e.created_at)}</p>
@@ -279,7 +279,7 @@ export default function EnquiriesPage() {
               <div style={{ borderTop: "1px solid #f0f0f0" }} />
 
               <p style={{ color: NAVY, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", margin: 0 }}>Project</p>
-              <DetailRow label="Project type" value={detail.project_type === "Other" ? `Other — ${detail.project_type_other}` : detail.project_type} />
+              <DetailRow label="Project type" value={detail.project_type === "Other" ? `Other: ${detail.project_type_other}` : detail.project_type} />
               <DetailRow label="Property location" value={detail.property_location} />
               <DetailRow label="Space size" value={detail.space_size} />
               <DetailRow label="Areas" value={[...(detail.areas ?? []), detail.areas_other].filter(Boolean).join(", ")} />

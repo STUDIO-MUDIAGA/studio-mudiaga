@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Category name must contain letters or numbers" }, { status: 400 });
   }
   if (RESERVED_SLUGS.includes(slug)) {
-    return NextResponse.json({ error: "This name is reserved — choose a different name" }, { status: 409 });
+    return NextResponse.json({ error: "This name is reserved, choose a different name" }, { status: 409 });
   }
 
   const { data, error } = await db

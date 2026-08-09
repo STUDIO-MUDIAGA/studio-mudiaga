@@ -538,7 +538,7 @@ export default function PropertyDetailPage() {
             <div style={{ marginTop: 12, background: "#fdf0eb", border: `1px solid ${ORANGE}33`, borderRadius: 12, padding: "12px 16px", display: "flex", gap: 10 }}>
               <Star size={14} fill={ORANGE} color={ORANGE} style={{ flexShrink: 0, marginTop: 1 }} />
               <p style={{ color: "#555", fontSize: 12, margin: 0, lineHeight: 1.5 }}>
-                <strong style={{ color: "#0a0a0a" }}>{shortlet.host.name}</strong> is a Superhost — one of our most experienced and highly rated hosts.
+                <strong style={{ color: "#0a0a0a" }}>{shortlet.host.name}</strong> is a Superhost, one of our most experienced and highly rated hosts.
               </p>
             </div>
           )}

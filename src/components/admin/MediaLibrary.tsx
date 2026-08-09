@@ -265,7 +265,7 @@ export default function MediaLibrary({
         <p style={{ color: drag ? NAVY : "#aaa", fontSize: 13, margin: 0 }}>
           {drag ? "Drop to upload" : "Drag & drop images here, or click to browse"}
         </p>
-        <p style={{ color: "#ccc", fontSize: 11, margin: "4px 0 0" }}>JPG, PNG, WebP, AVIF — max 10 MB each</p>
+        <p style={{ color: "#ccc", fontSize: 11, margin: "4px 0 0" }}>JPG, PNG, WebP, AVIF · max 10 MB each</p>
       </div>
 
       {/* Category picker — All Media only. Selecting a chip both filters the grid below and sets where new uploads go. */}
@@ -332,7 +332,7 @@ export default function MediaLibrary({
             </button>
           </div>
           <p style={{ color: "#ccc", fontSize: 11, margin: "8px 0 0" }}>
-            Selecting a category filters the images below and sets where new uploads are saved — currently uploading to <strong style={{ color: "#888" }}>{labelFor(activeTab === "all" ? "homepage" : activeTab)}</strong>.
+            Selecting a category filters the images below and sets where new uploads are saved. Currently uploading to <strong style={{ color: "#888" }}>{labelFor(activeTab === "all" ? "homepage" : activeTab)}</strong>.
           </p>
         </div>
       )}

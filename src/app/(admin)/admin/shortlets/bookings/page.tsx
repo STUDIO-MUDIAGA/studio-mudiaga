@@ -200,7 +200,7 @@ export default function ShortletBookingsPage() {
                   )}
                 </div>
                 <div style={{ minWidth: 0 }}>
-                  <p style={{ color: "#555", fontSize: 12, fontWeight: 500, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{b.shortlet?.title ?? "—"}</p>
+                  <p style={{ color: "#555", fontSize: 12, fontWeight: 500, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{b.shortlet?.title ?? "N/A"}</p>
                   <p style={{ color: "#bbb", fontSize: 11, margin: "1px 0 0" }}>{b.shortlet?.city}</p>
                 </div>
               </div>

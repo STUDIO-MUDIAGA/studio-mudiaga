@@ -144,7 +144,7 @@ export default function ContactPage() {
                   className="text-black font-light"
                   style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(22px, 2.4vw, 30px)", lineHeight: 1.4 }}
                 >
-                  Thank you — your message is in. We read every note personally and will reply soon.
+                  Thank you. Your message is in. We read every note personally and will reply soon.
                 </p>
               </div>
             ) : (

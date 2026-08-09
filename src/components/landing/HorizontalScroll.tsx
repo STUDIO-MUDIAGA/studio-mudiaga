@@ -291,7 +291,7 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
                 }}
               >
                 Studio Mudiaga brings together bespoke shortlet apartments and
-                handcrafted furniture — each space considered, each detail
+                handcrafted furniture, each space considered, each detail
                 purposeful.
               </p>
               <p
@@ -302,7 +302,7 @@ function EditorialPanel({ scrollYProgress }: { scrollYProgress: MotionValue<numb
                   fontFamily: "var(--font-inter)",
                 }}
               >
-                We design for real living, guided by your vision — so every room
+                We design for real living, guided by your vision, so every room
                 feels like it was made for you, because it was.
               </p>
 

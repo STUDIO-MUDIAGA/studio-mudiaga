@@ -469,7 +469,7 @@ export default function NewShortletPage() {
               <p style={{ color: drag ? NAVY : "#888", fontSize: 13, fontWeight: 500, margin: "0 0 3px" }}>
                 {drag ? "Drop to upload" : "Drag & drop images here"}
               </p>
-              <p style={{ color: "#bbb", fontSize: 11, margin: 0 }}>or <span style={{ color: NAVY, fontWeight: 600, textDecoration: "underline" }}>click to browse</span> — JPG, PNG, WebP · max 10 MB · multiple allowed</p>
+              <p style={{ color: "#bbb", fontSize: 11, margin: 0 }}>or <span style={{ color: NAVY, fontWeight: 600, textDecoration: "underline" }}>click to browse</span> · JPG, PNG, WebP · max 10 MB · multiple allowed</p>
             </div>
 
             {/* Thumbnail strip — uploaded + uploading */}
