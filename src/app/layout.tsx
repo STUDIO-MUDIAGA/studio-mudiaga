@@ -9,7 +9,7 @@ const inter = Inter({ variable: "--font-inter", subsets: ["latin"], style: ["nor
 
 export const metadata: Metadata = {
   title: "Studio Mudiaga | Curated Living",
-  description: "Premium shortlet apartments and handcrafted furniture in Nigeria.",
+  description: "A contemporary African interior design studio, blending minimalism, culture, and soul into unforgettable spaces.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
