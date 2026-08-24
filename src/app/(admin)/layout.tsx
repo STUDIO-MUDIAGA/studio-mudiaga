@@ -32,6 +32,13 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    label: "Projects", href: "/admin/projects", icon: Folder,
+    children: [
+      { label: "All Projects", href: "/admin/projects",     icon: List },
+      { label: "Add Project",  href: "/admin/projects/new", icon: Plus },
+    ],
+  },
+  {
     label: "Shortlets", href: "/admin/shortlets", icon: Building2,
     children: [
       { label: "All Apartments",      href: "/admin/shortlets",             icon: List },

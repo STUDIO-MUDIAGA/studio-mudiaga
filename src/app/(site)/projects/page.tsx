@@ -1,7 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getPublishedProjects } from "@/lib/projects";
 
-const PROJECTS = [
+export const dynamic = "force-dynamic";
+
+const STATIC_PROJECTS = [
   {
     title: "Abode",
     eyebrow: "Interior Design",
@@ -16,7 +19,18 @@ const PROJECTS = [
   },
 ];
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const dbProjects = await getPublishedProjects();
+  const PROJECTS = [
+    ...STATIC_PROJECTS,
+    ...dbProjects.map((p) => ({
+      title: p.title,
+      eyebrow: p.eyebrow,
+      image: p.hero_image,
+      href: `/projects/${p.slug}`,
+    })),
+  ];
+
   return (
     <div className="bg-white">
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "clamp(140px, 14vw, 200px) 48px clamp(64px, 8vw, 120px)" }}>
