@@ -8,7 +8,8 @@ import {
   ArrowLeft, Plus, X, Image as ImageIcon, Check, Loader2, Upload, GripVertical,
 } from "lucide-react";
 import { slugify, isValidSlug } from "@/lib/media-categories";
-import { RESERVED_PROJECT_SLUGS, type DbProject } from "@/lib/projects";
+import { RESERVED_PROJECT_SLUGS } from "@/lib/project-constants";
+import type { DbProject } from "@/lib/projects";
 
 const NAVY = "#1e156d";
 const NAVY_BG = "#eeedf8";

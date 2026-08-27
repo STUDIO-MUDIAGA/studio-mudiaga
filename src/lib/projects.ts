@@ -1,14 +1,13 @@
+import "server-only";
 import { createClient } from "@supabase/supabase-js";
+
+export { RESERVED_PROJECT_SLUGS } from "@/lib/project-constants";
 
 const db = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
-
-// Slugs already used by hand-built pages under src/app/(site)/projects/<slug> —
-// blocked so a client-created project can never shadow or collide with them.
-export const RESERVED_PROJECT_SLUGS = ["abode", "ub"];
 
 export type DbFact = { value: string; label: string };
 export type DbGalleryImage = { src: string; alt: string };
