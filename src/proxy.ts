@@ -9,7 +9,7 @@ const supabaseAdmin = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
-const AUTH_RELEVANT_PREFIXES = ["/account", "/admin", "/login", "/signup"];
+const AUTH_RELEVANT_PREFIXES = ["/account", "/admin", "/api/admin", "/login", "/signup"];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -53,10 +53,15 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // ── Protect /admin (except /admin/login) ──────────────────────────
-  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
+  // ── Protect /admin pages and /api/admin/* endpoints ────────────────
+  const isAdminApi = pathname.startsWith("/api/admin");
+  const isAdminPage = pathname.startsWith("/admin") && !pathname.startsWith("/admin/login");
+
+  if (isAdminApi || isAdminPage) {
     if (!user) {
-      return NextResponse.redirect(new URL("/admin/login", request.url));
+      return isAdminApi
+        ? NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+        : NextResponse.redirect(new URL("/admin/login", request.url));
     }
 
     // Use service role to check role — bypasses RLS, always reliable
@@ -67,7 +72,9 @@ export async function proxy(request: NextRequest) {
       .single();
 
     if (profile?.role !== "admin") {
-      return NextResponse.redirect(new URL("/admin/login?error=access_denied", request.url));
+      return isAdminApi
+        ? NextResponse.json({ error: "Forbidden" }, { status: 403 })
+        : NextResponse.redirect(new URL("/admin/login?error=access_denied", request.url));
     }
   }
 
