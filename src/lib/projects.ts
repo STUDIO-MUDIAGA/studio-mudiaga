@@ -11,6 +11,7 @@ const db = createClient(
 
 export type DbFact = { value: string; label: string };
 export type DbGalleryImage = { src: string; alt: string };
+export type DbStoryRow = { eyebrow: string; heading: string; body: string[]; image: DbGalleryImage };
 
 export type DbProject = {
   id: string;
@@ -21,6 +22,7 @@ export type DbProject = {
   hero_image: string;
   intro: string[];
   facts: DbFact[];
+  story_rows: DbStoryRow[];
   gallery: DbGalleryImage[];
   cta_label: string;
   cta_href: string;

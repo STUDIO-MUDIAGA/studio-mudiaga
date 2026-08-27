@@ -18,6 +18,7 @@ export default async function DbProjectPage({ params }: { params: Promise<{ slug
         heroImage: project.hero_image,
         intro: project.intro,
         facts: project.facts,
+        storyRows: project.story_rows,
         gallery: project.gallery,
         cta: { label: project.cta_label, href: project.cta_href },
       }}

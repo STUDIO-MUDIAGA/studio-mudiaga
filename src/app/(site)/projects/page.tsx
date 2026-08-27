@@ -4,32 +4,14 @@ import { getPublishedProjects } from "@/lib/projects";
 
 export const dynamic = "force-dynamic";
 
-const STATIC_PROJECTS = [
-  {
-    title: "Abode",
-    eyebrow: "Interior Design",
-    image: "/IMG_1666.JPG",
-    href: "/projects/abode",
-  },
-  {
-    title: "UB",
-    eyebrow: "Interior Design",
-    image: "https://pub-2ddf02e2e1654b72808b735601463baf.r2.dev/project-ub/318cb696-ce33-4bb7-966e-62d193baaf1d.png",
-    href: "/projects/ub",
-  },
-];
-
 export default async function ProjectsPage() {
   const dbProjects = await getPublishedProjects();
-  const PROJECTS = [
-    ...STATIC_PROJECTS,
-    ...dbProjects.map((p) => ({
-      title: p.title,
-      eyebrow: p.eyebrow,
-      image: p.hero_image,
-      href: `/projects/${p.slug}`,
-    })),
-  ];
+  const PROJECTS = dbProjects.map((p) => ({
+    title: p.title,
+    eyebrow: p.eyebrow,
+    image: p.hero_image,
+    href: `/projects/${p.slug}`,
+  }));
 
   return (
     <div className="bg-white">
