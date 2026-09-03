@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import AuthSplitLayout from "@/components/auth/AuthSplitLayout";
+import { safeNext } from "@/lib/safe-next";
 
 const ORANGE = "#c46442";
 const HERO = "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80";
@@ -23,6 +25,15 @@ function GoogleIcon() {
 }
 
 export default function SignupPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignupForm />
+    </Suspense>
+  );
+}
+
+function SignupForm() {
+  const next = safeNext(useSearchParams().get("next"));
   const supabase = createClient();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -40,14 +51,14 @@ export default function SignupPage() {
     if (password !== confirmPassword) { setError("Passwords do not match."); return; }
     if (password.length < 8) { setError("Password must be at least 8 characters."); return; }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: fullName }, emailRedirectTo: `${window.location.origin}/auth/callback?next=/account` } });
+    const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: fullName }, emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` } });
     if (error) { setError(error.message); setLoading(false); return; }
     setSuccess(true); setLoading(false);
   };
 
   const handleGoogle = async () => {
     setGoogleLoading(true);
-    await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/auth/callback?next=/account` } });
+    await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` } });
   };
 
   const topRight = (

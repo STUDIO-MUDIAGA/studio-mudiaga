@@ -9,7 +9,12 @@ const supabaseAdmin = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
-const AUTH_RELEVANT_PREFIXES = ["/account", "/admin", "/api/admin", "/login", "/signup"];
+const AUTH_RELEVANT_PREFIXES = [
+  "/account", "/admin", "/api/admin", "/login", "/signup",
+  // MUDRES runs its own sign-in, so its authed routes need the session too.
+  // The public MUDRES pages stay on the fast path.
+  "/mudres/orders", "/mudres/login", "/mudres/signup",
+];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -51,6 +56,14 @@ export async function proxy(request: NextRequest) {
     if (!user) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
+  }
+
+  // ── Protect MUDRES order history ──────────────────────────────────
+  // MUDRES has its own sign-in, separate from ABODE's at /login.
+  if (pathname.startsWith("/mudres/orders") && !user) {
+    const to = new URL("/mudres/login", request.url);
+    to.searchParams.set("next", pathname);
+    return NextResponse.redirect(to);
   }
 
   // ── Protect /admin pages and /api/admin/* endpoints ────────────────
@@ -95,6 +108,10 @@ export async function proxy(request: NextRequest) {
   if (user) {
     if (pathname === "/login" || pathname === "/signup") {
       return NextResponse.redirect(new URL("/account", request.url));
+    }
+    // MUDRES keeps its own pair, and its own landing page.
+    if (pathname === "/mudres/login" || pathname === "/mudres/signup") {
+      return NextResponse.redirect(new URL("/mudres/orders", request.url));
     }
   }
 

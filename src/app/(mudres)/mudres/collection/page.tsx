@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Search, ShoppingBag } from "lucide-react";
+import { HEADER_SPACE } from "@/components/mudres/MudresHeader";
 
-const CREAM = "#EDE8D0";
+const WHITE = "#FFFFFF";
 const DARK = "#2A3812";
 const SAGE = "#96B85D";
-
-const CATEGORIES = ["All", "Sofa", "Chair", "Table", "Bed", "Storage", "Lighting", "Décor", "Outdoor", "Office", "Dining"];
 
 type FurnitureItem = {
   id: string; name: string; category: string; material: string;
@@ -17,16 +17,29 @@ type FurnitureItem = {
 };
 
 export default function MudresCollectionPage() {
+  return (
+    <Suspense fallback={null}>
+      <CollectionBrowser />
+    </Suspense>
+  );
+}
+
+function CollectionBrowser() {
+  const params = useSearchParams();
   const [all, setAll] = useState<FurnitureItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("All");
+  // Honours ?category= so the header mega menu and the homepage category
+  // tiles land on a pre-filtered listing.
+  const [category, setCategory] = useState(params.get("category") ?? "All");
 
   useEffect(() => {
-    fetch("/api/admin/furniture")
+    fetch("/api/furniture")
       .then((r) => r.json())
       .then((data) => { setAll(data); setLoading(false); });
   }, []);
+
+  const categories = ["All", ...Array.from(new Set(all.map((f) => f.category).filter(Boolean))).sort()];
 
   const filtered = all.filter((f) => {
     if (category !== "All" && f.category !== category) return false;
@@ -35,9 +48,9 @@ export default function MudresCollectionPage() {
   });
 
   return (
-    <div style={{ background: CREAM, minHeight: "100vh", color: DARK, paddingTop: 68 }}>
+    <div style={{ background: WHITE, minHeight: "100vh", color: DARK, paddingTop: HEADER_SPACE + 16 }}>
       {/* Header */}
-      <div style={{ borderBottom: "1px solid rgba(42,56,18,0.08)", padding: "40px 40px 28px" }}>
+      <div className="px-5 md:px-10 pt-8 md:pt-10 pb-7" style={{ borderBottom: "1px solid rgba(42,56,18,0.08)" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto" }}>
           <p style={{ color: SAGE, fontSize: 10, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", margin: "0 0 8px" }}>MUDRES</p>
           <h1 style={{ color: DARK, fontSize: 32, fontWeight: 700, margin: "0 0 24px" }}>The Collection</h1>
@@ -57,7 +70,7 @@ export default function MudresCollectionPage() {
 
           {/* Category filter */}
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {CATEGORIES.map((c) => (
+            {categories.map((c) => (
               <button key={c} onClick={() => setCategory(c)} style={{
                 padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: 500, border: "1px solid", cursor: "pointer",
                 background: category === c ? SAGE : "rgba(42,56,18,0.03)",
@@ -70,7 +83,7 @@ export default function MudresCollectionPage() {
       </div>
 
       {/* Grid */}
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "40px 40px 80px" }}>
+      <div className="px-5 md:px-10 pt-10 pb-20" style={{ maxWidth: 1280, margin: "0 auto" }}>
         <p style={{ color: "rgba(42,56,18,0.35)", fontSize: 12, marginBottom: 24 }}>
           {loading ? "Loading…" : `${filtered.length} item${filtered.length === 1 ? "" : "s"}`}
         </p>
@@ -78,7 +91,7 @@ export default function MudresCollectionPage() {
         {loading ? (
           <div style={{ textAlign: "center", padding: "80px 0", color: "rgba(42,56,18,0.25)", fontSize: 13 }}>Loading collection…</div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filtered.map((item) => (
               <Link key={item.id} href={`/mudres/collection/${item.id}`} style={{ textDecoration: "none", display: "block" }}>
                 <div style={{ position: "relative", aspectRatio: "1", borderRadius: 14, overflow: "hidden", background: "rgba(42,56,18,0.03)", border: "1px solid rgba(42,56,18,0.06)", marginBottom: 12 }}>
@@ -95,7 +108,7 @@ export default function MudresCollectionPage() {
                   <div style={{ position: "absolute", bottom: 10, right: 10, opacity: 0, transition: "opacity 0.2s" }}
                     onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.opacity = "1"}
                     onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.opacity = "0"}>
-                    <div style={{ background: CREAM, borderRadius: "50%", width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 16px rgba(42,56,18,0.2)" }}>
+                    <div style={{ background: WHITE, borderRadius: "50%", width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 16px rgba(42,56,18,0.2)" }}>
                       <ShoppingBag size={13} color={DARK} />
                     </div>
                   </div>

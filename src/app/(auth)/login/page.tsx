@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import AuthSplitLayout from "@/components/auth/AuthSplitLayout";
+import { safeNext } from "@/lib/safe-next";
 
 const ORANGE = "#c46442";
+
+
 const HERO = "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80";
 
 const inputStyle = { width: "100%", background: "#fafaf9", border: "1px solid #e8e8e4", borderRadius: 12, padding: "13px 16px", color: "#0a0a0a", fontSize: 13, outline: "none", boxSizing: "border-box" as const };
@@ -23,7 +27,16 @@ function GoogleIcon() {
 }
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const supabase = createClient();
+  const next = safeNext(useSearchParams().get("next"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -35,12 +48,12 @@ export default function LoginPage() {
     e.preventDefault(); setError(""); setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) { setError(error.message); setLoading(false); return; }
-    window.location.href = "/account";
+    window.location.href = next;
   };
 
   const handleGoogle = async () => {
     setGoogleLoading(true);
-    await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/auth/callback?next=/account` } });
+    await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` } });
   };
 
   return (

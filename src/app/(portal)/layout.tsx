@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { LogOut, LayoutDashboard, CalendarDays, ShoppingBag, User } from "lucide-react";
+import { LogOut, LayoutDashboard, CalendarDays, User } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 const ORANGE = "#c46442";
@@ -10,7 +10,6 @@ const ORANGE = "#c46442";
 const NAV = [
   { label: "Overview", href: "/account", icon: LayoutDashboard },
   { label: "Bookings", href: "/account/bookings", icon: CalendarDays },
-  { label: "Orders", href: "/account/orders", icon: ShoppingBag },
   { label: "Profile", href: "/account/profile", icon: User },
 ];
 

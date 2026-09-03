@@ -5,8 +5,9 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, Minus, Plus, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { HEADER_SPACE } from "@/components/mudres/MudresHeader";
 
-const CREAM = "#EDE8D0";
+const WHITE = "#FFFFFF";
 const DARK = "#2A3812";
 const SAGE = "#96B85D";
 
@@ -53,7 +54,7 @@ export default function ProductDetailPage() {
     setOrderPlaced(false);
     setActiveImage(0);
     setQuantity(1);
-    fetch(`/api/admin/furniture/${id}`)
+    fetch(`/api/furniture/${id}`)
       .then((r) => {
         if (!r.ok) throw new Error("not found");
         return r.json();
@@ -62,7 +63,7 @@ export default function ProductDetailPage() {
         setItem(data);
         setColor(data.colors?.[0] ?? "");
         setLoading(false);
-        fetch("/api/admin/furniture")
+        fetch("/api/furniture")
           .then((r) => r.json())
           .then((all: FurnitureItem[]) =>
             setRelated(all.filter((f) => f.id !== data.id && f.category === data.category).slice(0, 4))
@@ -113,7 +114,7 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div style={{ background: CREAM, minHeight: "100vh", color: "rgba(42,56,18,0.35)", paddingTop: 68, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>
+      <div style={{ background: WHITE, minHeight: "100vh", color: "rgba(42,56,18,0.35)", paddingTop: HEADER_SPACE + 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>
         Loading…
       </div>
     );
@@ -121,7 +122,7 @@ export default function ProductDetailPage() {
 
   if (notFound || !item) {
     return (
-      <div style={{ background: CREAM, minHeight: "100vh", color: DARK, paddingTop: 68, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
+      <div style={{ background: WHITE, minHeight: "100vh", color: DARK, paddingTop: HEADER_SPACE + 16, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
         <p style={{ color: "rgba(42,56,18,0.5)", fontSize: 14 }}>This piece could not be found.</p>
         <Link href="/mudres/collection" style={{ color: SAGE, fontSize: 13, textDecoration: "none", fontWeight: 600 }}>
           Back to the collection
@@ -139,7 +140,7 @@ export default function ProductDetailPage() {
       : "";
 
   return (
-    <div style={{ background: CREAM, minHeight: "100vh", color: DARK, paddingTop: 68 }}>
+    <div style={{ background: WHITE, minHeight: "100vh", color: DARK, paddingTop: HEADER_SPACE + 16 }}>
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 40px 100px" }}>
         <Link href="/mudres/collection" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "rgba(42,56,18,0.5)", fontSize: 12, textDecoration: "none", marginBottom: 28 }}>
           <ChevronLeft size={14} /> Collection
