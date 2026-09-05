@@ -2,8 +2,9 @@
 
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Search, ShoppingBag } from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { Search, ShoppingBag, Heart } from "lucide-react";
+import { useWishlist } from "@/lib/wishlist";
 import { HEADER_SPACE } from "@/components/mudres/MudresHeader";
 
 const WHITE = "#FFFFFF";
@@ -26,6 +27,8 @@ export default function MudresCollectionPage() {
 
 function CollectionBrowser() {
   const params = useSearchParams();
+  const router = useRouter();
+  const { has, toggle, signedIn } = useWishlist();
   const [all, setAll] = useState<FurnitureItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -105,6 +108,27 @@ function CollectionBrowser() {
                   {item.original_price && (
                     <div style={{ position: "absolute", top: 10, right: 10, background: SAGE, color: DARK, fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 6 }}>SALE</div>
                   )}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (!signedIn) {
+                        router.push(`/mudres/login?next=${encodeURIComponent(`/mudres/collection/${item.id}`)}`);
+                        return;
+                      }
+                      toggle(item.id);
+                    }}
+                    aria-label={has(item.id) ? "Remove from wishlist" : "Save to wishlist"}
+                    style={{
+                      position: "absolute", top: 10, left: 10, zIndex: 1,
+                      width: 30, height: 30, borderRadius: "50%", border: "none", cursor: "pointer",
+                      background: has(item.id) ? DARK : WHITE,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      boxShadow: "0 4px 12px -4px rgba(42,56,18,0.35)",
+                    }}
+                  >
+                    <Heart size={13} color={has(item.id) ? WHITE : DARK} fill={has(item.id) ? WHITE : "none"} />
+                  </button>
                   <div style={{ position: "absolute", bottom: 10, right: 10, opacity: 0, transition: "opacity 0.2s" }}
                     onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.opacity = "1"}
                     onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.opacity = "0"}>

@@ -13,7 +13,7 @@ const AUTH_RELEVANT_PREFIXES = [
   "/account", "/admin", "/api/admin", "/login", "/signup",
   // MUDRES runs its own sign-in, so its authed routes need the session too.
   // The public MUDRES pages stay on the fast path.
-  "/mudres/orders", "/mudres/login", "/mudres/signup",
+  "/mudres/orders", "/mudres/dashboard", "/mudres/login", "/mudres/signup",
 ];
 
 export async function proxy(request: NextRequest) {
@@ -58,9 +58,11 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // ── Protect MUDRES order history ──────────────────────────────────
+  // ── Protect the MUDRES customer dashboard ──────────────────────────
   // MUDRES has its own sign-in, separate from ABODE's at /login.
-  if (pathname.startsWith("/mudres/orders") && !user) {
+  const isMudresAccountArea =
+    pathname.startsWith("/mudres/orders") || pathname.startsWith("/mudres/dashboard");
+  if (isMudresAccountArea && !user) {
     const to = new URL("/mudres/login", request.url);
     to.searchParams.set("next", pathname);
     return NextResponse.redirect(to);

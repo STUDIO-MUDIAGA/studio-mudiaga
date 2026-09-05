@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Minus, Plus, CheckCircle2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ChevronLeft, Minus, Plus, CheckCircle2, Heart } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useWishlist } from "@/lib/wishlist";
 import { HEADER_SPACE } from "@/components/mudres/MudresHeader";
 
 const WHITE = "#FFFFFF";
@@ -34,6 +36,8 @@ export default function ProductDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const { profile } = useAuth();
+  const { has, toggle, signedIn } = useWishlist();
+  const router = useRouter();
 
   const [item, setItem] = useState<FurnitureItem | null>(null);
   const [related, setRelated] = useState<FurnitureItem[]>([]);
@@ -180,7 +184,26 @@ export default function ProductDetailPage() {
             <p style={{ color: SAGE, fontSize: 10, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", margin: "0 0 10px" }}>
               {item.category}{item.material ? ` · ${item.material}` : ""}
             </p>
-            <h1 style={{ color: DARK, fontSize: 32, fontWeight: 700, margin: "0 0 16px", lineHeight: 1.15 }}>{item.name}</h1>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 16 }}>
+              <h1 style={{ color: DARK, fontSize: 32, fontWeight: 700, margin: 0, lineHeight: 1.15, flex: 1 }}>{item.name}</h1>
+              <button
+                onClick={() => {
+                  if (!signedIn) {
+                    router.push(`/mudres/login?next=${encodeURIComponent(`/mudres/collection/${item.id}`)}`);
+                    return;
+                  }
+                  toggle(item.id);
+                }}
+                aria-label={has(item.id) ? "Remove from wishlist" : "Save to wishlist"}
+                style={{
+                  width: 42, height: 42, borderRadius: "50%", border: "1px solid rgba(42,56,18,0.12)", cursor: "pointer",
+                  background: has(item.id) ? DARK : WHITE, flex: "0 0 auto",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}
+              >
+                <Heart size={17} color={has(item.id) ? WHITE : DARK} fill={has(item.id) ? WHITE : "none"} />
+              </button>
+            </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
               <span style={{ color: DARK, fontSize: 24, fontWeight: 700 }}>{fmt(item.price)}</span>
               {item.original_price && (

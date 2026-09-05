@@ -8,7 +8,6 @@ import { safeNext } from "@/lib/safe-next";
 
 const WHITE = "#FFFFFF";
 const DARK = "#2A3812";
-const SAGE = "#96B85D";
 const LINE = "#E7E8E0";
 const MUTED = "#6F7A5E";
 const FAINT = "#8A9276";
@@ -222,9 +221,6 @@ export default function MudresAuthForm({
         </Link>
       </p>
 
-      <p style={{ color: FAINT, fontSize: 11.5, lineHeight: 1.6, textAlign: "center", margin: "26px 0 0" }}>
-        Looking for shortlets? <Link href="/login" style={{ color: SAGE, fontWeight: 600 }}>Sign in to ABODE</Link>
-      </p>
     </>
   );
 }

@@ -43,7 +43,6 @@ export default function MudresLayout({ children }: { children: React.ReactNode }
             <Link href="/mudres/collection" style={{ color: "rgba(237,232,208,0.5)", fontSize: 12, textDecoration: "none" }}>Collection</Link>
             <Link href="/mudres/orders" style={{ color: "rgba(237,232,208,0.5)", fontSize: 12, textDecoration: "none" }}>My Orders</Link>
             <Link href="/" style={{ color: "rgba(237,232,208,0.5)", fontSize: 12, textDecoration: "none" }}>Studio Mudiaga</Link>
-            <Link href="/abode" style={{ color: "rgba(237,232,208,0.5)", fontSize: 12, textDecoration: "none" }}>ABODE</Link>
           </div>
           <p style={{ color: "rgba(237,232,208,0.3)", fontSize: 11 }}>© {new Date().getFullYear()} Studio Mudiaga</p>
         </div>

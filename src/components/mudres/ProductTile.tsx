@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ShoppingBag } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ShoppingBag, Heart } from "lucide-react";
 import type { FurnitureItem } from "@/lib/furniture";
+import { useWishlist } from "@/lib/wishlist";
 
 const WHITE = "#FFFFFF";
 const DARK = "#2A3812";
@@ -11,6 +13,19 @@ const SAGE = "#96B85D";
 
 export default function ProductTile({ item }: { item: FurnitureItem }) {
   const [hover, setHover] = useState(false);
+  const { has, toggle, signedIn } = useWishlist();
+  const router = useRouter();
+  const saved = has(item.id);
+
+  const onWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!signedIn) {
+      router.push(`/mudres/login?next=${encodeURIComponent(`/mudres/collection/${item.id}`)}`);
+      return;
+    }
+    toggle(item.id);
+  };
 
   return (
     <Link
@@ -58,6 +73,19 @@ export default function ProductTile({ item }: { item: FurnitureItem }) {
             SALE
           </div>
         )}
+        <button
+          onClick={onWishlist}
+          aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
+          style={{
+            position: "absolute", top: 10, left: 10, zIndex: 1,
+            width: 30, height: 30, borderRadius: "50%", border: "none", cursor: "pointer",
+            background: saved ? DARK : WHITE,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "0 4px 12px -4px rgba(28,38,12,0.4)",
+          }}
+        >
+          <Heart size={13} color={saved ? WHITE : DARK} fill={saved ? WHITE : "none"} />
+        </button>
         <div
           style={{
             position: "absolute",

@@ -237,8 +237,8 @@ export default function MudresHeader() {
               <ShoppingBag size={14} /> {!compact && `Cart (${cartCount})`}
             </Link>
             <Link
-              href={user ? "/mudres/orders" : "/mudres/login"}
-              aria-label={user ? "My orders" : "Sign in"}
+              href={user ? "/mudres/dashboard" : "/mudres/login"}
+              aria-label={user ? "My account" : "Sign in"}
               style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                 padding: compact ? 0 : "11px 19px",
@@ -247,7 +247,7 @@ export default function MudresHeader() {
                 fontSize: 12.5, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap",
               }}
             >
-              <User size={14} /> {!compact && (user ? "My orders" : "Sign in")}
+              <User size={14} /> {!compact && (user ? "My account" : "Sign in")}
             </Link>
             {compact && (
               <button

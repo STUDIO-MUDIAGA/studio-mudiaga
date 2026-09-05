@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Package, ArrowRight } from "lucide-react";
-import { HEADER_SPACE } from "@/components/mudres/MudresHeader";
+import DashboardShell from "@/components/mudres/DashboardShell";
 
 const DARK = "#2A3812";
 const INK = DARK;
@@ -53,8 +53,7 @@ export default function MudresOrdersPage() {
   }, []);
 
   return (
-    <div style={{ background: "#FFFFFF", minHeight: "100vh", paddingTop: HEADER_SPACE + 16 }}>
-    <div className="px-5 md:px-10 pt-8 pb-20" style={{ maxWidth: 1000, margin: "0 auto" }}>
+    <DashboardShell>
       <h1 style={{ color: INK, fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 700, margin: "0 0 6px", letterSpacing: "-0.03em" }}>
         Orders
       </h1>
@@ -130,7 +129,6 @@ export default function MudresOrdersPage() {
           </div>
         </div>
       ))}
-    </div>
-    </div>
+    </DashboardShell>
   );
 }
