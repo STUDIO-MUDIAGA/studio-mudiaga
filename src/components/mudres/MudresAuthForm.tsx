@@ -5,6 +5,11 @@ import Link from "next/link";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { safeNext } from "@/lib/safe-next";
+import TurnstileWidget from "@/components/TurnstileWidget";
+
+// Whether a widget will actually render. If unset, Turnstile is skipped
+// entirely rather than blocking sign-in on a check that cannot run yet.
+const TURNSTILE_ACTIVE = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 const WHITE = "#FFFFFF";
 const DARK = "#2A3812";
@@ -22,16 +27,6 @@ const inputStyle: React.CSSProperties = {
   boxSizing: "border-box", fontFamily: "inherit",
 };
 
-function GoogleIcon() {
-  return (
-    <svg width="17" height="17" viewBox="0 0 18 18" fill="none" aria-hidden>
-      <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-      <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
-      <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-      <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-    </svg>
-  );
-}
 
 export default function MudresAuthForm({
   mode,
@@ -49,14 +44,22 @@ export default function MudresAuthForm({
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (TURNSTILE_ACTIVE && !captchaToken) {
+      setError("Please complete the verification check.");
+      return;
+    }
     setError("");
     setLoading(true);
+
+    // Supabase ignores captchaToken when its own Attack Protection setting
+    // is off, so this is always safe to send.
+    const captchaOptions = captchaToken ? { captchaToken } : {};
 
     if (isSignup) {
       const { error } = await supabase.auth.signUp({
@@ -65,6 +68,7 @@ export default function MudresAuthForm({
         options: {
           data: { full_name: fullName },
           emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+          ...captchaOptions,
         },
       });
       if (error) {
@@ -77,7 +81,7 @@ export default function MudresAuthForm({
       return;
     }
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email, password, options: captchaOptions });
     if (error) {
       setError(error.message);
       setLoading(false);
@@ -86,13 +90,6 @@ export default function MudresAuthForm({
     window.location.href = next;
   };
 
-  const google = async () => {
-    setGoogleLoading(true);
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
-    });
-  };
 
   if (sent) {
     return (
@@ -121,26 +118,6 @@ export default function MudresAuthForm({
           ? "One account to order and track handcrafted pieces from MUDRES."
           : "Sign in to your MUDRES account to order and track your pieces."}
       </p>
-
-      <button
-        type="button"
-        onClick={google}
-        disabled={googleLoading}
-        style={{
-          width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-          background: WHITE, border: `1px solid ${LINE}`, borderRadius: 999,
-          padding: "13px 18px", color: DARK, fontSize: 13.5, fontWeight: 600,
-          cursor: googleLoading ? "default" : "pointer", fontFamily: "inherit",
-        }}
-      >
-        <GoogleIcon /> {googleLoading ? "Redirecting…" : "Continue with Google"}
-      </button>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0" }}>
-        <span style={{ flex: 1, height: 1, background: LINE }} />
-        <span style={{ color: FAINT, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase" }}>or</span>
-        <span style={{ flex: 1, height: 1, background: LINE }} />
-      </div>
 
       <form onSubmit={submit}>
         {isSignup && (
@@ -192,18 +169,25 @@ export default function MudresAuthForm({
           </div>
         </Field>
 
+        {TURNSTILE_ACTIVE && (
+          <div style={{ margin: "4px 0 14px" }}>
+            <TurnstileWidget onVerify={setCaptchaToken} onExpire={() => setCaptchaToken(null)} />
+          </div>
+        )}
+
         {error && (
           <p style={{ color: "#A33", fontSize: 12.5, lineHeight: 1.6, margin: "0 0 14px" }}>{error}</p>
         )}
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || (TURNSTILE_ACTIVE && !captchaToken)}
           style={{
             width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
             background: DARK, color: WHITE, border: "none", borderRadius: 999,
             padding: "14px 20px", fontSize: 13.5, fontWeight: 600, fontFamily: "inherit",
-            cursor: loading ? "default" : "pointer", opacity: loading ? 0.6 : 1,
+            cursor: loading || (TURNSTILE_ACTIVE && !captchaToken) ? "default" : "pointer",
+            opacity: loading || (TURNSTILE_ACTIVE && !captchaToken) ? 0.6 : 1,
           }}
         >
           {loading ? "Please wait…" : isSignup ? "Create account" : "Sign in"}
