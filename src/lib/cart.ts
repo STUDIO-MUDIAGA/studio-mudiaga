@@ -8,6 +8,10 @@ export type CartLine = {
   price: number;
   image: string | null;
   quantity: number;
+  /** Set when the item has per-color variant pricing — two lines with the
+   *  same id but different colors are kept separate, not merged, since they
+   *  can carry different prices. */
+  color?: string;
 };
 
 const STORAGE_KEY = "mudres.cart.v1";
@@ -84,11 +88,11 @@ export function useCart() {
 
   const add = useCallback(
     (line: Omit<CartLine, "quantity">, quantity = 1) => {
-      const existing = snapshot.find((l) => l.id === line.id);
+      const existing = snapshot.find((l) => l.id === line.id && l.color === line.color);
       commit(
         existing
           ? snapshot.map((l) =>
-              l.id === line.id ? { ...l, quantity: l.quantity + quantity } : l
+              l.id === line.id && l.color === line.color ? { ...l, quantity: l.quantity + quantity } : l
             )
           : [...snapshot, { ...line, quantity }]
       );
@@ -96,16 +100,16 @@ export function useCart() {
     []
   );
 
-  const setQuantity = useCallback((id: string, quantity: number) => {
+  const setQuantity = useCallback((id: string, quantity: number, color?: string) => {
     commit(
       quantity <= 0
-        ? snapshot.filter((l) => l.id !== id)
-        : snapshot.map((l) => (l.id === id ? { ...l, quantity } : l))
+        ? snapshot.filter((l) => !(l.id === id && l.color === color))
+        : snapshot.map((l) => (l.id === id && l.color === color ? { ...l, quantity } : l))
     );
   }, []);
 
-  const remove = useCallback((id: string) => {
-    commit(snapshot.filter((l) => l.id !== id));
+  const remove = useCallback((id: string, color?: string) => {
+    commit(snapshot.filter((l) => !(l.id === id && l.color === color)));
   }, []);
 
   const clear = useCallback(() => commit(EMPTY), []);

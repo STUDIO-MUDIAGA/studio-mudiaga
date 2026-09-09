@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import ImagesField from "@/components/admin/ImagesField";
+import VariantPricing, { type VariantMap } from "@/components/admin/VariantPricing";
 
 const NAVY = "#1e156d";
 const CATEGORIES = ["Sofa","Chair","Table","Bed","Storage","Lighting","Décor","Outdoor","Office","Dining"];
@@ -19,29 +21,49 @@ export default function EditFurniturePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [form, setForm] = useState({ name: "", category: "Sofa", material: "", price: "", original_price: "", description: "", dimensions: "", weight: "", colors: "", images: "", tags: "", in_stock: true, featured: false });
+  const [form, setForm] = useState({ name: "", category: "Sofa", material: "", price: "", original_price: "", description: "", dimensions: "", weight: "", colors: "", images: [] as string[], tags: "", in_stock: true, featured: false, product_of_month: false });
+  const [variants, setVariants] = useState<VariantMap>({});
 
   useEffect(() => {
-    fetch(`/api/admin/furniture/${id}`).then((r) => r.json()).then((data) => {
-      setForm({ name: data.name ?? "", category: data.category ?? "Sofa", material: data.material ?? "", price: String(data.price ?? ""), original_price: data.original_price ? String(data.original_price) : "", description: data.description ?? "", dimensions: data.dimensions ?? "", weight: data.weight ?? "", colors: (data.colors ?? []).join(", "), images: (data.images ?? []).join(", "), tags: (data.tags ?? []).join(", "), in_stock: data.in_stock ?? true, featured: data.featured ?? false });
+    Promise.all([
+      fetch(`/api/admin/furniture/${id}`).then((r) => r.json()),
+      fetch(`/api/admin/furniture/${id}/variants`).then((r) => r.json()),
+    ]).then(([data, variantRows]) => {
+      setForm({ name: data.name ?? "", category: data.category ?? "Sofa", material: data.material ?? "", price: String(data.price ?? ""), original_price: data.original_price ? String(data.original_price) : "", description: data.description ?? "", dimensions: data.dimensions ?? "", weight: data.weight ?? "", colors: (data.colors ?? []).join(", "), images: data.images ?? [], tags: (data.tags ?? []).join(", "), in_stock: data.in_stock ?? true, featured: data.featured ?? false, product_of_month: data.product_of_month ?? false });
+      const map: VariantMap = {};
+      for (const v of Array.isArray(variantRows) ? variantRows : []) {
+        map[v.color] = { price: String(v.price ?? ""), in_stock: v.in_stock ?? true };
+      }
+      setVariants(map);
       setLoading(false);
     });
   }, [id]);
 
   const set = (k: string, v: unknown) => setForm((p) => ({ ...p, [k]: v }));
+  const colorList = form.colors.split(",").map((c) => c.trim()).filter(Boolean);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true); setError("");
-    const payload = { name: form.name, category: form.category, material: form.material, price: parseInt(form.price), original_price: form.original_price ? parseInt(form.original_price) : null, description: form.description, dimensions: form.dimensions, weight: form.weight, colors: form.colors.split(",").map((c) => c.trim()).filter(Boolean), images: form.images.split(",").map((u) => u.trim()).filter(Boolean), tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean), in_stock: form.in_stock, featured: form.featured };
+    const payload = { name: form.name, category: form.category, material: form.material, price: parseInt(form.price), original_price: form.original_price ? parseInt(form.original_price) : null, description: form.description, dimensions: form.dimensions, weight: form.weight, colors: colorList, images: form.images, tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean), in_stock: form.in_stock, featured: form.featured, product_of_month: form.product_of_month };
     const res = await fetch(`/api/admin/furniture/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
     if (!res.ok) { const d = await res.json(); setError(d.error ?? "Failed to save"); setSaving(false); return; }
+
+    const variantPayload = colorList
+      .filter((c) => variants[c]?.price)
+      .map((c) => ({ color: c, price: Number(variants[c].price), in_stock: variants[c].in_stock }));
+    await fetch(`/api/admin/furniture/${id}/variants`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ variants: variantPayload }),
+    });
+
     router.push("/admin/furniture");
   };
 
   if (loading) return <div style={{ color: "#aaa", fontSize: 13, padding: "60px 0", textAlign: "center" }}>Loading…</div>;
 
   return (
-    <div style={{ maxWidth: 720 }}>
+    <div>
       <div style={{ marginBottom: 28 }}>
         <Link href="/admin/furniture" style={{ display: "flex", alignItems: "center", gap: 6, color: "#aaa", fontSize: 12, textDecoration: "none", marginBottom: 16 }}><ArrowLeft size={12} /> Back to Furniture</Link>
         <h1 style={{ color: "#0a0a0a", fontSize: 22, fontWeight: 700, margin: 0 }}>Edit Item</h1>
@@ -66,14 +88,21 @@ export default function EditFurniturePage() {
           </Row>
           <Field label="Available Colors (comma-separated)"><input style={inputStyle} value={form.colors} onChange={(e) => set("colors", e.target.value)} placeholder="Charcoal, Ivory, Terracotta" /></Field>
         </Section>
+        <Section title="Per-Color Pricing (optional)">
+          <p style={{ color: "#aaa", fontSize: 12, margin: "-6px 0 4px" }}>
+            Leave a color&apos;s price blank to keep charging the base price above for it.
+          </p>
+          <VariantPricing colors={colorList} value={variants} onChange={setVariants} basePlaceholder={form.price || "Base price"} />
+        </Section>
         <Section title="Images & Tags">
-          <Field label="Image URLs (comma-separated)"><textarea style={{ ...inputStyle, minHeight: 72, resize: "vertical" }} value={form.images} onChange={(e) => set("images", e.target.value)} placeholder="https://..., https://..." /></Field>
+          <Field label="Images"><ImagesField images={form.images} onChange={(images) => set("images", images)} /></Field>
           <Field label="Tags (comma-separated)"><input style={inputStyle} value={form.tags} onChange={(e) => set("tags", e.target.value)} placeholder="Modern, Minimalist, Lagos" /></Field>
         </Section>
         <Section title="Status">
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}><input type="checkbox" checked={form.in_stock} onChange={(e) => set("in_stock", e.target.checked)} /><span style={{ color: "#555", fontSize: 13 }}>In stock (available for purchase)</span></label>
             <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}><input type="checkbox" checked={form.featured} onChange={(e) => set("featured", e.target.checked)} /><span style={{ color: "#555", fontSize: 13 }}>Featured on homepage</span></label>
+            <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}><input type="checkbox" checked={form.product_of_month} onChange={(e) => set("product_of_month", e.target.checked)} /><span style={{ color: "#555", fontSize: 13 }}>Product of the Month spotlight</span></label>
           </div>
         </Section>
         {error && <p style={{ color: "#dc2626", fontSize: 12, background: "#fff5f5", border: "1px solid #fecaca", borderRadius: 10, padding: "10px 14px", marginBottom: 16 }}>{error}</p>}
