@@ -41,7 +41,7 @@ export default function EditShortletPage() {
   if (loading) return <div style={{ color: "#aaa", fontSize: 13, padding: "60px 0", textAlign: "center" }}>Loading…</div>;
 
   return (
-    <div style={{ maxWidth: 720 }}>
+    <div>
       <div style={{ marginBottom: 28 }}>
         <Link href="/admin/shortlets" style={{ display: "flex", alignItems: "center", gap: 6, color: "#aaa", fontSize: 12, textDecoration: "none", marginBottom: 16 }}><ArrowLeft size={12} /> Back to Shortlets</Link>
         <h1 style={{ color: "#0a0a0a", fontSize: 22, fontWeight: 700, margin: 0 }}>Edit Shortlet</h1>
