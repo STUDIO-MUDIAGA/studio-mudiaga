@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Search, User, ChevronDown, ArrowRight, Star, BedDouble } from "lucide-react";
+import { Search, User, ChevronDown, ArrowRight, Star, BedDouble, Menu, X, ArrowUpRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { resolveShortletCategoryIcon } from "@/lib/shortlet-category-icons";
 
@@ -23,6 +23,8 @@ export default function AbodeHeader() {
   const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [compact, setCompact] = useState(false);
+  const [drawer, setDrawer] = useState(false);
   const [listings, setListings] = useState<Shortlet[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -31,6 +33,14 @@ export default function AbodeHeader() {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 860px)");
+    const sync = () => setCompact(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
   }, []);
 
   useEffect(() => {
@@ -45,10 +55,17 @@ export default function AbodeHeader() {
   }, []);
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { setOpen(false); setDrawer(false); } };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = drawer ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [drawer]);
 
   const cancelClose = useCallback(() => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -63,7 +80,7 @@ export default function AbodeHeader() {
 
   return (
     <header
-      onMouseLeave={scheduleClose}
+      onMouseLeave={compact ? undefined : scheduleClose}
       style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
         background: "#fff",
@@ -71,50 +88,76 @@ export default function AbodeHeader() {
         transition: "border-color 0.3s",
       }}
     >
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 40px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Link href="/abode" style={{ textDecoration: "none" }} onClick={() => setOpen(false)}>
-          <span style={{ color: "#0a0a0a", fontSize: 18, fontWeight: 800, letterSpacing: "0.12em", lineHeight: 1, display: "block" }}>ABODE</span>
-          <span style={{ color: "#bbb", fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase", display: "block", marginTop: 2 }}>by Studio Mudiaga</span>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: compact ? "0 20px" : "0 40px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Link href="/abode" style={{ textDecoration: "none" }} onClick={() => { setOpen(false); setDrawer(false); }}>
+          <span style={{ color: "#0a0a0a", fontSize: compact ? 16 : 18, fontWeight: 800, letterSpacing: "0.12em", lineHeight: 1, display: "block" }}>ABODE</span>
+          {!compact && (
+            <span style={{ color: "#bbb", fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase", display: "block", marginTop: 2 }}>by Studio Mudiaga</span>
+          )}
         </Link>
 
-        <nav style={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <button
-            onMouseEnter={() => { cancelClose(); setOpen(true); }}
-            onClick={() => setOpen((v) => !v)}
-            aria-expanded={open}
-            aria-haspopup="true"
-            style={{
-              display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 8,
-              fontSize: 13, fontWeight: open || pathname.startsWith("/abode/properties") ? 600 : 400,
-              cursor: "pointer", border: "none",
-              color: open || pathname.startsWith("/abode/properties") ? ORANGE : "#888",
-              background: open || pathname.startsWith("/abode/properties") ? "#fdf0eb" : "transparent",
-            }}
-          >
-            Properties
-            <ChevronDown size={13} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
-          </button>
-        </nav>
+        {!compact && (
+          <nav style={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <button
+              onMouseEnter={() => { cancelClose(); setOpen(true); }}
+              onClick={() => setOpen((v) => !v)}
+              aria-expanded={open}
+              aria-haspopup="true"
+              style={{
+                display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 8,
+                fontSize: 13, fontWeight: open || pathname.startsWith("/abode/properties") ? 600 : 400,
+                cursor: "pointer", border: "none",
+                color: open || pathname.startsWith("/abode/properties") ? ORANGE : "#888",
+                background: open || pathname.startsWith("/abode/properties") ? "#fdf0eb" : "transparent",
+              }}
+            >
+              Properties
+              <ChevronDown size={13} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
+            </button>
+          </nav>
+        )}
 
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Link href="/abode/properties" onClick={() => setOpen(false)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 10, background: "#f7f7f5", border: "1px solid #ebebeb", color: "#888", fontSize: 12, textDecoration: "none" }}>
-            <Search size={13} /> Search
-          </Link>
-          <Link
-            href={user ? "/account" : `/login?next=${encodeURIComponent(pathname)}`}
-            onClick={() => setOpen(false)}
-            style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 10, background: ORANGE, color: "#fff", fontSize: 12, fontWeight: 600, textDecoration: "none" }}
-          >
-            <User size={13} /> {user ? "Account" : "Sign in"}
-          </Link>
-          <Link href="/" style={{ color: "#bbb", fontSize: 11, textDecoration: "none", marginLeft: 4 }}>
-            Studio Mudiaga ↗
-          </Link>
+        <div style={{ display: "flex", alignItems: "center", gap: compact ? 8 : 10 }}>
+          {!compact && (
+            <>
+              <Link href="/abode/properties" style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 10, background: "#f7f7f5", border: "1px solid #ebebeb", color: "#888", fontSize: 12, textDecoration: "none" }}>
+                <Search size={13} /> Search
+              </Link>
+              <Link
+                href={user ? "/account" : `/login?next=${encodeURIComponent(pathname)}`}
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 10, background: ORANGE, color: "#fff", fontSize: 12, fontWeight: 600, textDecoration: "none" }}
+              >
+                <User size={13} /> {user ? "Account" : "Sign in"}
+              </Link>
+              <Link href="/" style={{ color: "#bbb", fontSize: 11, textDecoration: "none", marginLeft: 4 }}>
+                Studio Mudiaga ↗
+              </Link>
+            </>
+          )}
+          {compact && (
+            <>
+              <Link
+                href={user ? "/account" : `/login?next=${encodeURIComponent(pathname)}`}
+                onClick={() => setDrawer(false)}
+                aria-label={user ? "Account" : "Sign in"}
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 38, height: 38, borderRadius: 10, background: ORANGE, color: "#fff", textDecoration: "none" }}
+              >
+                <User size={15} />
+              </Link>
+              <button
+                aria-label={drawer ? "Close menu" : "Open menu"}
+                onClick={() => setDrawer((d) => !d)}
+                style={{ width: 38, height: 38, borderRadius: 10, cursor: "pointer", background: "#f7f7f5", border: "1px solid #ebebeb", color: DARK, display: "flex", alignItems: "center", justifyContent: "center" }}
+              >
+                {drawer ? <X size={17} /> : <Menu size={17} />}
+              </button>
+            </>
+          )}
         </div>
       </div>
 
-      {/* ── Mega menu ── */}
-      {open && (
+      {/* ── Mega menu (desktop) ── */}
+      {!compact && open && (
         <div
           onMouseEnter={cancelClose}
           style={{
@@ -207,7 +250,76 @@ export default function AbodeHeader() {
         </div>
       )}
 
-      <style>{`@keyframes abodeMega { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+      {/* ── Mobile drawer ── */}
+      {compact && drawer && (
+        <div
+          style={{
+            position: "fixed", inset: 0, top: 64, zIndex: 45, background: "#fff",
+            overflowY: "auto", animation: "abodeDrawer 0.22s ease",
+          }}
+        >
+          <div style={{ padding: "24px 20px 48px" }}>
+            <Link
+              href="/abode/properties"
+              onClick={() => setDrawer(false)}
+              style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 0", borderBottom: `1px solid ${LINE}`, color: DARK, fontSize: 20, fontWeight: 600, textDecoration: "none" }}
+            >
+              Properties <ArrowUpRight size={17} color="#ccc" />
+            </Link>
+            <Link
+              href="/abode/properties"
+              onClick={() => setDrawer(false)}
+              style={{ display: "flex", alignItems: "center", gap: 8, padding: "16px 0", borderBottom: `1px solid ${LINE}`, color: MUTED, fontSize: 14, fontWeight: 500, textDecoration: "none" }}
+            >
+              <Search size={14} /> Search properties
+            </Link>
+
+            {categories.length > 0 && (
+              <>
+                <p style={{ color: "#bbb", fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", margin: "26px 0 12px" }}>
+                  Browse by category
+                </p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  {categories.map((c) => {
+                    const Icon = resolveShortletCategoryIcon(c.icon);
+                    return (
+                      <Link
+                        key={c.id}
+                        href={`/abode/properties?category=${encodeURIComponent(c.slug)}`}
+                        onClick={() => setDrawer(false)}
+                        style={{ display: "flex", alignItems: "center", gap: 10, padding: 12, borderRadius: 14, border: `1px solid ${LINE}`, textDecoration: "none", color: DARK, fontSize: 13, fontWeight: 600 }}
+                      >
+                        <Icon size={15} color={c.color} strokeWidth={1.8} />
+                        <span style={{ minWidth: 0 }}>{c.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+
+            <Link
+              href={user ? "/account" : `/login?next=${encodeURIComponent(pathname)}`}
+              onClick={() => setDrawer(false)}
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 28, background: ORANGE, color: "#fff", fontSize: 13.5, fontWeight: 600, padding: "15px 20px", borderRadius: 999, textDecoration: "none" }}
+            >
+              <User size={15} /> {user ? "My account" : "Sign in"}
+            </Link>
+            <Link
+              href="/"
+              onClick={() => setDrawer(false)}
+              style={{ display: "block", textAlign: "center", marginTop: 18, color: "#bbb", fontSize: 12, textDecoration: "none" }}
+            >
+              Studio Mudiaga ↗
+            </Link>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes abodeMega { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes abodeDrawer { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
     </header>
   );
 }

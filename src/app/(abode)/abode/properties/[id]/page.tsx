@@ -227,18 +227,19 @@ export default function PropertyDetailPage() {
   return (
     <div style={{ background: "#f8f8f6", minHeight: "100vh", paddingTop: 64 }}>
       {/* Breadcrumb */}
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "22px 32px 0" }}>
+      <div className="px-5 md:px-8" style={{ maxWidth: 1200, margin: "0 auto" }}>
         <Link href="/abode/properties" style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#aaa", fontSize: 12, textDecoration: "none" }}>
           <ArrowLeft size={12} /> All Properties
         </Link>
       </div>
 
       {/* ── Gallery ── */}
-      <div style={{ maxWidth: 1200, margin: "12px auto 0", padding: "0 32px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: hasMany ? "1fr 1fr" : "1fr", gridTemplateRows: "340px", gap: 6, borderRadius: 18, overflow: "hidden" }}>
+      <div className="px-5 md:px-8" style={{ maxWidth: 1200, margin: "12px auto 0" }}>
+        <div className={hasMany ? "grid grid-cols-1 md:grid-cols-2" : "grid grid-cols-1"} style={{ gap: 6, borderRadius: 18, overflow: "hidden" }}>
           {/* Main image */}
           <div
-            style={{ position: "relative", gridRow: "1", cursor: "pointer", background: "#e8e8e4", overflow: "hidden" }}
+            className="h-[240px] md:h-[340px]"
+            style={{ position: "relative", cursor: "pointer", background: "#e8e8e4", overflow: "hidden" }}
             onClick={() => setLightbox(0)}
           >
             {imgs[0] ? (
@@ -260,7 +261,7 @@ export default function PropertyDetailPage() {
 
           {/* Side thumbnails */}
           {hasMany && (
-            <div style={{ display: "grid", gridTemplateRows: imgs.length >= 3 ? "1fr 1fr" : "1fr", gridTemplateColumns: imgs.length >= 4 ? "1fr 1fr" : "1fr", gap: 6, overflow: "hidden" }}>
+            <div className="h-[180px] md:h-[340px] grid grid-cols-2" style={{ gridTemplateRows: imgs.length >= 3 ? "1fr 1fr" : "1fr", gap: 6, overflow: "hidden" }}>
               {imgs.slice(1, 5).map((url, i) => (
                 <div
                   key={i}
@@ -283,7 +284,7 @@ export default function PropertyDetailPage() {
       </div>
 
       {/* ── Main content ── */}
-      <div style={{ maxWidth: 1200, margin: "32px auto", padding: "0 32px 80px", display: "grid", gridTemplateColumns: "1fr 380px", gap: 40, alignItems: "flex-start" }}>
+      <div className="px-5 md:px-8 pb-20 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 lg:gap-10" style={{ maxWidth: 1200, margin: "32px auto", alignItems: "flex-start" }}>
 
         {/* ── LEFT ── */}
         <div>
@@ -347,7 +348,7 @@ export default function PropertyDetailPage() {
           {shortlet.amenities.length > 0 && (
             <div style={{ marginBottom: 28, paddingBottom: 28, borderBottom: "1px solid #ebebeb" }}>
               <h2 style={{ color: "#0a0a0a", fontSize: 16, fontWeight: 700, margin: "0 0 14px" }}>What&apos;s included</h2>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: 10 }}>
                 {shortlet.amenities.map((a) => (
                   <div key={a} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "#fff", border: "1px solid #e8e8e4", borderRadius: 10 }}>
                     <AmenityIcon name={a} />
@@ -425,7 +426,7 @@ export default function PropertyDetailPage() {
               </div>
 
               {/* Review cards */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: 14 }}>
                 {(showAllReviews ? reviews : reviews.slice(0, 4)).map((r) => (
                   <div key={r.id} style={{ background: "#fff", border: "1px solid #e8e8e4", borderRadius: 14, padding: "16px 18px" }}>
                     {/* Reviewer */}
@@ -482,7 +483,7 @@ export default function PropertyDetailPage() {
         </div>
 
         {/* ── RIGHT: Booking card ── */}
-        <div style={{ position: "sticky", top: 84 }}>
+        <div className="lg:sticky" style={{ top: 84 }}>
           <div style={{ background: "#fff", border: "1px solid #e8e8e4", borderRadius: 20, padding: 24, boxShadow: "0 4px 30px rgba(0,0,0,0.06)" }}>
             {/* Price */}
             <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 20 }}>

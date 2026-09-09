@@ -43,27 +43,32 @@ export default function AbodeLanding() {
           </p>
 
           {/* Search bar */}
-          <div style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 18, padding: "6px 6px 6px 20px", display: "flex", alignItems: "center", gap: 8, maxWidth: 600, margin: "0 auto" }}>
-            <Search size={16} color="rgba(255,255,255,0.45)" style={{ flexShrink: 0 }} />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by location or property name..."
-              style={{ flex: 1, background: "none", border: "none", outline: "none", color: "#fff", fontSize: 14, padding: "8px 0" }}
-            />
-            <select
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 10, padding: "10px 12px", color: "#fff", fontSize: 13, outline: "none" }}
-            >
-              {CITIES.map((c) => <option key={c} style={{ background: "#2a2a2a" }}>{c}</option>)}
-            </select>
-            <Link
-              href={`/abode/properties?q=${search}&city=${city}`}
-              style={{ background: ORANGE, color: "#fff", fontWeight: 700, fontSize: 13, padding: "12px 22px", borderRadius: 12, textDecoration: "none", whiteSpace: "nowrap" }}
-            >
-              Search
-            </Link>
+          <div className="flex flex-col sm:flex-row sm:items-center" style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 18, padding: 14, gap: 8, maxWidth: 600, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 0 }}>
+              <Search size={16} color="rgba(255,255,255,0.45)" style={{ flexShrink: 0 }} />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by location or property name..."
+                style={{ flex: 1, minWidth: 0, background: "none", border: "none", outline: "none", color: "#fff", fontSize: 14, padding: "4px 0" }}
+              />
+            </div>
+            <div className="flex" style={{ gap: 8 }}>
+              <select
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="flex-1 sm:flex-none"
+                style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 10, padding: "10px 12px", color: "#fff", fontSize: 13, outline: "none" }}
+              >
+                {CITIES.map((c) => <option key={c} style={{ background: "#2a2a2a" }}>{c}</option>)}
+              </select>
+              <Link
+                href={`/abode/properties?q=${search}&city=${city}`}
+                style={{ background: ORANGE, color: "#fff", fontWeight: 700, fontSize: 13, padding: "12px 22px", borderRadius: 12, textDecoration: "none", whiteSpace: "nowrap" }}
+              >
+                Search
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -75,8 +80,8 @@ export default function AbodeLanding() {
       </section>
 
       {/* ── Stats bar ── */}
-      <section style={{ borderTop: "1px solid #ebebeb", borderBottom: "1px solid #ebebeb", padding: "32px 40px", background: "#fafaf9" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, textAlign: "center" }}>
+      <section className="px-5 md:px-10" style={{ borderTop: "1px solid #ebebeb", borderBottom: "1px solid #ebebeb", paddingTop: 32, paddingBottom: 32, background: "#fafaf9" }}>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" style={{ maxWidth: 1280, margin: "0 auto", textAlign: "center" }}>
           {[
             { value: "50+", label: "Verified properties" },
             { value: "2",   label: "Cities" },
@@ -92,9 +97,9 @@ export default function AbodeLanding() {
       </section>
 
       {/* ── Featured properties ── */}
-      <section style={{ padding: "72px 40px 80px", background: "#fff" }}>
+      <section className="px-5 md:px-10" style={{ paddingTop: 72, paddingBottom: 80, background: "#fff" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 36 }}>
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 12 }}>
             <div>
               <p style={{ color: ORANGE, fontSize: 10, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", margin: "0 0 8px" }}>Handpicked</p>
               <h2 style={{ color: "#0a0a0a", fontSize: 30, fontWeight: 700, margin: 0 }}>Featured Properties</h2>
@@ -104,7 +109,7 @@ export default function AbodeLanding() {
             </Link>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {featured.map((item) => (
               <Link
                 key={item.id}
@@ -156,14 +161,14 @@ export default function AbodeLanding() {
       </section>
 
       {/* ── CTA ── */}
-      <section style={{ padding: "72px 40px 80px", background: "#fafaf9", borderTop: "1px solid #ebebeb" }}>
+      <section className="px-5 md:px-10" style={{ paddingTop: 72, paddingBottom: 80, background: "#fafaf9", borderTop: "1px solid #ebebeb" }}>
         <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
           <p style={{ color: ORANGE, fontSize: 10, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", margin: "0 0 14px" }}>Ready to book?</p>
           <h2 style={{ color: "#0a0a0a", fontSize: 34, fontWeight: 700, margin: "0 0 14px", lineHeight: 1.2 }}>Book your perfect stay</h2>
           <p style={{ color: "#aaa", fontSize: 14, lineHeight: 1.7, margin: "0 0 32px" }}>
             Create an account to save properties, track your bookings, and get exclusive rates.
           </p>
-          <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
             <Link href="/abode/properties" style={{ background: ORANGE, color: "#fff", fontWeight: 700, fontSize: 13, padding: "13px 28px", borderRadius: 12, textDecoration: "none" }}>
               Browse all properties
             </Link>

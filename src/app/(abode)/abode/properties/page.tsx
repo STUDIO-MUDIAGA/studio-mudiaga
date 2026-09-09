@@ -64,7 +64,7 @@ function PropertiesBrowser() {
   return (
     <div style={{ background: "#f8f8f6", minHeight: "100vh", paddingTop: 64 }}>
       {/* Page header */}
-      <div style={{ background: "#fff", borderBottom: "1px solid #ebebeb", padding: "36px 40px 28px" }}>
+      <div className="px-5 md:px-10" style={{ background: "#fff", borderBottom: "1px solid #ebebeb", paddingTop: 36, paddingBottom: 28 }}>
         <div style={{ maxWidth: 1280, margin: "0 auto" }}>
           <p style={{ color: ORANGE, fontSize: 10, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", margin: "0 0 6px" }}>ABODE</p>
           <h1 style={{ color: "#0a0a0a", fontSize: 28, fontWeight: 700, margin: "0 0 22px" }}>{activeCategory?.name ?? "All Properties"}</h1>
@@ -142,7 +142,7 @@ function PropertiesBrowser() {
       </div>
 
       {/* Results */}
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 40px 80px" }}>
+      <div className="px-5 md:px-10" style={{ maxWidth: 1280, margin: "0 auto", paddingTop: 32, paddingBottom: 80 }}>
         <p style={{ color: "#bbb", fontSize: 12, marginBottom: 20 }}>
           {loading ? "Loading…" : `${filtered.length} propert${filtered.length === 1 ? "y" : "ies"} found`}
         </p>
@@ -150,7 +150,7 @@ function PropertiesBrowser() {
         {loading ? (
           <div style={{ textAlign: "center", padding: "80px 0", color: "#ccc", fontSize: 13 }}>Loading properties…</div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filtered.map((item) => (
               <Link
                 key={item.id}
