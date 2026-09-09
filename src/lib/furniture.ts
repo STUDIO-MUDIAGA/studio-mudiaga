@@ -10,10 +10,11 @@ export type FurnitureItem = {
   description: string | null;
   in_stock: boolean;
   featured: boolean;
+  product_of_month: boolean;
 };
 
 const PUBLIC_FIELDS =
-  "id, name, category, price, original_price, images, description, in_stock, featured";
+  "id, name, category, price, original_price, images, description, in_stock, featured, product_of_month";
 
 const db = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
