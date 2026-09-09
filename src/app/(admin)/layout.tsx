@@ -65,6 +65,7 @@ const navItems: NavItem[] = [
       { label: "Apartment Metrics",   href: "/admin/shortlets/metrics",     icon: BarChart2 },
       { label: "Apartment Bookings",  href: "/admin/shortlets/bookings",    icon: CalendarDays },
       { label: "Categories",          href: "/admin/shortlets/categories",  icon: Tag },
+      { label: "Coupons",             href: "/admin/shortlets/coupons",     icon: Ticket },
     ],
   },
   {

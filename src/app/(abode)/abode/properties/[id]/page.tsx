@@ -76,6 +76,10 @@ export default function PropertyDetailPage() {
   const [guestPhone, setGuestPhone] = useState("");
   const [bookingNotes, setBookingNotes] = useState("");
   const [bookingError, setBookingError] = useState("");
+  const [couponCode, setCouponCode] = useState("");
+  const [couponStatus, setCouponStatus] = useState<"idle" | "checking" | "valid" | "invalid">("idle");
+  const [couponError, setCouponError] = useState("");
+  const [couponDiscount, setCouponDiscount] = useState(0);
 
   useEffect(() => {
     fetch(`/api/shortlets/${id}`)
@@ -115,6 +119,37 @@ export default function PropertyDetailPage() {
     }
     setBookingModal(true);
     setBookingError("");
+    setCouponCode("");
+    setCouponStatus("idle");
+    setCouponError("");
+    setCouponDiscount(0);
+  }
+
+  async function applyCoupon() {
+    if (!shortlet || !couponCode.trim()) return;
+    setCouponStatus("checking");
+    setCouponError("");
+    const modalNights = Math.max(shortlet.min_nights ?? 1, daysBetween(checkin, checkout));
+    const subtotal = shortlet.price * modalNights + Math.round(shortlet.price * modalNights * 0.05);
+    try {
+      const res = await fetch("/api/shortlet-coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: couponCode, subtotal }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setCouponStatus("valid");
+        setCouponDiscount(data.discount);
+      } else {
+        setCouponStatus("invalid");
+        setCouponError(data.error ?? "Invalid coupon code");
+        setCouponDiscount(0);
+      }
+    } catch {
+      setCouponStatus("invalid");
+      setCouponError("Could not check that code right now");
+    }
   }
 
   async function submitBooking(e: React.FormEvent) {
@@ -133,6 +168,7 @@ export default function PropertyDetailPage() {
           checkin, checkout,
           guests,
           notes: bookingNotes,
+          coupon_code: couponStatus === "valid" ? couponCode : undefined,
         }),
       });
       const data = await res.json();
@@ -648,6 +684,29 @@ export default function PropertyDetailPage() {
                 />
               </div>
 
+              {/* Coupon */}
+              <div>
+                <label style={{ display: "block", color: "#555", fontSize: 11, fontWeight: 600, marginBottom: 6 }}>Coupon code <span style={{ color: "#bbb", fontWeight: 400 }}>(optional)</span></label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input
+                    value={couponCode}
+                    onChange={(e) => { setCouponCode(e.target.value); setCouponStatus("idle"); setCouponError(""); }}
+                    placeholder="Enter code"
+                    style={{ flex: 1, background: "#fafaf9", border: "1px solid #e8e8e4", borderRadius: 10, padding: "10px 14px", color: "#0a0a0a", fontSize: 13, outline: "none", boxSizing: "border-box", textTransform: "uppercase" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={applyCoupon}
+                    disabled={!couponCode.trim() || couponStatus === "checking"}
+                    style={{ background: "#f2f2f4", border: "none", borderRadius: 10, padding: "0 18px", fontSize: 12.5, fontWeight: 600, color: "#555", cursor: "pointer" }}
+                  >
+                    {couponStatus === "checking" ? "Checking…" : "Apply"}
+                  </button>
+                </div>
+                {couponStatus === "valid" && <p style={{ color: "#15803d", fontSize: 12, margin: "6px 0 0" }}>Coupon applied — ₦{couponDiscount.toLocaleString()} off</p>}
+                {couponStatus === "invalid" && <p style={{ color: "#dc2626", fontSize: 12, margin: "6px 0 0" }}>{couponError}</p>}
+              </div>
+
               {/* Price summary */}
               <div style={{ background: "#f8f8f6", borderRadius: 12, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 7 }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -658,9 +717,17 @@ export default function PropertyDetailPage() {
                   <span style={{ color: "#555", fontSize: 12 }}>Service fee (5%)</span>
                   <span style={{ color: "#0a0a0a", fontSize: 12, fontWeight: 500 }}>₦{Math.round(shortlet.price * Math.max(shortlet.min_nights ?? 1, daysBetween(checkin, checkout)) * 0.05).toLocaleString()}</span>
                 </div>
+                {couponStatus === "valid" && (
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span style={{ color: "#15803d", fontSize: 12 }}>Coupon ({couponCode.toUpperCase()})</span>
+                    <span style={{ color: "#15803d", fontSize: 12, fontWeight: 500 }}>−₦{couponDiscount.toLocaleString()}</span>
+                  </div>
+                )}
                 <div style={{ borderTop: "1px solid #e8e8e4", paddingTop: 8, display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "#0a0a0a", fontSize: 13, fontWeight: 700 }}>Total (estimate)</span>
-                  <span style={{ color: ORANGE, fontSize: 13, fontWeight: 800 }}>₦{(shortlet.price * Math.max(shortlet.min_nights ?? 1, daysBetween(checkin, checkout)) + Math.round(shortlet.price * Math.max(shortlet.min_nights ?? 1, daysBetween(checkin, checkout)) * 0.05)).toLocaleString()}</span>
+                  <span style={{ color: ORANGE, fontSize: 13, fontWeight: 800 }}>
+                    ₦{(shortlet.price * Math.max(shortlet.min_nights ?? 1, daysBetween(checkin, checkout)) + Math.round(shortlet.price * Math.max(shortlet.min_nights ?? 1, daysBetween(checkin, checkout)) * 0.05) - (couponStatus === "valid" ? couponDiscount : 0)).toLocaleString()}
+                  </span>
                 </div>
               </div>
 
