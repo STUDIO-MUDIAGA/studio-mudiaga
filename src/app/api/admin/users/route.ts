@@ -8,10 +8,12 @@ const db = createClient(
 );
 
 export async function GET() {
-  const [{ data: profiles, error }, { data: orders }, { data: wishlist }] = await Promise.all([
+  const [{ data: profiles, error }, { data: orders }, { data: wishlist }, { data: bookings }, { data: savedListings }] = await Promise.all([
     db.from("profiles").select("id, full_name, email, avatar_url, created_at").eq("role", "customer").order("created_at", { ascending: false }),
     db.from("furniture_orders").select("user_id, total, status"),
     db.from("furniture_wishlist").select("user_id"),
+    db.from("shortlet_bookings").select("user_id, total_amount, status"),
+    db.from("shortlet_wishlist").select("user_id"),
   ]);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
@@ -28,6 +30,20 @@ export async function GET() {
     wishlistCounts.set(w.user_id, (wishlistCounts.get(w.user_id) ?? 0) + 1);
   }
 
+  const bookingStats = new Map<string, { count: number; spent: number }>();
+  for (const b of bookings ?? []) {
+    if (!b.user_id) continue;
+    const s = bookingStats.get(b.user_id) ?? { count: 0, spent: 0 };
+    s.count += 1;
+    if (b.status !== "cancelled") s.spent += b.total_amount ?? 0;
+    bookingStats.set(b.user_id, s);
+  }
+
+  const savedListingCounts = new Map<string, number>();
+  for (const w of savedListings ?? []) {
+    savedListingCounts.set(w.user_id, (savedListingCounts.get(w.user_id) ?? 0) + 1);
+  }
+
   const users = (profiles ?? []).map((p) => ({
     id: p.id,
     full_name: p.full_name,
@@ -37,6 +53,9 @@ export async function GET() {
     order_count: orderStats.get(p.id)?.count ?? 0,
     total_spent: orderStats.get(p.id)?.spent ?? 0,
     wishlist_count: wishlistCounts.get(p.id) ?? 0,
+    booking_count: bookingStats.get(p.id)?.count ?? 0,
+    booking_spent: bookingStats.get(p.id)?.spent ?? 0,
+    saved_listing_count: savedListingCounts.get(p.id) ?? 0,
   }));
 
   return NextResponse.json(users);

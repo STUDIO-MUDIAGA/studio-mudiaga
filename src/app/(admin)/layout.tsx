@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import {
   LayoutDashboard, Building2, Sofa, CalendarDays,
-  ShoppingBag, Users, TrendingUp, LogOut, Menu, X,
+  ShoppingBag, Users, LogOut, Menu, X,
   Settings, Bell, Search, ChevronDown, Tag, BarChart2, Plus, List,
   Images, Home, Armchair, Folder, MessageSquare, MessageCircle, LayoutGrid, Ticket,
 } from "lucide-react";
@@ -82,9 +82,6 @@ const navItems: NavItem[] = [
     ],
   },
   { label: "Users",      href: "/admin/users",     icon: Users },
-  { label: "Bookings",   href: "/admin/bookings",  icon: CalendarDays },
-  { label: "Orders",     href: "/admin/orders",    icon: ShoppingBag },
-  { label: "Analytics",  href: "/admin/analytics", icon: TrendingUp },
 ];
 
 /** Trimmed nav for the MUDRES-only workspace: just what runs the furniture
@@ -102,13 +99,19 @@ function mudresNavItems(fullNav: NavItem[]): NavItem[] {
   return items;
 }
 
-/** Same idea for ABODE — just the shortlets side. */
+/** Same idea for ABODE — just the shortlets side. Support and Users are
+ *  shared/cross-vertical backends (one inbox, one customer list regardless
+ *  of which storefront someone came from), so they're pulled in here too
+ *  rather than duplicated. */
 function abodeNavItems(fullNav: NavItem[]): NavItem[] {
   const dashboard = fullNav.find((n) => n.href === "/admin");
   const shortlets = fullNav.find((n) => n.href === "/admin/shortlets");
+  const users = fullNav.find((n) => n.href === "/admin/users");
   const items: NavItem[] = [];
   if (dashboard) items.push(dashboard);
   if (shortlets) items.push(shortlets);
+  items.push({ label: "Support", href: "/admin/furniture/support", icon: MessageCircle });
+  if (users) items.push(users);
   items.push({ label: "ABODE Media", href: "/admin/media/abode", icon: Building2 });
   return items;
 }
