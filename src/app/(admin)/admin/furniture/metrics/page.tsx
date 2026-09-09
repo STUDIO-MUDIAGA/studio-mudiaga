@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Package, CheckCircle, XCircle, Star, TrendingUp, Tag, BarChart2, Award, Layers } from "lucide-react";
+import Link from "next/link";
+import { Package, CheckCircle, XCircle, Star, TrendingUp, Tag, BarChart2, Award, Layers, Wallet, ShoppingBag, Heart, Clock } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 type Overview = {
@@ -18,6 +19,15 @@ type ByMaterial = { material: string; count: number }[];
 type PriceTier = { label: string; range: string; count: number }[];
 type TopRatedItem = { id: string; name: string; category: string; price: number; rating: number; review_count: number; image: string | null };
 type FeaturedItem = { id: string; name: string; category: string; price: number; image: string | null };
+type WishlistedItem = { id: string; name: string; category: string; price: number; image: string | null; count: number };
+type Sales = {
+  totalRevenue: number;
+  totalOrders: number;
+  avgOrderValue: number;
+  statusCounts: Record<string, number>;
+  monthlyRevenue: { month: string; revenue: number }[];
+  mostWishlisted: WishlistedItem[];
+};
 
 const COLORS = ["#c46442", "#1e156d", "#f59e0b", "#10b981", "#8b5cf6", "#ef4444", "#3b82f6", "#06b6d4"];
 const fmt = (n: number) => "₦" + n.toLocaleString("en-NG");
@@ -56,6 +66,7 @@ export default function FurnitureMetricsPage() {
   const [priceTiers, setPriceTiers] = useState<PriceTier>([]);
   const [topRated, setTopRated] = useState<TopRatedItem[]>([]);
   const [topFeatured, setTopFeatured] = useState<FeaturedItem[]>([]);
+  const [sales, setSales] = useState<Sales | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -68,6 +79,7 @@ export default function FurnitureMetricsPage() {
         setPriceTiers(d.byPriceTier ?? []);
         setTopRated(d.topRated ?? []);
         setTopFeatured(d.topFeatured ?? []);
+        setSales(d.sales ?? null);
         setLoading(false);
       });
   }, []);
@@ -79,20 +91,28 @@ export default function FurnitureMetricsPage() {
   const maxCat = Math.max(...byCategory.map((c) => c.count), 1);
   const maxMat = Math.max(...byMaterial.map((m) => m.count), 1);
   const maxTier = Math.max(...priceTiers.map((t) => t.count), 1);
-
-  // Simulated monthly trend (last 6 months)
-  const monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-  const trendData = monthLabels.map((month, i) => ({
-    month,
-    items: Math.max(1, Math.round((overview?.total ?? 0) * (0.4 + i * 0.12))),
-  }));
+  const trendData = sales?.monthlyRevenue ?? [];
+  const pendingOrders = (sales?.statusCounts.pending ?? 0) + (sales?.statusCounts.confirmed ?? 0);
 
   return (
     <div style={{ padding: "32px 28px", minHeight: "100vh", backgroundColor: "#fafafa" }}>
       {/* Header */}
-      <div style={{ marginBottom: 28 }}>
-        <p style={{ fontSize: 20, fontWeight: 700, color: "#1e156d", margin: 0 }}>Furniture Metrics</p>
-        <p style={{ fontSize: 13, color: "#888", margin: "4px 0 0" }}>Catalogue health, pricing, and performance overview</p>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
+        <div>
+          <p style={{ fontSize: 20, fontWeight: 700, color: "#1e156d", margin: 0 }}>Furniture Metrics</p>
+          <p style={{ fontSize: 13, color: "#888", margin: "4px 0 0" }}>Sales, catalogue health, and performance overview</p>
+        </div>
+        <Link href="/admin/furniture/orders" style={{ fontSize: 12.5, fontWeight: 600, color: "#1e156d", textDecoration: "none" }}>
+          View all orders →
+        </Link>
+      </div>
+
+      {/* Row 0 — Sales overview */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 20 }}>
+        <StatCard icon={Wallet}      label="Total Revenue"     value={fmt(sales?.totalRevenue ?? 0)} sub="excludes cancelled orders" color="#10b981" />
+        <StatCard icon={ShoppingBag} label="Total Orders"      value={sales?.totalOrders ?? 0}       color="#1e156d" />
+        <StatCard icon={TrendingUp}  label="Avg Order Value"   value={fmt(sales?.avgOrderValue ?? 0)} color="#c46442" />
+        <StatCard icon={Clock}       label="Awaiting Action"   value={pendingOrders} sub="pending + confirmed" color="#f59e0b" />
       </div>
 
       {/* Row 1 — Stat Cards */}
@@ -151,9 +171,9 @@ export default function FurnitureMetricsPage() {
           )}
         </Card>
 
-        {/* Catalogue Growth Trend */}
+        {/* Revenue Trend — real, from furniture_orders */}
         <Card style={{ display: "flex", flexDirection: "column" }}>
-          <SectionTitle label="Catalogue Growth" />
+          <SectionTitle label="Revenue Trend (6mo)" />
           <div style={{ flex: 1, minHeight: 0 }}>
             <ResponsiveContainer width="100%" height={160}>
               <AreaChart data={trendData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
@@ -165,16 +185,16 @@ export default function FurnitureMetricsPage() {
                 </defs>
                 <XAxis dataKey="month" tick={{ fontSize: 10, fill: "#aaa" }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 10, fill: "#aaa" }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #eee" }} formatter={(v) => [v, "items"]} />
-                <Area type="monotone" dataKey="items" stroke="#c46442" strokeWidth={2} fill="url(#fgGrad)" dot={false} />
+                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #eee" }} formatter={(v) => [fmt(Number(v)), "revenue"]} />
+                <Area type="monotone" dataKey="revenue" stroke="#c46442" strokeWidth={2} fill="url(#fgGrad)" dot={false} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </Card>
       </div>
 
-      {/* Row 3 — Price Tiers / Pie / Top Featured */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
+      {/* Row 3 — Price Tiers / Pie / Top Featured / Most Wishlisted */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
         {/* Price Tiers */}
         <Card>
           <SectionTitle label="Price Tiers" />
@@ -254,6 +274,32 @@ export default function FurnitureMetricsPage() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: "#222", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.name}</p>
                     <p style={{ margin: 0, fontSize: 11, color: "#aaa" }}>{item.category} · {fmt(item.price)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+
+        {/* Most Wishlisted */}
+        <Card>
+          <SectionTitle label="Most Wishlisted" />
+          {!sales?.mostWishlisted.length ? (
+            <p style={{ color: "#aaa", fontSize: 12 }}>No wishlist activity yet</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {sales.mostWishlisted.map((item) => (
+                <div key={item.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 8, overflow: "hidden", flexShrink: 0, background: "#f5f5f5" }}>
+                    {item.image ? <img src={item.image} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <Heart size={16} color="#ccc" style={{ margin: "10px auto", display: "block" }} />}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: "#222", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.name}</p>
+                    <p style={{ margin: 0, fontSize: 11, color: "#aaa" }}>{item.category}</p>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 3, flexShrink: 0 }}>
+                    <Heart size={11} fill="#c46442" color="#c46442" />
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#333" }}>{item.count}</span>
                   </div>
                 </div>
               ))}

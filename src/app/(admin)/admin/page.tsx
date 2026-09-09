@@ -1,16 +1,161 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Building2, Sofa, CalendarDays, Users, TrendingUp, ArrowRight, TrendingDown, Info } from "lucide-react";
+import { Building2, Sofa, CalendarDays, Users, TrendingUp, ArrowRight, TrendingDown, Info, Wallet, ShoppingBag, MessageCircle } from "lucide-react";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
 } from "recharts";
+import { useAdminWorkspace } from "../layout";
 
 const NAVY = "#1e156d";
 const NAVY_BG = "#eeedf8";
+const MUDRES = "#2A3812";
+const MUDRES_BG = "#EDF0E4";
+const ABODE = "#c46442";
+const ABODE_BG = "#f7ece7";
+
+const fmt = (n: number) => "₦" + (n ?? 0).toLocaleString("en-NG");
+
+function StatCard({ icon: Icon, label, value, color, bg, href }: { icon: typeof Wallet; label: string; value: string | number; color: string; bg: string; href?: string }) {
+  const body = (
+    <div style={{ background: "#fff", border: "1px solid #ebebeb", borderRadius: 16, padding: "20px 22px" }}>
+      <div style={{ width: 30, height: 30, borderRadius: 8, background: bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
+        <Icon size={14} color={color} />
+      </div>
+      <p style={{ color: "#0a0a0a", fontSize: 28, fontWeight: 800, margin: "0 0 6px", lineHeight: 1, letterSpacing: "-1px" }}>{value}</p>
+      <p style={{ color: "#888", fontSize: 12, margin: 0 }}>{label}</p>
+    </div>
+  );
+  return href ? <Link href={href} style={{ textDecoration: "none", display: "block" }}>{body}</Link> : body;
+}
+
+/* ── MUDRES dashboard — real data from the APIs built for the store ── */
+
+type MudresSummary = {
+  revenue: number;
+  orders: number;
+  avgOrder: number;
+  customers: number;
+  unreadSupport: number;
+  recentOrders: { id: string; full_name: string; total: number; status: string; created_at: string }[];
+};
+
+function MudresDashboard() {
+  const router = useRouter();
+  const [data, setData] = useState<MudresSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/admin/furniture/metrics").then((r) => r.json()),
+      fetch("/api/admin/users").then((r) => r.json()),
+      fetch("/api/admin/support").then((r) => r.json()),
+      fetch("/api/admin/orders/furniture").then((r) => r.json()),
+    ]).then(([metrics, users, threads, orders]) => {
+      setData({
+        revenue: metrics?.sales?.totalRevenue ?? 0,
+        orders: metrics?.sales?.totalOrders ?? 0,
+        avgOrder: metrics?.sales?.avgOrderValue ?? 0,
+        customers: Array.isArray(users) ? users.length : 0,
+        unreadSupport: Array.isArray(threads) ? threads.filter((t: { unread: boolean }) => t.unread).length : 0,
+        recentOrders: Array.isArray(orders) ? orders.slice(0, 5) : [],
+      });
+      setLoading(false);
+    });
+  }, []);
+
+  return (
+    <div>
+      <div style={{ marginBottom: 16 }}>
+        <p style={{ color: "#0a0a0a", fontSize: 16, fontWeight: 700, margin: "0 0 2px" }}>MUDRES Highlights</p>
+        <p style={{ color: "#bbb", fontSize: 12, margin: 0 }}>Store performance at a glance</p>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 24 }}>
+        <StatCard icon={Wallet} label="Total Revenue" value={loading ? "…" : fmt(data!.revenue)} color={MUDRES} bg={MUDRES_BG} href="/admin/furniture/metrics" />
+        <StatCard icon={ShoppingBag} label="Total Orders" value={loading ? "…" : data!.orders} color={MUDRES} bg={MUDRES_BG} href="/admin/furniture/orders" />
+        <StatCard icon={Users} label="Customers" value={loading ? "…" : data!.customers} color={MUDRES} bg={MUDRES_BG} href="/admin/users" />
+        <StatCard icon={MessageCircle} label="Awaiting Reply" value={loading ? "…" : data!.unreadSupport} color={MUDRES} bg={MUDRES_BG} href="/admin/furniture/support" />
+      </div>
+
+      <div style={{ background: "#fff", border: "1px solid #ebebeb", borderRadius: 16, padding: "22px 24px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+          <p style={{ color: "#0a0a0a", fontSize: 14, fontWeight: 700, margin: 0 }}>Recent Orders</p>
+          <Link href="/admin/furniture/orders" style={{ fontSize: 12, color: MUDRES, fontWeight: 600, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
+            View all <ArrowRight size={12} />
+          </Link>
+        </div>
+        {!loading && data!.recentOrders.length === 0 ? (
+          <p style={{ color: "#bbb", fontSize: 13, padding: "20px 0", textAlign: "center" }}>No orders yet.</p>
+        ) : (
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr>{["Order", "Customer", "Total", "Status"].map((h) => (
+                <th key={h} style={{ color: "#ccc", fontSize: 11, fontWeight: 600, textAlign: "left", padding: "8px 10px", borderBottom: "1px solid #f0f0f0" }}>{h}</th>
+              ))}</tr>
+            </thead>
+            <tbody>
+              {data?.recentOrders.map((o) => (
+                <tr
+                  key={o.id}
+                  onClick={() => router.push(`/admin/furniture/orders/${o.id}`)}
+                  style={{ cursor: "pointer" }}
+                  onMouseOver={(e) => { e.currentTarget.style.background = "#fafafa"; }}
+                  onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; }}
+                >
+                  <td style={{ padding: "10px", fontSize: 12, fontFamily: "monospace", color: "#888" }}>{o.id}</td>
+                  <td style={{ padding: "10px", fontSize: 13, color: "#222" }}>{o.full_name}</td>
+                  <td style={{ padding: "10px", fontSize: 13, fontWeight: 600, color: MUDRES }}>{fmt(o.total)}</td>
+                  <td style={{ padding: "10px" }}>
+                    <span style={{ background: MUDRES_BG, color: MUDRES, fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 20, textTransform: "capitalize" }}>{o.status}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── ABODE dashboard — only what's actually built on that side so far ── */
+
+function AbodeDashboard() {
+  const [count, setCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/shortlets").then((r) => r.json()).then((d) => setCount(Array.isArray(d) ? d.length : 0));
+  }, []);
+
+  return (
+    <div>
+      <div style={{ marginBottom: 16 }}>
+        <p style={{ color: "#0a0a0a", fontSize: 16, fontWeight: 700, margin: "0 0 2px" }}>ABODE Highlights</p>
+        <p style={{ color: "#bbb", fontSize: 12, margin: 0 }}>Shortlet listings overview</p>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 24 }}>
+        <StatCard icon={Building2} label="Active Shortlets" value={count === null ? "…" : count} color={ABODE} bg={ABODE_BG} href="/admin/shortlets" />
+      </div>
+
+      <div style={{ background: "#fff", border: "1px solid #ebebeb", borderRadius: 16, padding: "22px 24px", textAlign: "center" }}>
+        <p style={{ color: "#888", fontSize: 13, margin: "0 0 16px" }}>
+          Bookings, guest accounts, and revenue tracking for ABODE haven&apos;t been built yet — this workspace only reflects the listings side for now.
+        </p>
+        <Link href="/admin/shortlets" style={{ display: "inline-flex", alignItems: "center", gap: 6, background: ABODE_BG, color: ABODE, fontSize: 13, fontWeight: 600, padding: "10px 18px", borderRadius: 10, textDecoration: "none" }}>
+          Manage Shortlets <ArrowRight size={13} />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+/* ── Main (all-brands) dashboard — unchanged combined overview ── */
 
 const areaData = [
   { day: "1", value: 10 }, { day: "5", value: 18 }, { day: "10", value: 32 },
@@ -80,7 +225,7 @@ function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: 
   );
 }
 
-export default function AdminDashboard() {
+function MainDashboard() {
   const [stats, setStats] = useState<Stats>({ shortlets: 0, furniture: 0, bookings: 0, users: 0 });
   const [loading, setLoading] = useState(true);
 
@@ -270,4 +415,11 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
+}
+
+export default function AdminDashboard() {
+  const workspace = useAdminWorkspace();
+  if (workspace === "mudres") return <MudresDashboard />;
+  if (workspace === "abode") return <AbodeDashboard />;
+  return <MainDashboard />;
 }

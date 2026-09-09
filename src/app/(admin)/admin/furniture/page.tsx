@@ -34,7 +34,7 @@ export default function AdminFurniturePage() {
   };
 
   return (
-    <div style={{ maxWidth: 1100 }}>
+    <div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
         <div>
           <p style={{ color: NAVY, fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 6px" }}>Inventory</p>
