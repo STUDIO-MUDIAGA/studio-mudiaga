@@ -12,10 +12,6 @@ const DARK = "#0a0a0a";
 const LINE = "#ebebeb";
 const MUTED = "#888888";
 
-const NAV = [
-  { label: "How it works", href: "/abode/how-it-works" },
-];
-
 type Shortlet = {
   id: string; title: string; city: string; price: number;
   images: string[]; rating: number; tags: string[]; available: boolean;
@@ -98,21 +94,6 @@ export default function AbodeHeader() {
             Properties
             <ChevronDown size={13} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
           </button>
-          {NAV.map(({ label, href }) => (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => setOpen(false)}
-              style={{
-                padding: "7px 14px", borderRadius: 8, fontSize: 13, textDecoration: "none",
-                color: pathname === href ? ORANGE : "#888",
-                background: pathname === href ? "#fdf0eb" : "transparent",
-                fontWeight: pathname === href ? 600 : 400,
-              }}
-            >
-              {label}
-            </Link>
-          ))}
         </nav>
 
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
