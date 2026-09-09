@@ -1,89 +1,130 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { CalendarDays, Heart, ArrowRight, Building2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { CalendarDays, ShoppingBag, MapPin, Package } from "lucide-react";
+import { useAbodeWishlist } from "@/lib/abode-wishlist";
+import AbodeDashboardShell from "@/components/abode/AbodeDashboardShell";
 
+const WHITE = "#FFFFFF";
+const DARK = "#0a0a0a";
 const ORANGE = "#c46442";
+const MUTED = "#888888";
+const LINE = "#ebebeb";
+const SURFACE = "#f7f7f5";
 
-export default function AccountPage() {
+const naira = (n: number) => `₦${(n ?? 0).toLocaleString()}`;
+
+type Booking = {
+  id: string;
+  checkin: string;
+  checkout: string;
+  status: string;
+  total_amount: number;
+  shortlet: { title: string } | null;
+};
+
+export default function AccountHome() {
   const { profile, user } = useAuth();
-  const displayName = profile?.full_name ?? user?.email?.split("@")[0] ?? "there";
+  const { ids: savedIds } = useAbodeWishlist();
+  const [bookings, setBookings] = useState<Booking[] | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    fetch("/api/bookings/shortlets")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data: Booking[]) => live && setBookings(Array.isArray(data) ? data : []))
+      .catch(() => live && setBookings([]));
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  const firstName = (profile?.full_name || "").trim().split(" ")[0];
 
   return (
-    <div>
-      <div style={{ marginBottom: 36 }}>
-        <p style={{ color: ORANGE, fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 8px" }}>My Account</p>
-        <h1 style={{ color: "#0a0a0a", fontSize: 30, fontWeight: 700, margin: "0 0 6px" }}>Hello, {displayName}</h1>
-        <p style={{ color: "#aaa", fontSize: 13, margin: 0 }}>{user?.email}</p>
+    <AbodeDashboardShell>
+      <h1 style={{ color: DARK, fontSize: "clamp(26px, 3.6vw, 34px)", fontWeight: 700, letterSpacing: "-0.02em", margin: "0 0 6px" }}>
+        {firstName ? `Welcome back, ${firstName}` : "Welcome back"}
+      </h1>
+      <p style={{ color: MUTED, fontSize: 13.5, margin: "0 0 28px" }}>{user?.email}</p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" style={{ marginBottom: 32 }}>
+        <StatCard icon={CalendarDays} label="Bookings" value={bookings?.length ?? "—"} href="/account/bookings" />
+        <StatCard icon={Heart} label="Saved listings" value={savedIds.size} href="/account/saved" />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 32 }}>
-        {[
-          { label: "Bookings", value: "0", icon: CalendarDays },
-          { label: "Orders", value: "0", icon: ShoppingBag },
-          { label: "Shortlets viewed", value: "0", icon: MapPin },
-          { label: "Items in cart", value: "0", icon: Package },
-        ].map(({ label, value, icon: Icon }) => (
-          <div key={label} style={{ background: "#fff", border: "1px solid #e8e8e4", borderRadius: 16, padding: 20 }}>
-            <Icon size={16} color={ORANGE} style={{ marginBottom: 12 }} />
-            <p style={{ color: "#0a0a0a", fontSize: 26, fontWeight: 700, margin: "0 0 4px" }}>{value}</p>
-            <p style={{ color: "#aaa", fontSize: 12, margin: 0 }}>{label}</p>
-          </div>
-        ))}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+        <h2 style={{ color: DARK, fontSize: 16, fontWeight: 700, margin: 0 }}>Recent bookings</h2>
+        <Link href="/account/bookings" style={{ color: DARK, fontSize: 12.5, fontWeight: 600, display: "flex", alignItems: "center", gap: 4, textDecoration: "none" }}>
+          View all <ArrowRight size={13} />
+        </Link>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
-        <div style={{ background: "#fff", border: "1px solid #e8e8e4", borderRadius: 16, padding: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-            <h2 style={{ color: "#0a0a0a", fontSize: 14, fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
-              <CalendarDays size={14} color={ORANGE} /> Shortlet Bookings
-            </h2>
-            <Link href="/abode" style={{ color: ORANGE, fontSize: 12, textDecoration: "none" }}>Browse</Link>
-          </div>
-          <div style={{ textAlign: "center", padding: "36px 0" }}>
-            <p style={{ color: "#ccc", fontSize: 13, margin: "0 0 14px" }}>No bookings yet</p>
-            <Link href="/abode" style={{ display: "inline-block", fontSize: 12, background: "#fdf0eb", border: "1px solid #f5d4c8", color: ORANGE, borderRadius: 20, padding: "7px 16px", textDecoration: "none" }}>
-              Explore shortlets
-            </Link>
-          </div>
-        </div>
+      {bookings === null && <p style={{ color: MUTED, fontSize: 13 }}>Loading…</p>}
 
-        <div style={{ background: "#fff", border: "1px solid #e8e8e4", borderRadius: 16, padding: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-            <h2 style={{ color: "#0a0a0a", fontSize: 14, fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
-              <ShoppingBag size={14} color={ORANGE} /> Furniture Orders
-            </h2>
-            <Link href="/mudres" style={{ color: ORANGE, fontSize: 12, textDecoration: "none" }}>Shop</Link>
-          </div>
-          <div style={{ textAlign: "center", padding: "36px 0" }}>
-            <p style={{ color: "#ccc", fontSize: 13, margin: "0 0 14px" }}>No orders yet</p>
-            <Link href="/mudres" style={{ display: "inline-block", fontSize: 12, background: "#fdf0eb", border: "1px solid #f5d4c8", color: ORANGE, borderRadius: 20, padding: "7px 16px", textDecoration: "none" }}>
-              Shop the collection
-            </Link>
-          </div>
+      {bookings?.length === 0 && (
+        <div style={{ border: `1px solid ${LINE}`, borderRadius: 16, padding: "32px 20px", textAlign: "center" }}>
+          <p style={{ color: MUTED, fontSize: 13, margin: "0 0 16px" }}>You have not booked a stay yet.</p>
+          <Link
+            href="/abode/properties"
+            style={{ display: "inline-flex", alignItems: "center", gap: 8, background: ORANGE, color: WHITE, fontSize: 12.5, fontWeight: 600, padding: "10px 18px", borderRadius: 999, textDecoration: "none" }}
+          >
+            <Building2 size={14} /> Browse properties
+          </Link>
         </div>
-      </div>
+      )}
 
-      <div style={{ background: "#fff", border: "1px solid #e8e8e4", borderRadius: 16, padding: 24 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-          <h2 style={{ color: "#0a0a0a", fontSize: 14, fontWeight: 600, margin: 0 }}>Profile</h2>
-          <Link href="/account/profile" style={{ color: ORANGE, fontSize: 12, textDecoration: "none" }}>Edit</Link>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          {[
-            { label: "Full name", value: profile?.full_name ?? "N/A" },
-            { label: "Email", value: user?.email ?? "N/A" },
-            { label: "Account type", value: profile?.role ?? "customer" },
-            { label: "Member since", value: user?.created_at ? new Date(user.created_at).toLocaleDateString("en-NG", { month: "long", year: "numeric" }) : "N/A" },
-          ].map(({ label, value }) => (
-            <div key={label}>
-              <p style={{ color: "#bbb", fontSize: 11, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.1em" }}>{label}</p>
-              <p style={{ color: "#0a0a0a", fontSize: 13, margin: 0, textTransform: label === "Account type" ? "capitalize" : "none" }}>{value}</p>
-            </div>
-          ))}
-        </div>
+      {bookings?.slice(0, 3).map((b) => (
+        <Link
+          key={b.id}
+          href="/account/bookings"
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16,
+            border: `1px solid ${LINE}`, borderRadius: 14, padding: "14px 16px", marginBottom: 10,
+            textDecoration: "none",
+          }}
+        >
+          <div style={{ minWidth: 0 }}>
+            <p style={{ color: DARK, fontSize: 13.5, fontWeight: 600, margin: "0 0 3px" }}>{b.shortlet?.title ?? "Property"}</p>
+            <p style={{ color: MUTED, fontSize: 12, margin: 0 }}>
+              {new Date(b.checkin).toLocaleDateString("en-NG", { day: "numeric", month: "short" })} → {new Date(b.checkout).toLocaleDateString("en-NG", { day: "numeric", month: "short" })}
+            </p>
+          </div>
+          <div style={{ textAlign: "right", flex: "0 0 auto" }}>
+            <p style={{ color: DARK, fontSize: 13.5, fontWeight: 700, margin: "0 0 3px" }}>{naira(b.total_amount)}</p>
+            <p style={{ color: MUTED, fontSize: 11, textTransform: "capitalize", margin: 0 }}>{b.status}</p>
+          </div>
+        </Link>
+      ))}
+    </AbodeDashboardShell>
+  );
+}
+
+function StatCard({
+  icon: Icon, label, value, href,
+}: {
+  icon: typeof CalendarDays;
+  label: string;
+  value: number | string;
+  href: string;
+}) {
+  return (
+    <Link
+      href={href}
+      style={{
+        display: "flex", alignItems: "center", gap: 12,
+        background: SURFACE, borderRadius: 16, padding: "16px 18px", textDecoration: "none",
+      }}
+    >
+      <span style={{ width: 38, height: 38, borderRadius: "50%", background: WHITE, display: "flex", alignItems: "center", justifyContent: "center", flex: "0 0 auto" }}>
+        <Icon size={17} color={ORANGE} strokeWidth={1.8} />
+      </span>
+      <div style={{ minWidth: 0 }}>
+        <p style={{ color: DARK, fontSize: 19, fontWeight: 700, margin: "0 0 2px" }}>{value}</p>
+        <p style={{ color: MUTED, fontSize: 11.5, margin: 0 }}>{label}</p>
       </div>
-    </div>
+    </Link>
   );
 }

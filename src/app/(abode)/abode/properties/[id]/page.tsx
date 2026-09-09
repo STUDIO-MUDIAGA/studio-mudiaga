@@ -78,7 +78,7 @@ export default function PropertyDetailPage() {
   const [bookingError, setBookingError] = useState("");
 
   useEffect(() => {
-    fetch(`/api/admin/shortlets/${id}`)
+    fetch(`/api/shortlets/${id}`)
       .then((r) => r.json())
       .then((d) => { setShortlet(d); setGuests(Math.min(2, d.guests)); setLoading(false); })
       .catch(() => setLoading(false));

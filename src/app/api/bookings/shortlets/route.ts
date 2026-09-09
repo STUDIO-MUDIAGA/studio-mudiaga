@@ -8,6 +8,34 @@ const db = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } },
 );
 
+/** The signed-in customer's own bookings, most recent first, with just
+ *  enough of the listing joined in for a dashboard list (title/image). */
+export async function GET() {
+  const supabase = await createServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { data: bookings, error } = await db
+    .from("shortlet_bookings")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  const shortletIds = [...new Set((bookings ?? []).map((b) => b.shortlet_id))];
+  const { data: listings } = shortletIds.length
+    ? await db.from("shortlets").select("id, title, city, images").in("id", shortletIds)
+    : { data: [] };
+  const listingById = new Map((listings ?? []).map((l) => [l.id, l]));
+
+  const withListing = (bookings ?? []).map((b) => ({
+    ...b,
+    shortlet: listingById.get(b.shortlet_id) ?? null,
+  }));
+
+  return NextResponse.json(withListing);
+}
+
 export async function POST(req: Request) {
   const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();

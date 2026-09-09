@@ -27,7 +27,7 @@ export default function AbodePropertiesPage() {
   const [minBeds, setMinBeds] = useState(0);
 
   useEffect(() => {
-    fetch("/api/admin/shortlets")
+    fetch("/api/shortlets")
       .then((r) => r.json())
       .then((data) => { setAll(data); setLoading(false); });
   }, []);

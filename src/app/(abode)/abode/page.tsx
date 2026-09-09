@@ -20,7 +20,7 @@ export default function AbodeLanding() {
   const [featured, setFeatured] = useState<Shortlet[]>([]);
 
   useEffect(() => {
-    fetch("/api/admin/shortlets")
+    fetch("/api/shortlets")
       .then((r) => r.json())
       .then((data: Shortlet[]) => setFeatured(data.filter((s) => s.available).slice(0, 6)));
   }, []);
