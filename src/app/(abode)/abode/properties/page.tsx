@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, MapPin, Star, SlidersHorizontal, BedDouble } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Search, MapPin, Star, SlidersHorizontal, BedDouble, Heart } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { useAbodeWishlist } from "@/lib/abode-wishlist";
 
 const ORANGE = "#c46442";
 const CITIES = ["All", "Lagos", "Abuja", "Port Harcourt"];
@@ -14,6 +17,9 @@ type Shortlet = {
 };
 
 export default function AbodePropertiesPage() {
+  const router = useRouter();
+  const { user } = useAuth();
+  const { has: isSaved, toggle: toggleWishlist } = useAbodeWishlist();
   const [all, setAll] = useState<Shortlet[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -114,10 +120,26 @@ export default function AbodePropertiesPage() {
                     {item.city}
                   </div>
                   {item.tags?.includes("Superhost") && (
-                    <div style={{ position: "absolute", top: 12, right: 12, background: "#fdf0eb", border: `1px solid ${ORANGE}33`, borderRadius: 8, padding: "4px 10px", fontSize: 11, color: ORANGE, fontWeight: 600 }}>
+                    <div style={{ position: "absolute", top: 12, right: 50, background: "#fdf0eb", border: `1px solid ${ORANGE}33`, borderRadius: 8, padding: "4px 10px", fontSize: 11, color: ORANGE, fontWeight: 600 }}>
                       Superhost
                     </div>
                   )}
+                  {/* Save */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (!user) {
+                        router.push(`/login?next=${encodeURIComponent("/abode/properties")}`);
+                        return;
+                      }
+                      toggleWishlist(item.id);
+                    }}
+                    aria-label={isSaved(item.id) ? "Remove from saved" : "Save property"}
+                    style={{ position: "absolute", top: 12, right: 12, width: 30, height: 30, borderRadius: "50%", background: "rgba(255,255,255,0.92)", backdropFilter: "blur(6px)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+                  >
+                    <Heart size={13} fill={isSaved(item.id) ? ORANGE : "none"} color={isSaved(item.id) ? ORANGE : "#888"} />
+                  </button>
                 </div>
 
                 {/* Card body */}

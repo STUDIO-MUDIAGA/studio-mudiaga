@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft, Star, MapPin, BedDouble, Bath, Users, Check,
@@ -9,6 +9,8 @@ import {
   X, ChevronLeft, ChevronRight, Share2, Heart, Building2,
   Moon, CalendarDays, Loader2, Mail, Phone, User,
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { useAbodeWishlist } from "@/lib/abode-wishlist";
 
 const ORANGE = "#c46442";
 
@@ -53,13 +55,15 @@ function fmt(d: string) {
 
 export default function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
+  const { user, profile } = useAuth();
+  const { has: isSaved, toggle: toggleWishlist } = useAbodeWishlist();
   const [shortlet, setShortlet] = useState<Shortlet | null>(null);
   const [loading, setLoading] = useState(true);
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [checkin, setCheckin] = useState(addDays(today(), 3));
   const [checkout, setCheckout] = useState(addDays(today(), 6));
   const [guests, setGuests] = useState(2);
-  const [saved, setSaved] = useState(false);
   const [requesting, setRequesting] = useState(false);
   const [requested, setRequested] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -84,27 +88,33 @@ export default function PropertyDetailPage() {
       .catch(() => {});
   }, [id]);
 
-  // Load saved state from localStorage
   useEffect(() => {
-    try {
-      const favs: string[] = JSON.parse(localStorage.getItem("abode_favourites") ?? "[]");
-      setSaved(favs.includes(id));
-    } catch { /* ignore */ }
-  }, [id]);
+    if (!user) return;
+    setGuestName((n) => n || profile?.full_name || "");
+    setGuestEmail((e) => e || user.email || "");
+  }, [user, profile]);
 
   function showToast(msg: string) {
     setToast(msg);
     setTimeout(() => setToast(null), 2800);
   }
 
-  function toggleSaved() {
-    try {
-      const favs: string[] = JSON.parse(localStorage.getItem("abode_favourites") ?? "[]");
-      const next = saved ? favs.filter((f) => f !== id) : [...favs, id];
-      localStorage.setItem("abode_favourites", JSON.stringify(next));
-      setSaved(!saved);
-      showToast(saved ? "Removed from saved" : "Saved to your favourites");
-    } catch { /* ignore */ }
+  async function toggleSaved() {
+    if (!user) {
+      router.push(`/login?next=${encodeURIComponent(`/abode/properties/${id}`)}`);
+      return;
+    }
+    const nowSaved = await toggleWishlist(id);
+    showToast(nowSaved ? "Saved to your listings" : "Removed from saved");
+  }
+
+  function openBookingModal() {
+    if (!user) {
+      router.push(`/login?next=${encodeURIComponent(`/abode/properties/${id}`)}`);
+      return;
+    }
+    setBookingModal(true);
+    setBookingError("");
   }
 
   async function submitBooking(e: React.FormEvent) {
@@ -266,8 +276,8 @@ export default function PropertyDetailPage() {
             </div>
             {/* Save + Share */}
             <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-              <button onClick={toggleSaved} title={saved ? "Remove from saved" : "Save property"} style={{ width: 38, height: 38, borderRadius: "50%", background: saved ? "#fdf0eb" : "#fff", border: `1px solid ${saved ? ORANGE + "44" : "#e8e8e4"}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.15s" }}>
-                <Heart size={15} fill={saved ? ORANGE : "none"} color={saved ? ORANGE : "#aaa"} />
+              <button onClick={toggleSaved} title={isSaved(id) ? "Remove from saved" : "Save property"} style={{ width: 38, height: 38, borderRadius: "50%", background: isSaved(id) ? "#fdf0eb" : "#fff", border: `1px solid ${isSaved(id) ? ORANGE + "44" : "#e8e8e4"}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.15s" }}>
+                <Heart size={15} fill={isSaved(id) ? ORANGE : "none"} color={isSaved(id) ? ORANGE : "#aaa"} />
               </button>
               <button onClick={handleShare} title="Share this property" style={{ width: 38, height: 38, borderRadius: "50%", background: "#fff", border: "1px solid #e8e8e4", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                 <Share2 size={15} color="#aaa" />
@@ -502,7 +512,7 @@ export default function PropertyDetailPage() {
 
             {/* CTA */}
             <button
-              onClick={() => { setBookingModal(true); setBookingError(""); }}
+              onClick={openBookingModal}
               disabled={bookingDone}
               style={{ width: "100%", background: bookingDone ? "#15803d" : ORANGE, color: "#fff", border: "none", borderRadius: 12, padding: "14px 0", fontSize: 14, fontWeight: 700, cursor: bookingDone ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "background 0.2s", marginBottom: 10 }}
             >
