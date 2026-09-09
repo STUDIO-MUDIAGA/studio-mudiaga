@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Send, MessageCircle } from "lucide-react";
 import DashboardShell from "@/components/mudres/DashboardShell";
 import { useAuth } from "@/context/AuthContext";
+import { createClient } from "@/lib/supabase/client";
 
 const WHITE = "#FFFFFF";
 const DARK = "#2A3812";
@@ -17,21 +18,49 @@ const timeLabel = (iso: string) =>
   new Date(iso).toLocaleString("en-NG", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
 
 export default function MudresSupportPage() {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const [messages, setMessages] = useState<Message[] | null>(null);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const load = () =>
+  useEffect(() => {
     fetch("/api/support/messages")
       .then((r) => (r.ok ? r.json() : []))
       .then((data: Message[]) => setMessages(Array.isArray(data) ? data : []))
       .catch(() => setMessages([]));
-
-  useEffect(() => {
-    load();
   }, []);
+
+  // Live updates — new studio replies (and our own messages, once the insert
+  // round-trips) arrive here instead of needing a manual refresh.
+  useEffect(() => {
+    if (!user) return;
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`support-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "support_messages", filter: `user_id=eq.${user.id}` },
+        (payload) => {
+          const row = payload.new as Message;
+          setMessages((cur) => {
+            if (!cur) return [row];
+            const optimisticIdx = cur.findIndex((m) => m.id.startsWith("local-") && m.sender === row.sender && m.body === row.body);
+            if (optimisticIdx !== -1) {
+              const next = [...cur];
+              next[optimisticIdx] = row;
+              return next;
+            }
+            if (cur.some((m) => m.id === row.id)) return cur;
+            return [...cur, row];
+          });
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ block: "end" });
@@ -52,16 +81,12 @@ export default function MudresSupportPage() {
     setMessages((current) => [...(current ?? []), optimistic]);
     setDraft("");
 
-    try {
-      await fetch("/api/support/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: text }),
-      });
-    } finally {
-      setSending(false);
-      load();
-    }
+    await fetch("/api/support/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ body: text }),
+    });
+    setSending(false);
   };
 
   return (
