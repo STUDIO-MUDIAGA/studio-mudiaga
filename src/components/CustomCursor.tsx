@@ -15,7 +15,12 @@ export default function CustomCursor() {
     pathname === "/signup";
 
   const [label, setLabel] = useState<string | null>(null);
-  const [visible, setVisible] = useState(false);
+  // Starts true: the cursor is positioned off-screen (-200,-200) until the
+  // first real mousemove anyway, so there's nothing to flash — but gating
+  // this on the first move meant a real gap where neither the OS cursor
+  // (hidden site-wide via CSS) nor this one was visible right as the mouse
+  // entered the page.
+  const [visible, setVisible] = useState(true);
 
   const rawX = useMotionValue(-200);
   const rawY = useMotionValue(-200);

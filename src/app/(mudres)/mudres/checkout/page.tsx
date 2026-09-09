@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Script from "next/script";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Lock, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Lock, CheckCircle2, Tag, X } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/context/AuthContext";
 import { HEADER_SPACE } from "@/components/mudres/MudresHeader";
@@ -29,17 +30,56 @@ export default function CheckoutPage() {
   const [form, setForm] = useState({
     full_name: "", phone: "", address: "", city: "", state: "", notes: "",
   });
-  const [payment, setPayment] = useState<"transfer" | "on_delivery">("transfer");
+  const [payment, setPayment] = useState<"paystack" | "on_delivery">("paystack");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [placed, setPlaced] = useState<string | null>(null);
+  const [paid, setPaid] = useState(false);
+
+  const [couponInput, setCouponInput] = useState("");
+  const [coupon, setCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [couponError, setCouponError] = useState("");
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
 
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }));
 
+  const applyCoupon = async () => {
+    if (!couponInput.trim()) return;
+    setApplyingCoupon(true);
+    setCouponError("");
+    const res = await fetch("/api/coupons/validate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: couponInput, subtotal }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setApplyingCoupon(false);
+    if (!data.valid) {
+      setCouponError(data.error ?? "Invalid coupon");
+      setCoupon(null);
+      return;
+    }
+    setCoupon({ code: data.code, discount: data.discount });
+  };
+
+  const removeCoupon = () => {
+    setCoupon(null);
+    setCouponInput("");
+    setCouponError("");
+  };
+
+  const total = Math.max(0, subtotal - (coupon?.discount ?? 0));
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (payment === "paystack" && !process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY) {
+      setError("Card payment isn't set up yet — choose \"Pay on delivery\" for now.");
+      return;
+    }
+
     setSubmitting(true);
 
     const res = await fetch("/api/orders", {
@@ -48,7 +88,8 @@ export default function CheckoutPage() {
       body: JSON.stringify({
         ...form,
         payment_method: payment,
-        items: lines.map((l) => ({ id: l.id, quantity: l.quantity })),
+        coupon_code: coupon?.code,
+        items: lines.map((l) => ({ id: l.id, quantity: l.quantity, color: l.color })),
       }),
     });
 
@@ -60,12 +101,41 @@ export default function CheckoutPage() {
     }
 
     clear();
-    setPlaced(data.id);
-    setSubmitting(false);
+
+    if (payment === "on_delivery" || !window.PaystackPop) {
+      setPlaced(data.id);
+      setSubmitting(false);
+      return;
+    }
+
+    window.PaystackPop.setup({
+      key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
+      email: user?.email ?? "",
+      amount: Math.round(data.total * 100),
+      ref: data.id,
+      currency: "NGN",
+      callback: async () => {
+        const verifyRes = await fetch("/api/payments/paystack/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: data.id }),
+        });
+        const verifyData = await verifyRes.json().catch(() => ({}));
+        setPaid(!!verifyData.paid);
+        setPlaced(data.id);
+        setSubmitting(false);
+      },
+      onClose: () => {
+        // The order already exists (unpaid) — let them see it and pay again from there.
+        setPlaced(data.id);
+        setSubmitting(false);
+      },
+    }).openIframe();
   };
 
   const shell = (children: React.ReactNode) => (
     <div style={{ background: WHITE, minHeight: "100vh", color: DARK, paddingTop: HEADER_SPACE + 16 }}>
+      <Script src="https://js.paystack.co/v1/inline.js" strategy="afterInteractive" />
       <div className="px-5 md:px-10 pt-8 pb-20" style={{ maxWidth: 1000, margin: "0 auto" }}>{children}</div>
     </div>
   );
@@ -74,12 +144,16 @@ export default function CheckoutPage() {
     return shell(
       <div style={{ border: `1px solid ${LINE}`, borderRadius: 20, padding: "56px 28px", textAlign: "center" }}>
         <CheckCircle2 size={32} color="#5F8F3C" strokeWidth={1.6} />
-        <h1 style={{ fontSize: 26, fontWeight: 700, margin: "16px 0 8px" }}>Order placed</h1>
+        <h1 style={{ fontSize: 26, fontWeight: 700, margin: "16px 0 8px" }}>
+          {paid ? "Payment received" : "Order placed"}
+        </h1>
         <p style={{ color: "#6F7A5E", fontSize: 14, lineHeight: 1.7, margin: "0 0 6px" }}>
           Your reference is <strong style={{ color: DARK }}>{placed}</strong>.
         </p>
         <p style={{ color: "#6F7A5E", fontSize: 14, lineHeight: 1.7, margin: "0 0 24px" }}>
-          The studio will confirm delivery cost and payment details by email.
+          {paid
+            ? "Thanks — we've received your payment and will start preparing your order."
+            : "If payment didn't go through, you can complete it from your order page."}
         </p>
         <Link href="/mudres/orders" style={primaryButton}>
           View my orders <ArrowRight size={15} />
@@ -135,7 +209,8 @@ export default function CheckoutPage() {
 
       <form onSubmit={submit} className="grid grid-cols-1 lg:grid-cols-[1fr_330px] gap-8 items-start">
         <div style={{ border: `1px solid ${LINE}`, borderRadius: 20, padding: 22 }}>
-          <h2 style={{ fontSize: 15, fontWeight: 700, margin: "0 0 18px" }}>Delivery details</h2>
+          <h2 style={{ fontSize: 15, fontWeight: 700, margin: "0 0 4px" }}>Billing information</h2>
+          <p style={{ color: "#8A9276", fontSize: 12, margin: "0 0 14px" }}>Who this order is for.</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="Full name" required>
@@ -145,6 +220,12 @@ export default function CheckoutPage() {
               <input value={form.phone} onChange={set("phone")} required inputMode="tel" style={inputStyle} />
             </Field>
           </div>
+          <Field label="Email">
+            <input value={user?.email ?? ""} disabled style={{ ...inputStyle, background: SURFACE, color: "#8A9276", cursor: "not-allowed" }} />
+          </Field>
+
+          <h2 style={{ fontSize: 15, fontWeight: 700, margin: "22px 0 4px" }}>Shipping information</h2>
+          <p style={{ color: "#8A9276", fontSize: 12, margin: "0 0 14px" }}>Where the piece should be delivered.</p>
 
           <Field label="Delivery address" required>
             <input value={form.address} onChange={set("address")} required style={inputStyle} />
@@ -172,10 +253,10 @@ export default function CheckoutPage() {
           <h2 style={{ fontSize: 15, fontWeight: 700, margin: "24px 0 12px" }}>Payment</h2>
           <div style={{ display: "grid", gap: 8 }}>
             <PayOption
-              checked={payment === "transfer"}
-              onSelect={() => setPayment("transfer")}
-              title="Bank transfer"
-              copy="The studio sends account details and confirms once payment lands."
+              checked={payment === "paystack"}
+              onSelect={() => setPayment("paystack")}
+              title="Pay by card / bank transfer"
+              copy="Secure payment via Paystack — card, bank transfer, or USSD."
             />
             <PayOption
               checked={payment === "on_delivery"}
@@ -190,7 +271,7 @@ export default function CheckoutPage() {
           <h2 style={{ fontSize: 15, fontWeight: 700, margin: "0 0 14px" }}>Order</h2>
 
           {lines.map((line) => (
-            <div key={line.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, marginBottom: 10 }}>
+            <div key={line.id + (line.color ?? "")} style={{ display: "flex", justifyContent: "space-between", gap: 12, marginBottom: 10 }}>
               <span style={{ color: "#6F7A5E", fontSize: 13, minWidth: 0 }}>
                 {line.name} <span style={{ color: "#9AA388" }}>x{line.quantity}</span>
               </span>
@@ -201,9 +282,50 @@ export default function CheckoutPage() {
           ))}
 
           <div style={{ borderTop: `1px solid ${LINE}`, margin: "14px 0" }} />
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+
+          {/* Coupon */}
+          {coupon ? (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, background: "rgba(150,184,93,0.15)", border: "1px solid rgba(150,184,93,0.4)", borderRadius: 10, padding: "9px 12px", marginBottom: 12 }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: DARK, fontWeight: 600 }}>
+                <Tag size={13} /> {coupon.code} applied
+              </span>
+              <button type="button" onClick={removeCoupon} style={{ background: "none", border: "none", cursor: "pointer", color: "#6F7A5E", display: "flex" }}>
+                <X size={14} />
+              </button>
+            </div>
+          ) : (
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  value={couponInput}
+                  onChange={(e) => { setCouponInput(e.target.value); setCouponError(""); }}
+                  placeholder="Coupon code"
+                  style={{ ...inputStyle, flex: 1, padding: "9px 12px", fontSize: 12.5 }}
+                />
+                <button
+                  type="button"
+                  onClick={applyCoupon}
+                  disabled={applyingCoupon || !couponInput.trim()}
+                  style={{ background: WHITE, border: `1px solid ${LINE}`, color: DARK, borderRadius: 10, padding: "9px 16px", fontSize: 12.5, fontWeight: 600, cursor: "pointer", opacity: applyingCoupon ? 0.6 : 1, fontFamily: "inherit" }}
+                >
+                  {applyingCoupon ? "..." : "Apply"}
+                </button>
+              </div>
+              {couponError && <p style={{ color: "#A33", fontSize: 12, margin: "6px 0 0" }}>{couponError}</p>}
+            </div>
+          )}
+
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#6F7A5E", marginBottom: 6 }}>
+            <span>Subtotal</span><span>{naira(subtotal)}</span>
+          </div>
+          {coupon && (
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#5F8F3C", marginBottom: 6 }}>
+              <span>Discount ({coupon.code})</span><span>-{naira(coupon.discount)}</span>
+            </div>
+          )}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 8 }}>
             <span style={{ color: "#6F7A5E", fontSize: 13 }}>Total</span>
-            <span style={{ fontSize: 17, fontWeight: 700 }}>{naira(subtotal)}</span>
+            <span style={{ fontSize: 17, fontWeight: 700 }}>{naira(total)}</span>
           </div>
           <p style={{ color: "#8A9276", fontSize: 11.5, lineHeight: 1.6, margin: "8px 0 0" }}>
             Delivery is quoted separately once the studio reviews your address.
@@ -222,7 +344,7 @@ export default function CheckoutPage() {
               opacity: submitting ? 0.6 : 1,
             }}
           >
-            {submitting ? "Placing order…" : "Place order"} {!submitting && <ArrowRight size={15} />}
+            {submitting ? "Please wait…" : payment === "paystack" ? "Continue to payment" : "Place order"} {!submitting && <ArrowRight size={15} />}
           </button>
           <button
             type="button"

@@ -69,7 +69,10 @@ export async function proxy(request: NextRequest) {
   }
 
   // ── Protect /admin pages and /api/admin/* endpoints ────────────────
-  const isAdminApi = pathname.startsWith("/api/admin");
+  // send-otp is how someone proves they're an admin in the first place — it
+  // must stay reachable by a logged-out visitor or a non-admin session, and
+  // already checks the target email's role itself before sending anything.
+  const isAdminApi = pathname.startsWith("/api/admin") && pathname !== "/api/admin/send-otp";
   const isAdminPage = pathname.startsWith("/admin") && !pathname.startsWith("/admin/login");
 
   if (isAdminApi || isAdminPage) {

@@ -43,9 +43,10 @@ export default function CartPage() {
             <div style={{ border: `1px solid ${LINE}`, borderRadius: 20, overflow: "hidden" }}>
               {lines.map((line, i) => (
                 <div
-                  key={line.id}
+                  key={line.id + (line.color ?? "")}
+                  className="flex flex-wrap sm:flex-nowrap"
                   style={{
-                    display: "flex", alignItems: "center", gap: 16, padding: 16,
+                    alignItems: "center", gap: 16, padding: 16,
                     borderTop: i === 0 ? "none" : `1px solid ${LINE}`,
                   }}
                 >
@@ -72,33 +73,35 @@ export default function CartPage() {
                     <p style={{ color: "#6F7A5E", fontSize: 13, margin: 0 }}>{naira(line.price)} each</p>
                   </div>
 
-                  <div style={{ display: "flex", alignItems: "center", gap: 4, border: `1px solid ${LINE}`, borderRadius: 999, padding: 3 }}>
-                    <StepButton label="Decrease quantity" onClick={() => setQuantity(line.id, line.quantity - 1)}>
-                      <Minus size={14} />
-                    </StepButton>
-                    <span style={{ minWidth: 24, textAlign: "center", fontSize: 14, fontWeight: 600 }}>
-                      {line.quantity}
-                    </span>
-                    <StepButton label="Increase quantity" onClick={() => setQuantity(line.id, line.quantity + 1)}>
-                      <Plus size={14} />
-                    </StepButton>
+                  <div className="w-full sm:w-auto" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 4, border: `1px solid ${LINE}`, borderRadius: 999, padding: 3, flex: "0 0 auto" }}>
+                      <StepButton label="Decrease quantity" onClick={() => setQuantity(line.id, line.quantity - 1, line.color)}>
+                        <Minus size={14} />
+                      </StepButton>
+                      <span style={{ minWidth: 24, textAlign: "center", fontSize: 14, fontWeight: 600 }}>
+                        {line.quantity}
+                      </span>
+                      <StepButton label="Increase quantity" onClick={() => setQuantity(line.id, line.quantity + 1, line.color)}>
+                        <Plus size={14} />
+                      </StepButton>
+                    </div>
+
+                    <p style={{ minWidth: 90, textAlign: "right", fontSize: 15, fontWeight: 700, margin: 0, flex: "0 0 auto" }}>
+                      {naira(line.price * line.quantity)}
+                    </p>
+
+                    <button
+                      aria-label={`Remove ${line.name}`}
+                      onClick={() => remove(line.id, line.color)}
+                      style={{
+                        width: 34, height: 34, borderRadius: 999, cursor: "pointer",
+                        border: `1px solid ${LINE}`, background: "transparent", color: "#8A9276",
+                        display: "flex", alignItems: "center", justifyContent: "center", flex: "0 0 auto",
+                      }}
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
-
-                  <p style={{ minWidth: 110, textAlign: "right", fontSize: 15, fontWeight: 700, margin: 0 }}>
-                    {naira(line.price * line.quantity)}
-                  </p>
-
-                  <button
-                    aria-label={`Remove ${line.name}`}
-                    onClick={() => remove(line.id)}
-                    style={{
-                      width: 34, height: 34, borderRadius: 999, cursor: "pointer",
-                      border: `1px solid ${LINE}`, background: "transparent", color: "#8A9276",
-                      display: "flex", alignItems: "center", justifyContent: "center", flex: "0 0 auto",
-                    }}
-                  >
-                    <Trash2 size={14} />
-                  </button>
                 </div>
               ))}
             </div>

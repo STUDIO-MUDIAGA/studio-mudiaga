@@ -42,6 +42,10 @@ export default function MudresLayout({ children }: { children: React.ReactNode }
           <div style={{ display: "flex", flexWrap: "wrap", gap: compact ? 16 : 24 }}>
             <Link href="/mudres/collection" style={{ color: "rgba(237,232,208,0.5)", fontSize: 12, textDecoration: "none" }}>Collection</Link>
             <Link href="/mudres/orders" style={{ color: "rgba(237,232,208,0.5)", fontSize: 12, textDecoration: "none" }}>My Orders</Link>
+            <Link href="/mudres/shipping" style={{ color: "rgba(237,232,208,0.5)", fontSize: 12, textDecoration: "none" }}>Shipping</Link>
+            <Link href="/mudres/returns" style={{ color: "rgba(237,232,208,0.5)", fontSize: 12, textDecoration: "none" }}>Returns</Link>
+            <Link href="/mudres/faq" style={{ color: "rgba(237,232,208,0.5)", fontSize: 12, textDecoration: "none" }}>FAQ</Link>
+            <Link href="/mudres/size-guide" style={{ color: "rgba(237,232,208,0.5)", fontSize: 12, textDecoration: "none" }}>Size Guide</Link>
             <Link href="/" style={{ color: "rgba(237,232,208,0.5)", fontSize: 12, textDecoration: "none" }}>Studio Mudiaga</Link>
           </div>
           <p style={{ color: "rgba(237,232,208,0.3)", fontSize: 11 }}>© {new Date().getFullYear()} Studio Mudiaga</p>

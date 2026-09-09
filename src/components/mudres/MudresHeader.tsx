@@ -4,11 +4,11 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  ShoppingBag, User, ChevronDown, Menu, X, ArrowRight, ArrowUpRight,
-  Sofa, Table2, Lamp, Archive, BedDouble, Flower2, LayoutGrid,
+  ShoppingBag, User, ChevronDown, Menu, X, ArrowRight, ArrowUpRight, MessageCircle,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/lib/cart";
+import { resolveCategoryIcon } from "@/lib/category-icons";
 
 const WHITE = "#FFFFFF";
 const DARK = "#2A3812";
@@ -42,16 +42,7 @@ type Item = {
   in_stock: boolean;
 };
 
-/** Icon and one-line blurb per category. Categories themselves come from the
- *  catalogue, so a category with no entry here still renders with a fallback. */
-const CATEGORY_META: Record<string, { icon: typeof Sofa; blurb: string }> = {
-  Seating: { icon: Sofa, blurb: "Chairs, sofas and lounge pieces." },
-  Tables: { icon: Table2, blurb: "Dining, coffee and side tables." },
-  Lighting: { icon: Lamp, blurb: "Pendants, lamps and shades." },
-  Storage: { icon: Archive, blurb: "Shelving, cabinets and consoles." },
-  Bedroom: { icon: BedDouble, blurb: "Beds, frames and headboards." },
-  Decor: { icon: Flower2, blurb: "Planters, ceramics and objects." },
-};
+type CategoryMeta = { category: string; icon: string; blurb: string };
 
 const NAIRA = (n: number | null) => `₦${(n ?? 0).toLocaleString()}`;
 
@@ -64,6 +55,7 @@ export default function MudresHeader() {
   const [open, setOpen] = useState<"collection" | "categories" | null>(null);
   const [drawer, setDrawer] = useState(false);
   const [items, setItems] = useState<Item[]>([]);
+  const [categoryMeta, setCategoryMeta] = useState<Record<string, CategoryMeta>>({});
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -79,6 +71,15 @@ export default function MudresHeader() {
       .then((r) => (r.ok ? r.json() : []))
       .then((d: Item[]) => setItems(Array.isArray(d) ? d : []))
       .catch(() => setItems([]));
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/furniture/categories")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((d: CategoryMeta[]) => {
+        setCategoryMeta(Object.fromEntries((Array.isArray(d) ? d : []).map((m) => [m.category, m])));
+      })
+      .catch(() => setCategoryMeta({}));
   }, []);
 
   useEffect(() => {
@@ -222,6 +223,19 @@ export default function MudresHeader() {
           {/* Actions */}
           <div style={{ display: "flex", alignItems: "center", gap: compact ? 8 : 10, flex: "0 0 auto" }}>
             <Link
+              href={user ? "/mudres/dashboard/support" : "/mudres/login?next=/mudres/dashboard/support"}
+              onClick={closeAll}
+              aria-label="Send us a message"
+              title="Send us a message"
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "center",
+                width: 38, height: 38, borderRadius: 999, cursor: "pointer", flex: "0 0 auto",
+                background: "transparent", border: `1px solid ${PILL_LINE}`, color: PILL_INK,
+              }}
+            >
+              <MessageCircle size={16} strokeWidth={1.8} />
+            </Link>
+            <Link
               href="/mudres/cart"
               onClick={closeAll}
               aria-label="Cart"
@@ -332,8 +346,8 @@ export default function MudresHeader() {
                     <PanelLabel>Shop by category</PanelLabel>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                       {categories.map(([name, count]) => {
-                        const meta = CATEGORY_META[name];
-                        const Icon = meta?.icon ?? LayoutGrid;
+                        const meta = categoryMeta[name];
+                        const Icon = resolveCategoryIcon(meta?.icon);
                         return (
                           <Link
                             key={name}
@@ -462,7 +476,7 @@ export default function MudresHeader() {
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
               {categories.map(([name, count]) => {
-                const Icon = CATEGORY_META[name]?.icon ?? LayoutGrid;
+                const Icon = resolveCategoryIcon(categoryMeta[name]?.icon);
                 return (
                   <Link
                     key={name}

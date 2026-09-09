@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Minus, Plus, CheckCircle2, Heart } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { ChevronLeft, Minus, Plus, CheckCircle2, Heart, ShoppingBag } from "lucide-react";
 import { useWishlist } from "@/lib/wishlist";
+import { useCart } from "@/lib/cart";
 import { HEADER_SPACE } from "@/components/mudres/MudresHeader";
 
 const WHITE = "#FFFFFF";
@@ -28,6 +28,7 @@ type FurnitureItem = {
   images: string[];
   tags: string[];
   in_stock: boolean;
+  variants: { color: string; price: number; in_stock: boolean }[];
 };
 
 const fmt = (n: number) => "₦" + n.toLocaleString("en-NG");
@@ -35,8 +36,8 @@ const fmt = (n: number) => "₦" + n.toLocaleString("en-NG");
 export default function ProductDetailPage() {
   const params = useParams();
   const id = params.id as string;
-  const { profile } = useAuth();
   const { has, toggle, signedIn } = useWishlist();
+  const { add } = useCart();
   const router = useRouter();
 
   const [item, setItem] = useState<FurnitureItem | null>(null);
@@ -47,15 +48,10 @@ export default function ProductDetailPage() {
   const [activeImage, setActiveImage] = useState(0);
   const [color, setColor] = useState("");
   const [quantity, setQuantity] = useState(1);
-
-  const [ordering, setOrdering] = useState(false);
-  const [orderPlaced, setOrderPlaced] = useState(false);
-  const [orderError, setOrderError] = useState("");
-  const [form, setForm] = useState({ name: "", email: "", phone: "", address: "", notes: "" });
+  const [justAdded, setJustAdded] = useState(false);
 
   useEffect(() => {
     setLoading(true);
-    setOrderPlaced(false);
     setActiveImage(0);
     setQuantity(1);
     fetch(`/api/furniture/${id}`)
@@ -79,41 +75,21 @@ export default function ProductDetailPage() {
       });
   }, [id]);
 
-  useEffect(() => {
-    if (profile) {
-      setForm((f) => ({ ...f, name: f.name || profile.full_name || "", email: f.email || profile.email || "" }));
-    }
-  }, [profile]);
+  const activeVariant = item?.variants?.find((v) => v.color === color);
+  const effectivePrice = activeVariant ? activeVariant.price : item?.price ?? 0;
+  const effectiveInStock = activeVariant ? activeVariant.in_stock : item?.in_stock ?? false;
 
-  const set = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
-
-  const handleOrder = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddToCart = () => {
     if (!item) return;
-    setOrdering(true);
-    setOrderError("");
-    const res = await fetch("/api/admin/orders/furniture", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        customer_name: form.name,
-        customer_email: form.email,
-        customer_phone: form.phone,
-        item_name: item.name + (color ? ` (${color})` : ""),
-        item_id: item.id,
-        quantity,
-        total_price: item.price * quantity,
-        delivery_address: form.address,
-        notes: form.notes,
-      }),
-    });
-    setOrdering(false);
-    if (!res.ok) {
-      const d = await res.json();
-      setOrderError(d.error ?? "Failed to place order");
-      return;
-    }
-    setOrderPlaced(true);
+    add({ id: item.id, name: item.name + (color ? ` (${color})` : ""), price: effectivePrice, image: images[0] ?? null, color: color || undefined }, quantity);
+    setJustAdded(true);
+    setTimeout(() => setJustAdded(false), 2000);
+  };
+
+  const handleBuyNow = () => {
+    if (!item) return;
+    add({ id: item.id, name: item.name + (color ? ` (${color})` : ""), price: effectivePrice, image: images[0] ?? null, color: color || undefined }, quantity);
+    router.push(signedIn ? "/mudres/checkout" : `/mudres/login?next=${encodeURIComponent("/mudres/checkout")}`);
   };
 
   if (loading) {
@@ -145,12 +121,12 @@ export default function ProductDetailPage() {
 
   return (
     <div style={{ background: WHITE, minHeight: "100vh", color: DARK, paddingTop: HEADER_SPACE + 16 }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 40px 100px" }}>
+      <div className="px-5 md:px-10" style={{ maxWidth: 1280, margin: "0 auto", paddingTop: 32, paddingBottom: 100 }}>
         <Link href="/mudres/collection" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "rgba(42,56,18,0.5)", fontSize: 12, textDecoration: "none", marginBottom: 28 }}>
           <ChevronLeft size={14} /> Collection
         </Link>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 64 }}>
+        <div className="grid grid-cols-1 md:grid-cols-[1.1fr_1fr] gap-8 md:gap-16">
           {/* Gallery */}
           <div>
             <div style={{ aspectRatio: "1", borderRadius: 18, overflow: "hidden", background: "rgba(42,56,18,0.04)", marginBottom: 12 }}>
@@ -205,8 +181,8 @@ export default function ProductDetailPage() {
               </button>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-              <span style={{ color: DARK, fontSize: 24, fontWeight: 700 }}>{fmt(item.price)}</span>
-              {item.original_price && (
+              <span style={{ color: DARK, fontSize: 24, fontWeight: 700 }}>{fmt(effectivePrice)}</span>
+              {!activeVariant && item.original_price && (
                 <>
                   <span style={{ color: "rgba(42,56,18,0.3)", fontSize: 16, textDecoration: "line-through" }}>{fmt(item.original_price)}</span>
                   <span style={{ background: SAGE, color: DARK, fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 6 }}>SALE</span>
@@ -239,37 +215,37 @@ export default function ProductDetailPage() {
               <div style={{ marginBottom: 24 }}>
                 <p style={{ color: "rgba(42,56,18,0.4)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 10px" }}>Colour — {color}</p>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {item.colors.map((c) => (
-                    <button
-                      key={c}
-                      onClick={() => setColor(c)}
-                      style={{
-                        padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: "pointer",
-                        border: color === c ? `1px solid ${SAGE}` : "1px solid rgba(42,56,18,0.12)",
-                        background: color === c ? "rgba(150,184,93,0.18)" : "rgba(42,56,18,0.03)",
-                        color: color === c ? DARK : "rgba(42,56,18,0.55)",
-                      }}
-                    >
-                      {c}
-                    </button>
-                  ))}
+                  {item.colors.map((c) => {
+                    const v = item.variants?.find((x) => x.color === c);
+                    const outOfStock = v ? !v.in_stock : false;
+                    return (
+                      <button
+                        key={c}
+                        onClick={() => setColor(c)}
+                        disabled={outOfStock}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 6,
+                          padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: 500,
+                          cursor: outOfStock ? "not-allowed" : "pointer",
+                          opacity: outOfStock ? 0.45 : 1,
+                          border: color === c ? `1px solid ${SAGE}` : "1px solid rgba(42,56,18,0.12)",
+                          background: color === c ? "rgba(150,184,93,0.18)" : "rgba(42,56,18,0.03)",
+                          color: color === c ? DARK : "rgba(42,56,18,0.55)",
+                        }}
+                      >
+                        {c}
+                        {v && <span style={{ color: "rgba(42,56,18,0.4)", fontSize: 11 }}>{fmt(v.price)}</span>}
+                        {outOfStock && <span style={{ fontSize: 10 }}>(out of stock)</span>}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {!item.in_stock ? (
+            {!effectiveInStock ? (
               <div style={{ background: "rgba(42,56,18,0.03)", border: "1px solid rgba(42,56,18,0.1)", borderRadius: 12, padding: "16px 18px", color: "rgba(42,56,18,0.5)", fontSize: 13 }}>
-                This piece is currently out of stock.
-              </div>
-            ) : orderPlaced ? (
-              <div style={{ background: "rgba(150,184,93,0.15)", border: `1px solid ${SAGE}`, borderRadius: 14, padding: "22px 20px", display: "flex", gap: 12, alignItems: "flex-start" }}>
-                <CheckCircle2 size={20} color={DARK} style={{ flexShrink: 0, marginTop: 1 }} />
-                <div>
-                  <p style={{ color: DARK, fontWeight: 600, fontSize: 14, margin: "0 0 4px" }}>Order placed</p>
-                  <p style={{ color: "rgba(42,56,18,0.6)", fontSize: 13, margin: 0, lineHeight: 1.6 }}>
-                    Thanks — we&rsquo;ve received your order for {item.name}. Our team will reach out at {form.email} to confirm delivery.
-                  </p>
-                </div>
+                {activeVariant ? `${color} is currently out of stock.` : "This piece is currently out of stock."}
               </div>
             ) : (
               <>
@@ -284,22 +260,28 @@ export default function ProductDetailPage() {
                       <Plus size={13} />
                     </button>
                   </div>
-                  <span style={{ color: "rgba(42,56,18,0.45)", fontSize: 13 }}>Total: {fmt(item.price * quantity)}</span>
+                  <span style={{ color: "rgba(42,56,18,0.45)", fontSize: 13 }}>Total: {fmt(effectivePrice * quantity)}</span>
                 </div>
 
-                <form onSubmit={handleOrder} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  <div style={{ display: "flex", gap: 10 }}>
-                    <input required value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Full name" style={inputStyle} />
-                    <input required type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="Email" style={inputStyle} />
-                  </div>
-                  <input value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="Phone number" style={inputStyle} />
-                  <input required value={form.address} onChange={(e) => set("address", e.target.value)} placeholder="Delivery address" style={inputStyle} />
-                  <textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="Notes (optional)" style={{ ...inputStyle, minHeight: 60, resize: "vertical" as const }} />
-                  {orderError && <p style={{ color: "#b3261e", fontSize: 12, margin: 0 }}>{orderError}</p>}
-                  <button type="submit" disabled={ordering} style={{ background: SAGE, color: DARK, fontWeight: 700, fontSize: 13, padding: "14px 24px", borderRadius: 12, border: "none", cursor: ordering ? "not-allowed" : "pointer", opacity: ordering ? 0.6 : 1, marginTop: 4 }}>
-                    {ordering ? "Placing order…" : "Place order"}
+                <div style={{ display: "flex", gap: 10 }}>
+                  <button
+                    onClick={handleAddToCart}
+                    style={{
+                      flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                      background: justAdded ? "rgba(150,184,93,0.18)" : "rgba(42,56,18,0.04)",
+                      border: `1px solid ${justAdded ? SAGE : "rgba(42,56,18,0.15)"}`,
+                      color: DARK, fontWeight: 700, fontSize: 13, padding: "14px 20px", borderRadius: 12, cursor: "pointer",
+                    }}
+                  >
+                    {justAdded ? <><CheckCircle2 size={16} /> Added</> : <><ShoppingBag size={16} /> Add to cart</>}
                   </button>
-                </form>
+                  <button
+                    onClick={handleBuyNow}
+                    style={{ flex: 1, background: SAGE, color: DARK, fontWeight: 700, fontSize: 13, padding: "14px 20px", borderRadius: 12, border: "none", cursor: "pointer" }}
+                  >
+                    Buy now
+                  </button>
+                </div>
               </>
             )}
 
@@ -320,7 +302,7 @@ export default function ProductDetailPage() {
           <div style={{ marginTop: 100 }}>
             <p style={{ color: SAGE, fontSize: 10, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", margin: "0 0 8px" }}>You may also like</p>
             <h2 style={{ color: DARK, fontSize: 24, fontWeight: 700, margin: "0 0 28px" }}>More {item.category.toLowerCase()}</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {related.map((r) => (
                 <Link key={r.id} href={`/mudres/collection/${r.id}`} style={{ textDecoration: "none", display: "block" }}>
                   <div style={{ aspectRatio: "1", borderRadius: 14, overflow: "hidden", background: "rgba(42,56,18,0.04)", marginBottom: 12 }}>
@@ -338,15 +320,3 @@ export default function ProductDetailPage() {
     </div>
   );
 }
-
-const inputStyle = {
-  width: "100%",
-  background: "#ffffff",
-  border: "1px solid rgba(42,56,18,0.12)",
-  borderRadius: 10,
-  padding: "11px 14px",
-  color: DARK,
-  fontSize: 13,
-  outline: "none",
-  boxSizing: "border-box" as const,
-};
