@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { createClient as createServerClient } from "@/lib/supabase/server";
 
 const db = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -8,6 +9,10 @@ const db = createClient(
 );
 
 export async function POST(req: Request) {
+  const supabase = await createServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Sign in to request a booking" }, { status: 401 });
+
   const body = await req.json();
   const { shortlet_id, guest_name, guest_email, guest_phone, checkin, checkout, guests, notes } = body;
 
@@ -37,7 +42,7 @@ export async function POST(req: Request) {
   const { data, error } = await db.from("shortlet_bookings").insert({
     shortlet_id, guest_name, guest_email, guest_phone: guest_phone ?? "",
     checkin, checkout, guests, nights, price_per_night, service_fee, total_amount,
-    status: "pending", notes: notes ?? "",
+    status: "pending", notes: notes ?? "", user_id: user.id,
   }).select("id").single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
