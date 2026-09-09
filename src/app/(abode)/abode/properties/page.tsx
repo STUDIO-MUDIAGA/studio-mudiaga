@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Search, MapPin, Star, SlidersHorizontal, BedDouble, Heart } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Search, MapPin, Star, SlidersHorizontal, BedDouble, Heart, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useAbodeWishlist } from "@/lib/abode-wishlist";
+import { resolveShortletCategoryIcon } from "@/lib/shortlet-category-icons";
 
 const ORANGE = "#c46442";
 const CITIES = ["All", "Lagos", "Abuja", "Port Harcourt"];
@@ -16,26 +17,46 @@ type Shortlet = {
   rating: number; review_count: number; images: string[]; available: boolean; tags: string[];
 };
 
+type Category = { id: string; name: string; slug: string; color: string; icon: string; property_count: number; shortlet_ids: string[] };
+
 export default function AbodePropertiesPage() {
+  return (
+    <Suspense fallback={null}>
+      <PropertiesBrowser />
+    </Suspense>
+  );
+}
+
+function PropertiesBrowser() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const { has: isSaved, toggle: toggleWishlist } = useAbodeWishlist();
   const [all, setAll] = useState<Shortlet[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("q") ?? "");
   const [city, setCity] = useState("All");
   const [minBeds, setMinBeds] = useState(0);
+  const [categorySlug, setCategorySlug] = useState(searchParams.get("category") ?? "");
 
   useEffect(() => {
     fetch("/api/shortlets")
       .then((r) => r.json())
       .then((data) => { setAll(data); setLoading(false); });
+    fetch("/api/shortlets/categories")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((d: Category[]) => setCategories(Array.isArray(d) ? d : []))
+      .catch(() => setCategories([]));
   }, []);
+
+  const activeCategory = categories.find((c) => c.slug === categorySlug) ?? null;
 
   const filtered = all.filter((s) => {
     if (!s.available) return false;
     if (city !== "All" && s.city !== city) return false;
     if (s.bedrooms < minBeds) return false;
+    if (activeCategory && !activeCategory.shortlet_ids.includes(s.id)) return false;
     if (search && !s.title.toLowerCase().includes(search.toLowerCase()) && !s.location.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
@@ -46,7 +67,7 @@ export default function AbodePropertiesPage() {
       <div style={{ background: "#fff", borderBottom: "1px solid #ebebeb", padding: "36px 40px 28px" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto" }}>
           <p style={{ color: ORANGE, fontSize: 10, fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", margin: "0 0 6px" }}>ABODE</p>
-          <h1 style={{ color: "#0a0a0a", fontSize: 28, fontWeight: 700, margin: "0 0 22px" }}>All Properties</h1>
+          <h1 style={{ color: "#0a0a0a", fontSize: 28, fontWeight: 700, margin: "0 0 22px" }}>{activeCategory?.name ?? "All Properties"}</h1>
 
           {/* Search + filters row */}
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
@@ -84,6 +105,39 @@ export default function AbodePropertiesPage() {
               </select>
             </div>
           </div>
+
+          {/* Category pills */}
+          {categories.length > 0 && (
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16 }}>
+              {categories.map((c) => {
+                const Icon = resolveShortletCategoryIcon(c.icon);
+                const active = c.slug === categorySlug;
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => setCategorySlug(active ? "" : c.slug)}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", borderRadius: 999,
+                      fontSize: 12, fontWeight: 600, border: "1px solid", cursor: "pointer",
+                      background: active ? c.color + "14" : "#fff",
+                      borderColor: active ? c.color : "#e8e8e4",
+                      color: active ? c.color : "#888",
+                    }}
+                  >
+                    <Icon size={12} /> {c.name}
+                  </button>
+                );
+              })}
+              {categorySlug && (
+                <button
+                  onClick={() => setCategorySlug("")}
+                  style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, border: "1px solid #e8e8e4", background: "#fff", color: "#aaa", cursor: "pointer" }}
+                >
+                  <X size={12} /> Clear
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -171,7 +225,7 @@ export default function AbodePropertiesPage() {
           <div style={{ textAlign: "center", padding: "80px 0" }}>
             <p style={{ color: "#bbb", fontSize: 15, marginBottom: 14 }}>No properties found</p>
             <button
-              onClick={() => { setSearch(""); setCity("All"); setMinBeds(0); }}
+              onClick={() => { setSearch(""); setCity("All"); setMinBeds(0); setCategorySlug(""); }}
               style={{ background: "#fdf0eb", border: `1px solid ${ORANGE}33`, color: ORANGE, borderRadius: 10, padding: "9px 20px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
             >
               Clear filters
