@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Script from "next/script";
 import Link from "next/link";
-import { Package, ArrowRight } from "lucide-react";
+import { Package, ArrowRight, CreditCard } from "lucide-react";
 import DashboardShell from "@/components/mudres/DashboardShell";
+import { useAuth } from "@/context/AuthContext";
 
 const DARK = "#2A3812";
 const INK = DARK;
@@ -35,25 +37,48 @@ const STATUS_FILL: Record<string, string> = {
 };
 
 export default function MudresOrdersPage() {
+  const { user } = useAuth();
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [error, setError] = useState("");
+  const [payingId, setPayingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    let live = true;
+  const load = () => {
     fetch("/api/orders")
       .then(async (r) => {
         if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error ?? "Could not load orders");
         return r.json();
       })
-      .then((data: Order[]) => live && setOrders(Array.isArray(data) ? data : []))
-      .catch((e: Error) => live && (setError(e.message), setOrders([])));
-    return () => {
-      live = false;
-    };
-  }, []);
+      .then((data: Order[]) => setOrders(Array.isArray(data) ? data : []))
+      .catch((e: Error) => (setError(e.message), setOrders([])));
+  };
+
+  useEffect(load, []);
+
+  const completePayment = (order: Order) => {
+    if (!window.PaystackPop || !process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || !user?.email) return;
+    setPayingId(order.id);
+    window.PaystackPop.setup({
+      key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
+      email: user.email,
+      amount: Math.round(order.total * 100),
+      ref: order.id,
+      currency: "NGN",
+      callback: async () => {
+        await fetch("/api/payments/paystack/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: order.id }),
+        });
+        setPayingId(null);
+        load();
+      },
+      onClose: () => setPayingId(null),
+    }).openIframe();
+  };
 
   return (
     <DashboardShell>
+      <Script src="https://js.paystack.co/v1/inline.js" strategy="afterInteractive" />
       <h1 style={{ color: INK, fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 700, margin: "0 0 6px", letterSpacing: "-0.03em" }}>
         Orders
       </h1>
@@ -121,11 +146,26 @@ export default function MudresOrdersPage() {
             </div>
           ))}
 
-          <div style={{ borderTop: `1px solid ${LINE}`, marginTop: 14, paddingTop: 14, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+          <div style={{ borderTop: `1px solid ${LINE}`, marginTop: 14, paddingTop: 14, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
             <span style={{ color: MUTED, fontSize: 12.5 }}>
-              {order.payment_method === "on_delivery" ? "Pay on delivery" : "Bank transfer"} · {order.payment_status}
+              {order.payment_method === "on_delivery" ? "Pay on delivery" : "Paystack"} · {order.payment_status}
             </span>
-            <span style={{ color: INK, fontSize: 16, fontWeight: 700 }}>{naira(order.total)}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              {order.payment_method === "paystack" && order.payment_status !== "paid" && (
+                <button
+                  onClick={() => completePayment(order)}
+                  disabled={payingId === order.id}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 6, background: DARK, color: "#fff", border: "none",
+                    borderRadius: 999, padding: "7px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer",
+                    opacity: payingId === order.id ? 0.6 : 1, fontFamily: "inherit",
+                  }}
+                >
+                  <CreditCard size={13} /> {payingId === order.id ? "Opening…" : "Complete payment"}
+                </button>
+              )}
+              <span style={{ color: INK, fontSize: 16, fontWeight: 700 }}>{naira(order.total)}</span>
+            </div>
           </div>
         </div>
       ))}

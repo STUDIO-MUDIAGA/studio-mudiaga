@@ -1,20 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ShoppingBag, Clock, CheckCircle, XCircle, Truck, Search, Filter } from "lucide-react";
+import Link from "next/link";
+import { ShoppingBag, Clock, CheckCircle, XCircle, Truck, Search, Filter, Eye } from "lucide-react";
 
+type OrderLine = { id: string; name: string; price: number; image: string | null; quantity: number; line_total: number };
 type Order = {
   id: string;
-  customer_name: string;
-  customer_email: string;
-  customer_phone?: string;
-  item_name: string;
-  item_id: string;
-  quantity: number;
-  total_price: number;
+  user_id: string;
+  email: string;
+  full_name: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  notes: string | null;
+  items: OrderLine[];
+  subtotal: number;
+  delivery_fee: number;
+  total: number;
+  payment_method: "paystack" | "on_delivery";
+  payment_status: string;
   status: "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled";
-  delivery_address?: string;
-  notes?: string;
+  courier: string | null;
+  tracking_number: string | null;
   created_at: string;
 };
 
@@ -29,8 +38,11 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; label: string }>
 
 const TABS = ["all", "pending", "confirmed", "processing", "shipped", "delivered", "cancelled"];
 
-const fmt = (n: number) => "₦" + n.toLocaleString("en-NG");
+const fmt = (n: number) => "₦" + (n ?? 0).toLocaleString("en-NG");
 const fmtDate = (s: string) => new Date(s).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" });
+const itemsSummary = (items: OrderLine[]) =>
+  items?.length ? `${items[0].name}${items.length > 1 ? ` +${items.length - 1} more` : ""}` : "—";
+const itemsQty = (items: OrderLine[]) => items?.reduce((n, l) => n + l.quantity, 0) ?? 0;
 
 export default function FurnitureOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -38,14 +50,13 @@ export default function FurnitureOrdersPage() {
   const [tab, setTab] = useState("all");
   const [search, setSearch] = useState("");
   const [updating, setUpdating] = useState<string | null>(null);
-  const [selected, setSelected] = useState<Order | null>(null);
 
   const load = async (status: string) => {
     setLoading(true);
     const q = status === "all" ? "" : `?status=${status}`;
     const res = await fetch(`/api/admin/orders/furniture${q}`);
     const data = await res.json();
-    setOrders(data);
+    setOrders(Array.isArray(data) ? data : []);
     setLoading(false);
   };
 
@@ -64,9 +75,9 @@ export default function FurnitureOrdersPage() {
 
   const filtered = orders.filter(
     (o) =>
-      o.customer_name?.toLowerCase().includes(search.toLowerCase()) ||
-      o.customer_email?.toLowerCase().includes(search.toLowerCase()) ||
-      o.item_name?.toLowerCase().includes(search.toLowerCase()) ||
+      o.full_name?.toLowerCase().includes(search.toLowerCase()) ||
+      o.email?.toLowerCase().includes(search.toLowerCase()) ||
+      o.items?.some((l) => l.name?.toLowerCase().includes(search.toLowerCase())) ||
       o.id?.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -98,7 +109,7 @@ export default function FurnitureOrdersPage() {
         </div>
       </div>
 
-      {/* Stat Cards */}
+      {/* Stat Cards — glanceable counts only; use the tabs below to filter */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 14, marginBottom: 24 }}>
         {["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"].map((s) => {
           const icons: Record<string, typeof Clock> = { pending: Clock, confirmed: CheckCircle, processing: Filter, shipped: Truck, delivered: CheckCircle, cancelled: XCircle };
@@ -107,8 +118,7 @@ export default function FurnitureOrdersPage() {
           return (
             <div
               key={s}
-              onClick={() => setTab(s)}
-              style={{ background: "#fff", border: tab === s ? `2px solid ${c.text}` : "1px solid #eee", borderRadius: 12, padding: "16px", cursor: "pointer", transition: "all .15s" }}
+              style={{ background: "#fff", border: "1px solid #eee", borderRadius: 12, padding: "16px" }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                 <div style={{ width: 30, height: 30, borderRadius: 8, background: c.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -140,7 +150,7 @@ export default function FurnitureOrdersPage() {
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr style={{ borderBottom: "1px solid #f0f0f0", backgroundColor: "#fafafa" }}>
-              {["Order ID", "Customer", "Item", "Qty", "Total", "Status", "Date", "Actions"].map((h) => (
+              {["Order ID", "Customer", "Items", "Qty", "Total", "Status", "Date", "Actions"].map((h) => (
                 <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: "0.05em" }}>{h}</th>
               ))}
             </tr>
@@ -157,22 +167,21 @@ export default function FurnitureOrdersPage() {
               filtered.map((o, i) => {
                 const c = STATUS_COLORS[o.status];
                 return (
-                  <tr
-                    key={o.id}
-                    style={{ borderBottom: i < filtered.length - 1 ? "1px solid #f5f5f5" : "none", backgroundColor: selected?.id === o.id ? "#fffaf8" : "transparent" }}
-                  >
+                  <tr key={o.id} style={{ borderBottom: i < filtered.length - 1 ? "1px solid #f5f5f5" : "none" }}>
                     <td style={{ padding: "14px 16px" }}>
-                      <span style={{ fontFamily: "monospace", fontSize: 11, color: "#888" }}>{o.id}</span>
+                      <Link href={`/admin/furniture/orders/${o.id}`} style={{ fontFamily: "monospace", fontSize: 11, color: "#1e156d", textDecoration: "none", fontWeight: 600 }}>
+                        {o.id}
+                      </Link>
                     </td>
                     <td style={{ padding: "14px 16px" }}>
-                      <p style={{ margin: 0, fontWeight: 600, color: "#111" }}>{o.customer_name}</p>
-                      <p style={{ margin: 0, fontSize: 11, color: "#888" }}>{o.customer_email}</p>
+                      <p style={{ margin: 0, fontWeight: 600, color: "#111" }}>{o.full_name}</p>
+                      <p style={{ margin: 0, fontSize: 11, color: "#888" }}>{o.email}</p>
                     </td>
                     <td style={{ padding: "14px 16px" }}>
-                      <p style={{ margin: 0, fontWeight: 500, color: "#333" }}>{o.item_name}</p>
+                      <p style={{ margin: 0, fontWeight: 500, color: "#333" }}>{itemsSummary(o.items)}</p>
                     </td>
-                    <td style={{ padding: "14px 16px", color: "#555" }}>{o.quantity}</td>
-                    <td style={{ padding: "14px 16px", fontWeight: 600, color: "#1e156d" }}>{fmt(o.total_price)}</td>
+                    <td style={{ padding: "14px 16px", color: "#555" }}>{itemsQty(o.items)}</td>
+                    <td style={{ padding: "14px 16px", fontWeight: 600, color: "#1e156d" }}>{fmt(o.total)}</td>
                     <td style={{ padding: "14px 16px" }}>
                       <span style={{ display: "inline-block", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600, background: c.bg, color: c.text }}>
                         {c.label}
@@ -180,17 +189,22 @@ export default function FurnitureOrdersPage() {
                     </td>
                     <td style={{ padding: "14px 16px", color: "#888", fontSize: 12 }}>{fmtDate(o.created_at)}</td>
                     <td style={{ padding: "14px 16px" }}>
-                      <select
-                        disabled={updating === o.id}
-                        onChange={(e) => updateStatus(o.id, e.target.value)}
-                        defaultValue=""
-                        style={{ fontSize: 12, padding: "5px 8px", border: "1px solid #ddd", borderRadius: 6, color: "#555", cursor: "pointer" }}
-                      >
-                        <option value="" disabled>Update</option>
-                        {Object.keys(STATUS_COLORS).filter((s) => s !== o.status).map((s) => (
-                          <option key={s} value={s} style={{ textTransform: "capitalize" }}>{STATUS_COLORS[s].label}</option>
-                        ))}
-                      </select>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <Link href={`/admin/furniture/orders/${o.id}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, borderRadius: 7, border: "1px solid #eee", color: "#888" }}>
+                          <Eye size={13} />
+                        </Link>
+                        <select
+                          disabled={updating === o.id}
+                          onChange={(e) => updateStatus(o.id, e.target.value)}
+                          defaultValue=""
+                          style={{ fontSize: 12, padding: "5px 8px", border: "1px solid #ddd", borderRadius: 6, color: "#555", cursor: "pointer" }}
+                        >
+                          <option value="" disabled>Update</option>
+                          {Object.keys(STATUS_COLORS).filter((s) => s !== o.status).map((s) => (
+                            <option key={s} value={s} style={{ textTransform: "capitalize" }}>{STATUS_COLORS[s].label}</option>
+                          ))}
+                        </select>
+                      </div>
                     </td>
                   </tr>
                 );

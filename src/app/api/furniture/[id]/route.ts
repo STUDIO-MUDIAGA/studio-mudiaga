@@ -9,11 +9,14 @@ const db = createClient(
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { data, error } = await db
-    .from("furniture_items")
-    .select("id, name, category, price, original_price, images, description, dimensions, material, colors, in_stock, featured, tags")
-    .eq("id", id)
-    .single();
+  const [{ data, error }, { data: variants }] = await Promise.all([
+    db
+      .from("furniture_items")
+      .select("id, name, category, price, original_price, images, description, dimensions, material, colors, in_stock, featured, tags")
+      .eq("id", id)
+      .single(),
+    db.from("furniture_variants").select("color, price, in_stock").eq("item_id", id).order("sort_order", { ascending: true }),
+  ]);
   if (error) return NextResponse.json({ error: error.message }, { status: 404 });
-  return NextResponse.json(data);
+  return NextResponse.json({ ...data, variants: variants ?? [] });
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { createClient } from "@supabase/supabase-js";
+import { checkCoupon, markCouponUsed } from "@/lib/coupons";
 
 const db = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -8,7 +9,7 @@ const db = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 );
 
-type IncomingLine = { id: string; quantity: number };
+type IncomingLine = { id: string; quantity: number; color?: string };
 
 const DELIVERY_FEE = 0; // Quoted by the studio after the order is reviewed.
 
@@ -48,13 +49,14 @@ export async function POST(req: Request) {
     }
   }
 
-  // Price server-side from the catalogue. Anything the client sent about
-  // money is ignored, so a tampered cart cannot set its own total.
+  // Price server-side from the catalogue (and, where a color was picked,
+  // from that color's variant row). Anything the client sent about money is
+  // ignored, so a tampered cart cannot set its own total.
   const ids = [...new Set(lines.map((l) => String(l.id)))];
-  const { data: catalogue, error: catalogueError } = await db
-    .from("furniture_items")
-    .select("id, name, price, images, in_stock")
-    .in("id", ids);
+  const [{ data: catalogue, error: catalogueError }, { data: variants }] = await Promise.all([
+    db.from("furniture_items").select("id, name, price, images, in_stock").in("id", ids),
+    db.from("furniture_variants").select("item_id, color, price, in_stock").in("item_id", ids),
+  ]);
 
   if (catalogueError) {
     return NextResponse.json({ error: catalogueError.message }, { status: 500 });
@@ -66,22 +68,43 @@ export async function POST(req: Request) {
     if (!item) {
       return NextResponse.json({ error: "A piece in your cart is no longer available" }, { status: 409 });
     }
-    if (!item.in_stock) {
-      return NextResponse.json({ error: `${item.name} is out of stock` }, { status: 409 });
+
+    const color = line.color ? String(line.color) : null;
+    const variant = color ? variants?.find((v) => v.item_id === line.id && v.color === color) : null;
+    const name = color ? `${item.name} (${color})` : item.name;
+    const price = variant ? variant.price : item.price ?? 0;
+    const inStock = variant ? variant.in_stock : item.in_stock;
+
+    if (!inStock) {
+      return NextResponse.json({ error: `${name} is out of stock` }, { status: 409 });
     }
     const quantity = Math.max(1, Math.min(99, Math.floor(Number(line.quantity) || 1)));
     priced.push({
       id: item.id,
-      name: item.name,
-      price: item.price ?? 0,
+      name,
+      price,
       image: item.images?.[0] ?? null,
       quantity,
-      line_total: (item.price ?? 0) * quantity,
+      line_total: price * quantity,
     });
   }
 
   const subtotal = priced.reduce((n, l) => n + l.line_total, 0);
-  const paymentMethod = body.payment_method === "on_delivery" ? "on_delivery" : "transfer";
+  const paymentMethod = body.payment_method === "on_delivery" ? "on_delivery" : "paystack";
+
+  // Coupon is re-checked here, never trusted from the client — the discount
+  // shown at "Apply" time is only a preview.
+  let discount = 0;
+  let couponCode: string | null = null;
+  const rawCoupon = String(body.coupon_code ?? "").trim();
+  if (rawCoupon) {
+    const result = await checkCoupon(rawCoupon, subtotal);
+    if (!result.valid) {
+      return NextResponse.json({ error: result.error }, { status: 400 });
+    }
+    discount = result.discount;
+    couponCode = result.code;
+  }
 
   const order = {
     id: "fo-" + Math.random().toString(36).slice(2, 9),
@@ -96,7 +119,9 @@ export async function POST(req: Request) {
     items: priced,
     subtotal,
     delivery_fee: DELIVERY_FEE,
-    total: subtotal + DELIVERY_FEE,
+    discount,
+    coupon_code: couponCode,
+    total: Math.max(0, subtotal + DELIVERY_FEE - discount),
     payment_method: paymentMethod,
     payment_status: "unpaid",
     status: "pending",
@@ -104,6 +129,8 @@ export async function POST(req: Request) {
 
   const { error } = await db.from("furniture_orders").insert(order);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  if (couponCode) await markCouponUsed(couponCode);
 
   return NextResponse.json({ id: order.id, total: order.total }, { status: 201 });
 }
